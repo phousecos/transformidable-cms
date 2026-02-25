@@ -6,7 +6,7 @@ const payload = await getPayload({ config })
 
 // Push schema to create/sync all tables (works in production unlike push config flag).
 // This is safe for a fresh project; once the schema stabilises, replace with proper migrations.
-await pushDevSchema(payload.db)
+await pushDevSchema(payload.db as any)
 
 await payload.db.migrate()
 await payload.destroy()
