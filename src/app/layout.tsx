@@ -1,14 +1,7 @@
 import React from 'react'
 
-export const metadata = {
-  title: 'Transformidable CMS',
-  description: 'Content Management System for the Transformidable Ecosystem',
-}
-
+/* Root layout is a pass-through because Payload's RootLayout
+   (in the (payload) route group) renders its own <html> and <body>. */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  )
+  return children
 }
