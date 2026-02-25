@@ -29,7 +29,13 @@ const connectionString =
       : rawConnectionString + (rawConnectionString.includes('?') ? '&' : '?') + 'sslmode=no-verify'
     : rawConnectionString
 
+const serverURL = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : process.env.NEXT_PUBLIC_SERVER_URL || ''
+
 export default buildConfig({
+  serverURL,
+
   admin: {
     user: Users.slug,
     meta: {
