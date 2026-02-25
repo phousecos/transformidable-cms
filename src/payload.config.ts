@@ -6,14 +6,14 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import sharp from 'sharp'
 
-import { Users } from './collections/Users'
-import { Media } from './collections/Media'
-import { Articles } from './collections/Articles'
-import { PodcastEpisodes } from './collections/PodcastEpisodes'
-import { Authors } from './collections/Authors'
-import { BrandPillars } from './collections/BrandPillars'
-import { Sponsors } from './collections/Sponsors'
-import { NewsletterIssues } from './collections/NewsletterIssues'
+import { Users } from './collections/Users.ts'
+import { Media } from './collections/Media.ts'
+import { Articles } from './collections/Articles.ts'
+import { PodcastEpisodes } from './collections/PodcastEpisodes.ts'
+import { Authors } from './collections/Authors.ts'
+import { BrandPillars } from './collections/BrandPillars.ts'
+import { Sponsors } from './collections/Sponsors.ts'
+import { NewsletterIssues } from './collections/NewsletterIssues.ts'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
