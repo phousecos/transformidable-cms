@@ -2,11 +2,12 @@
 /* DO NOT MODIFY IT BECAUSE IT COULD BE REWRITTEN AT ANY TIME. */
 import type { ServerFunctionClient } from 'payload'
 
+import '@payloadcms/next/css'
 import config from '@payload-config'
 import { handleServerFunctions, RootLayout } from '@payloadcms/next/layouts'
 import React from 'react'
 
-import { importMap } from './admin/importMap'
+import { importMap } from './admin/importMap.js'
 import './custom.scss'
 
 type Args = {
