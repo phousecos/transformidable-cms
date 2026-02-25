@@ -5,7 +5,8 @@
   "description": "Payload CMS v3 instance for the Transformidable content ecosystem",
   "scripts": {
     "dev": "next dev",
-    "build": "payload migrate && next build",
+    "build": "tsx src/migrate.ts && next build",
+    "migrate": "tsx src/migrate.ts",
     "start": "next start",
     "lint": "next lint",
     "generate:types": "payload generate:types",
@@ -30,6 +31,7 @@
     "@types/react-dom": "^19.0.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "15.4.11",
+    "tsx": "^4.0.0",
     "typescript": "^5.7.0"
   },
   "engines": {
