@@ -42,6 +42,7 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL || '',
+      ...(process.env.VERCEL && { ssl: { rejectUnauthorized: false } }),
     },
   }),
 
