@@ -6,7 +6,7 @@
   "description": "Payload CMS v3 instance for the Transformidable content ecosystem",
   "scripts": {
     "dev": "next dev",
-    "build": "tsx src/migrate.ts && next build",
+    "build": "tsx src/migrate.ts && npx payload generate:importmap && next build",
     "migrate": "tsx src/migrate.ts",
     "start": "next start",
     "lint": "next lint",
