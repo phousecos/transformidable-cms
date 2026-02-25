@@ -2,6 +2,7 @@
   "name": "transformidable-cms",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Payload CMS v3 instance for the Transformidable content ecosystem",
   "scripts": {
     "dev": "next dev",
