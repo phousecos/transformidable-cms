@@ -18,6 +18,8 @@ import { NewsletterIssues } from './collections/NewsletterIssues.ts'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL || ''
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -41,8 +43,10 @@ export default buildConfig({
 
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL || '',
-      ...(process.env.VERCEL && { ssl: { rejectUnauthorized: false } }),
+      connectionString,
+      ...(connectionString.includes('sslmode=') && {
+        ssl: { rejectUnauthorized: false },
+      }),
     },
   }),
 
