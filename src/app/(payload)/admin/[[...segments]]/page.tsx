@@ -20,39 +20,7 @@ type Args = {
 export const generateMetadata = ({ params, searchParams }: Args): Promise<Metadata> =>
   generatePageMetadata({ config, params, searchParams })
 
-const Page = async ({ params, searchParams }: Args) => {
-  try {
-    const result = await RootPage({ config, params, searchParams, importMap })
-    return (
-      <>
-        {result}
-        <div data-debug-rootpage="rendered" style={{ display: 'none' }} />
-      </>
-    )
-  } catch (error: unknown) {
-    // Re-throw Next.js internal errors (redirect, notFound)
-    if (
-      error &&
-      typeof error === 'object' &&
-      'digest' in error &&
-      typeof (error as { digest: unknown }).digest === 'string'
-    ) {
-      throw error
-    }
-    const message = error instanceof Error ? error.message : String(error)
-    const stack = error instanceof Error ? error.stack : ''
-    return (
-      <div style={{ padding: '2rem', fontFamily: 'system-ui', color: 'red', background: 'white' }}>
-        <h1>RootPage Error</h1>
-        <pre style={{ whiteSpace: 'pre-wrap', background: '#f5f5f5', padding: '1rem' }}>
-          {message}
-        </pre>
-        <pre style={{ whiteSpace: 'pre-wrap', fontSize: '11px', color: '#666' }}>
-          {stack}
-        </pre>
-      </div>
-    )
-  }
-}
+const Page = ({ params, searchParams }: Args) =>
+  RootPage({ config, importMap, params, searchParams })
 
 export default Page
