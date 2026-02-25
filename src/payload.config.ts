@@ -18,7 +18,16 @@ import { NewsletterIssues } from './collections/NewsletterIssues.ts'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL || ''
+// On Vercel, force sslmode=no-verify so pg accepts Neon's certificate.
+// Setting ssl in the pool config doesn't work because pg's Object.assign
+// overwrites it with the sslmode parsed from the connection string.
+const rawConnectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL || ''
+const connectionString =
+  process.env.VERCEL && rawConnectionString
+    ? rawConnectionString.includes('sslmode=')
+      ? rawConnectionString.replace(/sslmode=[^&]*/, 'sslmode=no-verify')
+      : rawConnectionString + (rawConnectionString.includes('?') ? '&' : '?') + 'sslmode=no-verify'
+    : rawConnectionString
 
 export default buildConfig({
   admin: {
@@ -44,7 +53,6 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString,
-      ...(process.env.VERCEL && { ssl: { rejectUnauthorized: false } }),
     },
   }),
 
