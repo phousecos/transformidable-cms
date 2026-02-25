@@ -54,6 +54,7 @@ export default buildConfig({
     pool: {
       connectionString,
     },
+    push: true,
   }),
 
   secret: process.env.PAYLOAD_SECRET || 'CHANGE-ME-IN-PRODUCTION',
