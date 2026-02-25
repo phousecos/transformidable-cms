@@ -1,5 +1,5 @@
 {
   "framework": "nextjs",
-  "buildCommand": "payload migrate && next build",
+  "buildCommand": "npm run build",
   "outputDirectory": ".next"
 }

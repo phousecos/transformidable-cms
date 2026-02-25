@@ -44,9 +44,7 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString,
-      ...(connectionString.includes('sslmode=') && {
-        ssl: { rejectUnauthorized: false },
-      }),
+      ...(process.env.VERCEL && { ssl: { rejectUnauthorized: false } }),
     },
   }),
 
