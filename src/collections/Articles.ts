@@ -1,5 +1,5 @@
 import type { CollectionConfig, Where } from 'payload'
-import { isAdmin, isAdminOrEditorOrContributor, isAdminOrEditorFieldAccess } from '../access/checkRole'
+import { isAdmin, isAdminOrEditorOrContributor, isAdminOrEditorFieldAccess } from '../access/checkRole.ts'
 
 export const Articles: CollectionConfig = {
   slug: 'articles',

@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isAdmin, isSponsorManagerOrAdmin } from '../access/checkRole'
+import { isAdmin, isSponsorManagerOrAdmin } from '../access/checkRole.ts'
 
 export const Sponsors: CollectionConfig = {
   slug: 'sponsors',

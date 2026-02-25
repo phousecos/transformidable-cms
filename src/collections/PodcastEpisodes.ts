@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isAdmin, isAdminOrEditor } from '../access/checkRole'
+import { isAdmin, isAdminOrEditor } from '../access/checkRole.ts'
 
 export const PodcastEpisodes: CollectionConfig = {
   slug: 'podcast-episodes',

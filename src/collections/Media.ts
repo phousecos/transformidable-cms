@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isAdmin, isAdminOrEditor, isAdminOrEditorOrContributor } from '../access/checkRole'
+import { isAdmin, isAdminOrEditor, isAdminOrEditorOrContributor } from '../access/checkRole.ts'
 
 export const Media: CollectionConfig = {
   slug: 'media',

@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isAdmin } from '../access/checkRole'
+import { isAdmin } from '../access/checkRole.ts'
 
 export const BrandPillars: CollectionConfig = {
   slug: 'brand-pillars',
