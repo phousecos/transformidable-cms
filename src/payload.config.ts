@@ -43,6 +43,11 @@ export default buildConfig({
     },
   },
 
+  localization: {
+    locales: ['en'],
+    defaultLocale: 'en',
+  },
+
   editor: lexicalEditor(),
 
   collections: [
