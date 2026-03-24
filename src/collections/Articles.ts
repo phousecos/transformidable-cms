@@ -10,6 +10,21 @@ export const Articles: CollectionConfig = {
   versions: {
     drafts: true,
   },
+  hooks: {
+    beforeChange: [
+      ({ data }) => {
+        // Keep Payload's _status in sync with the custom editorial status field.
+        // When drafts are enabled, Payload auto-filters by _status — so articles
+        // won't appear in the API unless _status is also 'published'.
+        if (data?.status === 'published') {
+          data._status = 'published'
+        } else if (data?.status) {
+          data._status = 'draft'
+        }
+        return data
+      },
+    ],
+  },
   access: {
     create: isAdminOrEditorOrContributor,
     read: ({ req: { user } }) => {

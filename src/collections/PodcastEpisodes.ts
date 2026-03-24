@@ -10,6 +10,18 @@ export const PodcastEpisodes: CollectionConfig = {
   versions: {
     drafts: true,
   },
+  hooks: {
+    beforeChange: [
+      ({ data }) => {
+        if (data?.status === 'published') {
+          data._status = 'published'
+        } else if (data?.status) {
+          data._status = 'draft'
+        }
+        return data
+      },
+    ],
+  },
   access: {
     create: isAdminOrEditor,
     read: ({ req: { user } }) => {
