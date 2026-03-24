@@ -136,6 +136,19 @@ try {
     }
   }
 
+  // Step 4: Backfill NULL version_body in _articles_v so SET NOT NULL doesn't fail
+  console.log('[migrate] Backfilling NULL version_body in _articles_v...')
+  try {
+    const emptyDoc = JSON.stringify({ root: { type: 'root', children: [], direction: null, format: '', indent: 0, version: 1 } })
+    const backfillRes = await client.query(
+      `UPDATE "_articles_v" SET "version_body" = $1::jsonb WHERE "version_body" IS NULL`,
+      [emptyDoc]
+    )
+    console.log(`[migrate] Backfilled ${backfillRes.rowCount} NULL version_body rows`)
+  } catch (e: any) {
+    console.log(`[migrate] Could not backfill version_body: ${e.message}`)
+  }
+
   console.log('[migrate] Phase 1 complete — enums dropped and data cleaned.')
 } catch (e: any) {
   console.error('[migrate] Phase 1 error:', e.message)
@@ -150,18 +163,6 @@ const { default: config } = await import('./payload.config.ts')
 
 const payload = await getPayload({ config })
 const adapter = payload.db as any
-
-// Backfill NULL version_body in _articles_v so SET NOT NULL doesn't fail
-console.log('[migrate] Backfilling NULL version_body in _articles_v...')
-try {
-  const emptyDoc = JSON.stringify({ root: { type: 'root', children: [], direction: null, format: '', indent: 0, version: 1 } })
-  const res = await adapter.drizzle.execute({
-    sql: `UPDATE "_articles_v" SET "version_body" = '${emptyDoc}'::jsonb WHERE "version_body" IS NULL`,
-  })
-  console.log('[migrate] Backfilled version_body NULLs')
-} catch (e: any) {
-  console.log('[migrate] Could not backfill version_body:', e.message)
-}
 
 console.log('[migrate] Pushing schema to database...')
 const { pushSchema } = adapter.requireDrizzleKit()
