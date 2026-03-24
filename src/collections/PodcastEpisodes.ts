@@ -7,21 +7,7 @@ export const PodcastEpisodes: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'episodeNumber', 'season', 'status', 'publishDate'],
   },
-  versions: {
-    drafts: true,
-  },
-  hooks: {
-    beforeChange: [
-      ({ data }) => {
-        if (data?.status === 'published') {
-          data._status = 'published'
-        } else if (data?.status) {
-          data._status = 'draft'
-        }
-        return data
-      },
-    ],
-  },
+  versions: true,
   access: {
     create: isAdminOrEditor,
     read: ({ req: { user } }) => {
