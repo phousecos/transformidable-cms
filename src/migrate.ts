@@ -2,8 +2,13 @@ import pg from 'pg'
 
 // ── Phase 1: Raw PG connection to diagnose & fix enum mismatches ─────────
 // Payload validates enums on init, so we must fix them before importing config.
-const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL || ''
-const client = new pg.Client({ connectionString, ssl: { rejectUnauthorized: false } })
+// pg's Object.assign overwrites the ssl option with sslmode from the connection
+// string, so we must rewrite the URL directly (same approach as payload.config).
+const rawCS = process.env.POSTGRES_URL || process.env.DATABASE_URL || ''
+const connectionString = rawCS.includes('sslmode=')
+  ? rawCS.replace(/sslmode=[^&]*/, 'sslmode=no-verify')
+  : rawCS + (rawCS.includes('?') ? '&' : '?') + 'sslmode=no-verify'
+const client = new pg.Client({ connectionString })
 await client.connect()
 
 try {
