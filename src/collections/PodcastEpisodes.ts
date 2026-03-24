@@ -6,7 +6,6 @@ export const PodcastEpisodes: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'episodeNumber', 'season', 'status', 'publishDate'],
-    listSearchableFields: ['title', 'description'],
   },
   versions: {
     drafts: true,
