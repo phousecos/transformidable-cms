@@ -1,7 +1,7 @@
 # Transformidable CMS — Project Specifications
 
-**Version:** 1.0.0
-**Last Updated:** 2026-03-04
+**Version:** 1.1.0
+**Last Updated:** 2026-03-24
 **Production URL:** `https://cms.transformidable.media`
 **Media CDN:** `https://assets.transformidable.media`
 
@@ -50,9 +50,10 @@ payload               ^3.14.0   — CMS core
 next                  15.4.11   — Fullstack React framework
 react                 ^19.0.0   — UI library
 sharp                 0.32.6    — Server-side image resizing
-slugify               ^1.6.6    — URL slug generation
 graphql               ^16.8.1   — GraphQL support
 ```
+
+> **Note:** `slugify` is listed in `package.json` but is not imported anywhere. Slug generation uses inline `beforeValidate` hooks with regex transforms (`toLowerCase → replace non-alphanumeric → trim hyphens`).
 
 ---
 
@@ -98,6 +99,7 @@ graphql               ^16.8.1   — GraphQL support
 3. Payload enforces role-based access control on every request
 4. Media uploads route through Vercel Blob Storage in production; local filesystem in dev
 5. Database schema is auto-pushed via Drizzle on every build (no manual migrations)
+6. Localization is configured with a single locale (`en`) — prepared for future multi-language support
 
 ---
 
@@ -114,10 +116,10 @@ Administrative accounts for the CMS. Each user has a single role that governs wh
 | `email`              | email (auth) | Unique, used for login                 |
 | `firstName`          | text         | Optional                               |
 | `lastName`           | text         | Optional                               |
-| `role`               | select       | `admin` · `editor` · `brandContributor` · `sponsorManager` |
-| `assignedBrandPillar`| relationship | → Brand Pillars. Shown only for Brand Contributors |
+| `role`               | select       | Required, defaults to `brandContributor`. Options: `admin` · `editor` · `brandContributor` · `sponsorManager` |
+| `assignedBrandPillar`| relationship | → Brand Pillars. Conditionally shown only when role = `brandContributor` |
 
-**Access:** Only admins can create/delete users. Users can update their own profile (but not their role).
+**Access:** Only admins can create/delete users. Users can update their own profile. The `role` field has field-level access — only admins can change it.
 
 ---
 
@@ -144,6 +146,12 @@ Handles image, audio, and PDF uploads with automatic image resizing.
 
 **Storage:** Vercel Blob in production (requires `BLOB_READ_WRITE_TOKEN`), local filesystem in dev.
 
+**Access:**
+- Create: Admins, Editors, and Brand Contributors
+- Read: Public (everyone)
+- Update: Admins and Editors only
+- Delete: Admins only
+
 ---
 
 ### 4.3 Articles
@@ -155,7 +163,7 @@ Primary editorial content with multi-brand syndication.
 | Field            | Type         | Notes                                        |
 | ---------------- | ------------ | -------------------------------------------- |
 | `title`          | text         | Required                                     |
-| `slug`           | text         | Unique, auto-generated from title            |
+| `slug`           | text         | Required, unique. Auto-generated from title via `beforeValidate` hook (inline regex) |
 | `body`           | richText     | Required — Lexical editor                    |
 | `excerpt`        | textarea     | 2-3 sentence summary for cards               |
 | `author`         | relationship | → Authors (required)                         |
@@ -185,7 +193,7 @@ Primary editorial content with multi-brand syndication.
 | Field            | Type         | Notes                                        |
 | ---------------- | ------------ | -------------------------------------------- |
 | `title`          | text         | Required                                     |
-| `slug`           | text         | Unique, auto-generated from title            |
+| `slug`           | text         | Required, unique. Auto-generated from title via `beforeValidate` hook (inline regex) |
 | `episodeNumber`  | number       | Required                                     |
 | `season`         | number       | Required, defaults to 1                      |
 | `description`    | textarea     | Show notes summary                           |
@@ -199,7 +207,13 @@ Primary editorial content with multi-brand syndication.
 | `syndicateTo`    | select       | Same 5 brand domains as Articles             |
 | `status`         | select       | `draft` → `review` → `scheduled` → `published` |
 
-**Access:** Admins & Editors have full access. Unauthenticated users see only published episodes.
+**Access:**
+- Create: Admins and Editors only (Brand Contributors cannot create episodes)
+- Read: Admins & Editors see all; unauthenticated users see only published episodes
+- Update: Admins and Editors only
+- Delete: Admins only
+
+> **Note:** Unlike Articles, the `status` field on Podcast Episodes does not have explicit field-level access control. This is functionally equivalent since only admins and editors have update access to episodes.
 
 ---
 
@@ -221,6 +235,12 @@ Author profiles linked to articles and podcast episodes.
 | `isActive`        | checkbox     | Defaults to true                             |
 
 **Social link platforms:** LinkedIn, Twitter/X, Website, Instagram, Other
+
+**Access:**
+- Create: Admins and Editors
+- Read: Public (everyone)
+- Update: Admins and Editors
+- Delete: Admins only
 
 ---
 
@@ -252,7 +272,7 @@ Campaign and ad-creative management for monetization.
 | `brandName`         | text         | Required                                    |
 | `logo`              | upload       | → Media                                     |
 | `adCreative`        | array        | Each entry: `label` + `asset` (upload) + `format` (`image`/`audio`/`html`) |
-| `placementType`     | select       | Multi-select: `podcastMidRoll` · `articleSidebar` · `newsletter` |
+| `placementType`     | select       | Required. Multi-select: `podcastMidRoll` · `articleSidebar` · `newsletter` |
 | `campaignStartDate` | date         | Required                                    |
 | `campaignEndDate`   | date         | Required                                    |
 | `linkUrl`           | text         | Required — click destination                |
@@ -294,6 +314,7 @@ The system uses four roles with hierarchical permissions:
 | Full content CRUD             |  ✓    |   ✓    |                   |                 |
 | Change article/episode status |  ✓    |   ✓    |                   |                 |
 | Create articles & media       |  ✓    |   ✓    |        ✓          |                 |
+| Create podcast episodes       |  ✓    |   ✓    |                   |                 |
 | Edit own-pillar articles      |  ✓    |   ✓    |        ✓          |                 |
 | Manage sponsors               |  ✓    |        |                   |        ✓        |
 | Read own profile              |  ✓    |   ✓    |        ✓          |        ✓        |
@@ -380,10 +401,13 @@ transformidable-cms/
 │   │   │   ├── admin/             # Payload admin UI (auto-generated routes)
 │   │   │   ├── api/[...slug]/     # REST + GraphQL API endpoint
 │   │   │   ├── layout.tsx         # Admin layout
+│   │   │   ├── page.tsx           # Root Payload page
 │   │   │   └── custom.scss        # Admin CSS overrides
 │   │   ├── (diagnostic)/
+│   │   │   ├── layout.tsx         # Diagnostic layout
 │   │   │   ├── health/route.ts    # Health check
-│   │   │   └── api/diag/route.ts  # Diagnostic endpoint
+│   │   │   ├── api/diag/route.ts  # Diagnostic endpoint
+│   │   │   └── test/page.tsx      # Test page
 │   │   └── global-error.tsx       # Global error boundary
 │   ├── collections/
 │   │   ├── Articles.ts
@@ -433,6 +457,7 @@ transformidable-cms/
 | `npm start`             | Start production server                                        |
 | `npm run lint`          | Run ESLint                                                     |
 | `npm run generate:types`| Regenerate `payload-types.ts` from collection configs          |
+| `npm run generate:importmap`| Regenerate Payload admin UI import map                   |
 
 ### Build Pipeline
 
@@ -464,6 +489,8 @@ The project uses **schema push** (`push: true` in the Postgres adapter config) r
 - **No migration rollbacks.** Schema push mode means changes are applied forward-only. If a schema change breaks something, it must be fixed manually.
 - **Audio hosting is external.** Podcast episodes store an `audioUrl` string rather than uploading audio directly. The actual audio hosting is managed outside this system.
 - **No frontend rendering.** The CMS is purely an admin + API backend. Brand sites consume the API but are separate projects.
+- **Unused dependency.** `slugify` is listed in `package.json` but is not imported anywhere. Slug generation is handled by inline `beforeValidate` hooks.
+- **Podcast Episodes status field lacks field-level access control.** Unlike Articles, the `status` field on Podcast Episodes has no explicit field-level restriction. This is functionally equivalent since only admins/editors have collection-level update access, but it is an asymmetry worth noting.
 
 ### Recommended Next Steps
 
@@ -473,7 +500,7 @@ The project uses **schema push** (`push: true` in the Postgres adapter config) r
 - **Implement API rate limiting** for public-facing endpoints
 - **Add content preview URLs** so editors can preview articles on brand sites before publishing
 - **Consider migration files** for production schema changes once the schema stabilizes
-- **Add slug uniqueness validation** with user-friendly error messages
+- ~~**Add slug uniqueness validation**~~ — slug fields now have `unique: true` enforced at the database level; user-friendly error messages for uniqueness conflicts could still be improved
 - **Implement content versioning UI** — drafts are enabled but version comparison isn't customized
 
 ---
@@ -500,3 +527,25 @@ npm run dev
 ```
 
 **Prerequisites:** Node.js 22.x, PostgreSQL (local or remote)
+
+---
+
+## 14. Changelog
+
+### v1.1.0 — 2026-03-24
+
+Spec audit against actual implementation. Changes:
+
+- **Users.role**: Documented as `required` with `defaultValue: 'brandContributor'`; clarified field-level access (admin-only)
+- **Media**: Added explicit access control documentation (create: admin/editor/contributor, read: public, update: admin/editor, delete: admin)
+- **Authors**: Added explicit access control documentation (create/update: admin/editor, read: public, delete: admin)
+- **Articles & Podcast Episodes slug fields**: Clarified as `required` with `unique: true` and inline `beforeValidate` regex hooks
+- **Podcast Episodes access**: Documented that Brand Contributors cannot create episodes; noted missing field-level access on `status`
+- **Sponsors.placementType**: Documented as `required`
+- **RBAC table**: Added row clarifying Brand Contributors cannot create podcast episodes
+- **Project structure**: Added missing files (`(payload)/page.tsx`, `(diagnostic)/layout.tsx`, `(diagnostic)/test/page.tsx`)
+- **Build scripts**: Added `generate:importmap` script
+- **Localization**: Documented `en`-only locale configuration
+- **Key Dependencies**: Removed `slugify` from key dependencies list; added note about unused dependency
+- **Known Limitations**: Added notes about unused `slugify` dependency and podcast status field asymmetry
+- **Slug uniqueness**: Marked as completed (was listed as future work; `unique: true` is already enforced)
