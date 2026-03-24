@@ -124,12 +124,12 @@ export const Articles: CollectionConfig = {
       type: 'select',
       hasMany: true,
       options: [
-        { label: 'jerribland.com', value: 'jerribland' },
-        { label: 'unlimitedpowerhouse.com', value: 'unlimitedpowerhouse' },
-        { label: 'agentpmo.com', value: 'agentpmo' },
-        { label: 'prept.com', value: 'prept' },
-        { label: 'lumynr.com', value: 'lumynr' },
-        { label: 'vettersgroup.com', value: 'vettersgroup' },
+        { label: 'Jerri Bland', value: 'jerribland' },
+        { label: 'UnlimITed Powerhouse', value: 'unlimitedpowerhouse' },
+        { label: 'AgentPMO', value: 'agentpmo' },
+        { label: 'Prept', value: 'prept' },
+        { label: 'Lumynr', value: 'lumynr' },
+        { label: 'Vetters Group', value: 'vettersgroup' },
       ],
       admin: {
         description: 'Which brand properties may republish this article',
