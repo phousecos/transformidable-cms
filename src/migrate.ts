@@ -140,13 +140,7 @@ try {
   console.log('[migrate] Backfilling NULL required columns in versioned tables...')
   const emptyDoc = JSON.stringify({ root: { type: 'root', children: [], direction: null, format: '', indent: 0, version: 1 } })
 
-  // Get a default author ID to use for backfilling
-  let defaultAuthorId: number | null = null
-  try {
-    const authorRes = await client.query(`SELECT id FROM "authors" LIMIT 1`)
-    if (authorRes.rows.length > 0) defaultAuthorId = authorRes.rows[0].id
-  } catch (_) {}
-
+  // For simple text/number fields, backfill with defaults
   const backfills: Array<{ table: string; column: string; value: string; params?: any[] }> = [
     // _articles_v required fields
     { table: '_articles_v', column: 'version_body', value: '$1::jsonb', params: [emptyDoc] },
@@ -161,10 +155,6 @@ try {
     { table: '_podcast_episodes_v', column: 'version_status', value: `'draft'`, params: [] },
   ]
 
-  if (defaultAuthorId !== null) {
-    backfills.push({ table: '_articles_v', column: 'version_author_id', value: `$1`, params: [defaultAuthorId] })
-  }
-
   for (const { table, column, value, params } of backfills) {
     try {
       const res = await client.query(
@@ -178,6 +168,26 @@ try {
       // Column may not exist yet — that's fine
       if (!e.message.includes('does not exist')) {
         console.log(`  Could not backfill ${table}.${column}: ${e.message}`)
+      }
+    }
+  }
+
+  // For FK columns (version_author_id etc.), we can't safely fabricate IDs.
+  // Delete incomplete version rows that would block SET NOT NULL on FK columns.
+  const fkCleanups: Array<{ table: string; column: string }> = [
+    { table: '_articles_v', column: 'version_author_id' },
+  ]
+  for (const { table, column } of fkCleanups) {
+    try {
+      const res = await client.query(
+        `DELETE FROM "${table}" WHERE "${column}" IS NULL`
+      )
+      if (res.rowCount && res.rowCount > 0) {
+        console.log(`  Deleted ${res.rowCount} version rows from ${table} with NULL ${column}`)
+      }
+    } catch (e: any) {
+      if (!e.message.includes('does not exist')) {
+        console.log(`  Could not clean ${table}.${column}: ${e.message}`)
       }
     }
   }
