@@ -1,14 +1,39 @@
 import pg from 'pg'
 
 // ── Phase 1: Raw PG connection to diagnose & fix enum mismatches ─────────
-// Payload validates enum types on init (even with push:false), so we must
-// ensure DB enums match the code BEFORE Payload boots.
+// When pushSchema() recreates enum types and casts TEXT columns back,
+// any row with a value not in the new enum causes error 22P02 (enum_in).
+// We must convert columns to TEXT, clean up stale values, then drop the types.
 const rawCS = process.env.POSTGRES_URL || process.env.DATABASE_URL || ''
 const connectionString = rawCS.includes('sslmode=')
   ? rawCS.replace(/sslmode=[^&]*/, 'sslmode=no-verify')
   : rawCS + (rawCS.includes('?') ? '&' : '?') + 'sslmode=no-verify'
 const client = new pg.Client({ connectionString })
 await client.connect()
+
+// Map of enum type name → valid values (must match the code in src/collections/)
+const expectedEnumValues: Record<string, string[]> = {
+  enum_articles_syndicate_to: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'],
+  enum_podcast_episodes_syndicate_to: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'],
+  enum_articles_status: ['draft', 'review', 'scheduled', 'published'],
+  enum_podcast_episodes_status: ['draft', 'review', 'scheduled', 'published'],
+  enum_newsletter_issues_status: ['draft', 'scheduled', 'sent'],
+  enum_users_role: ['admin', 'editor', 'brandContributor', 'sponsorManager'],
+  enum_authors_type: ['staff', 'guestContributor', 'podcastGuest'],
+  enum_authors_social_links_platform: ['linkedin', 'twitter', 'website', 'instagram', 'other'],
+  enum_sponsors_ad_creative_format: ['image', 'audio', 'html'],
+  enum_sponsors_placement_type: ['podcastMidRoll', 'articleSidebar', 'newsletter'],
+}
+
+// Known value renames (old DB value → new code value)
+const valueRenames: Record<string, string> = {
+  'jerribland.com': 'jerribland',
+  'unlimitedpowerhouse.com': 'unlimitedpowerhouse',
+  'agentpmo.com': 'agentpmo',
+  'prept.com': 'prept',
+  'lumynr.com': 'lumynr',
+  'vettersgroup.com': 'vettersgroup',
+}
 
 try {
   // Dump all enum types and values for diagnostics
@@ -23,9 +48,7 @@ try {
     console.log(`  ${row.enum_name}: ${row.enum_value}`)
   }
 
-  // Convert all enum columns to TEXT, drop the enum types, then recreate
-  // them with the correct values. This is the nuclear option but avoids
-  // any mismatch between DB state and code definitions.
+  // Find all columns that use enum types
   const { rows: enumCols } = await client.query(`
     SELECT c.table_name, c.column_name, t.typname AS enum_name
     FROM information_schema.columns c
@@ -43,14 +66,13 @@ try {
     enumUsages.set(col.enum_name, usages)
   }
 
-  // Get unique enum type names from the DB
   const enumTypes = [...new Set(enumRows.map((r: any) => r.enum_name))]
 
   for (const enumName of enumTypes) {
     console.log(`[migrate] Resetting enum type: ${enumName}`)
     const usages = enumUsages.get(enumName) || []
 
-    // Step 1: Convert columns using this enum to TEXT
+    // Step 1: Convert columns to TEXT
     for (const { table, column } of usages) {
       await client.query(
         `ALTER TABLE "${table}" ALTER COLUMN "${column}" TYPE TEXT USING "${column}"::TEXT`
@@ -58,17 +80,44 @@ try {
       console.log(`  Converted ${table}.${column} to TEXT`)
     }
 
-    // Step 2: Drop the enum type (CASCADE handles views, defaults, etc.)
+    // Step 2: Drop the enum type
     await client.query(`DROP TYPE IF EXISTS "${enumName}" CASCADE`)
     console.log(`  Dropped enum ${enumName}`)
+
+    // Step 3: Fix data — rename old values and null out anything invalid
+    const validValues = expectedEnumValues[enumName]
+    if (validValues) {
+      for (const { table, column } of usages) {
+        // Apply known renames
+        for (const [oldVal, newVal] of Object.entries(valueRenames)) {
+          const res = await client.query(
+            `UPDATE "${table}" SET "${column}" = $1 WHERE "${column}" = $2`,
+            [newVal, oldVal]
+          )
+          if (res.rowCount && res.rowCount > 0) {
+            console.log(`  Updated ${table}.${column}: '${oldVal}' → '${newVal}' (${res.rowCount} rows)`)
+          }
+        }
+        // Null out any remaining values that aren't in the valid set
+        const res = await client.query(
+          `UPDATE "${table}" SET "${column}" = NULL WHERE "${column}" IS NOT NULL AND "${column}" != ALL($1)`,
+          [validValues]
+        )
+        if (res.rowCount && res.rowCount > 0) {
+          console.log(`  Nulled ${res.rowCount} invalid values in ${table}.${column}`)
+        }
+      }
+    } else {
+      // For version tables or other enums we don't have a map for,
+      // find the base enum name and use those values
+      console.log(`  No expected values mapped for ${enumName} — skipping data cleanup`)
+    }
   }
 
-  // The enum types will be recreated by Payload's schema push (Phase 2)
-  // and the TEXT columns will be cast back to the new enum types.
-  console.log('[migrate] All enum types dropped. Payload will recreate them.')
+  console.log('[migrate] Phase 1 complete — all enums dropped and data cleaned.')
 } catch (e: any) {
   console.error('[migrate] Phase 1 error:', e.message)
-  // Don't throw — let Payload try to init anyway
+  console.error(e)
 } finally {
   await client.end()
 }
@@ -101,8 +150,6 @@ console.log('[migrate] Statements to apply:', JSON.stringify(statements, null, 2
 await apply()
 console.log('[migrate] Schema push complete.')
 
-// Run any pending migration files
 await payload.db.migrate()
-
 await payload.destroy()
 process.exit(0)
