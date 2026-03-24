@@ -173,22 +173,5 @@ await apply()
 console.log('[migrate] Schema push complete.')
 
 await payload.db.migrate()
-
-// ── Phase 3: Sync _status with custom status field ──────────────────────
-// With versions.drafts enabled, Payload auto-filters by _status. Articles
-// where status='published' but _status='draft' won't appear in API results.
-// Sync them so published articles are actually visible.
-console.log('[migrate] Syncing _status with editorial status...')
-for (const collection of ['articles', 'podcast_episodes']) {
-  try {
-    const res = await adapter.drizzle.execute({
-      sql: `UPDATE "${collection}" SET "_status" = 'published' WHERE "status" = 'published' AND ("_status" IS NULL OR "_status" != 'published')`,
-    })
-    console.log(`[migrate] Synced _status for ${collection}`)
-  } catch (e: any) {
-    console.log(`[migrate] Could not sync ${collection}._status: ${e.message}`)
-  }
-}
-
 await payload.destroy()
 process.exit(0)
