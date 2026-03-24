@@ -1,6 +1,6 @@
 # Transformidable CMS — Project Specifications
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Last Updated:** 2026-03-24
 **Production URL:** `https://cms.transformidable.media`
 **Media CDN:** `https://assets.transformidable.media`
@@ -11,7 +11,7 @@
 
 Transformidable CMS is a headless content management system built on **Payload CMS v3**. It serves as the central content hub for the Transformidable media ecosystem — a network of brand properties spanning personal branding, coaching, project management, interview prep, and membership content.
 
-The CMS manages articles, podcast episodes, newsletters, authors, sponsors, and multi-brand syndication from a single admin interface. Each piece of content can be tagged with **Brand Pillars** and syndicated across any combination of five brand domains.
+The CMS manages articles, podcast episodes, newsletters, authors, sponsors, and multi-brand syndication from a single admin interface. Each piece of content can be tagged with **Brand Pillars** and syndicated across any combination of six brand domains.
 
 ### Brand Properties
 
@@ -22,6 +22,7 @@ The CMS manages articles, podcast episodes, newsletters, authors, sponsors, and 
 | `agentpmo.com`              | Project management content   |
 | `prept.com`                 | Interview preparation        |
 | `lumynr.com`                | Membership-exclusive content |
+| `vettersgroup.com`          | HR & Compliance content      |
 
 ---
 
@@ -170,7 +171,8 @@ Primary editorial content with multi-brand syndication.
 | `publishDate`    | date         | Day + time picker                            |
 | `featuredImage`  | upload       | → Media                                      |
 | `brandPillars`   | relationship | → Brand Pillars (many)                       |
-| `syndicateTo`    | select       | Multi-select: `jerribland` · `unlimitedpowerhouse` · `agentpmo` · `prept` · `lumynr` |
+| `syndicateTo`    | select       | Multi-select: `jerribland` · `unlimitedpowerhouse` · `agentpmo` · `prept` · `lumynr` · `vettersgroup` |
+| `cycleNumber`    | number       | Content cycle number for editorial planning  |
 | `status`         | select       | `draft` → `review` → `scheduled` → `published` |
 | `seoTitle`       | text         | Override for `<title>` tag                   |
 | `seoDescription` | textarea     | Override for meta description                |
@@ -204,7 +206,7 @@ Primary editorial content with multi-brand syndication.
 | `publishDate`    | date         | Day + time picker                            |
 | `featuredImage`  | upload       | → Media (episode artwork)                    |
 | `brandPillars`   | relationship | → Brand Pillars (many)                       |
-| `syndicateTo`    | select       | Same 5 brand domains as Articles             |
+| `syndicateTo`    | select       | Same 6 brand domains as Articles             |
 | `status`         | select       | `draft` → `review` → `scheduled` → `published` |
 
 **Access:**
@@ -531,6 +533,12 @@ npm run dev
 ---
 
 ## 14. Changelog
+
+### v1.2.0 — 2026-03-24
+
+- **New brand property**: Added `vettersgroup.com` (HR & Compliance) to brand properties and `syndicateTo` options in Articles and Podcast Episodes
+- **New field**: Added `cycleNumber` (number) to Articles for editorial planning
+- **Data entry required**: Create a "Vetters Group" Brand Pillar in the admin panel with `mappedDomain: vettersgroup.com` and `contentFocus: HR & Compliance`
 
 ### v1.1.0 — 2026-03-24
 

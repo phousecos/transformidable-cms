@@ -133,6 +133,7 @@ export const PodcastEpisodes: CollectionConfig = {
         { label: 'agentpmo.com', value: 'agentpmo' },
         { label: 'prept.com', value: 'prept' },
         { label: 'lumynr.com', value: 'lumynr' },
+        { label: 'vettersgroup.com', value: 'vettersgroup' },
       ],
       admin: {
         description: 'Which brand properties may republish this episode',
