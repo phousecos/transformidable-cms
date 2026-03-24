@@ -1,29 +1,64 @@
-import { getPayload } from 'payload'
-import config from './payload.config.ts'
+import pg from 'pg'
 
-const payload = await getPayload({ config })
-const adapter = payload.db as any
+// ── Phase 1: Raw PG connection to diagnose & fix enum mismatches ─────────
+// Payload validates enums on init, so we must fix them before importing config.
+const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL || ''
+const client = new pg.Client({ connectionString, ssl: { rejectUnauthorized: false } })
+await client.connect()
 
-// Push schema to create/sync all tables directly via Drizzle Kit.
-// pushDevSchema() has a cache + interactive prompts that break in CI,
-// so we call pushSchema() ourselves and force-apply.
-// Log existing enum types and their values for debugging
 try {
-  const { sql } = await import('drizzle-orm')
-  const enumInfo = await adapter.drizzle.execute(sql.raw(`
+  // Dump all enum types and values for diagnostics
+  const { rows } = await client.query(`
     SELECT t.typname AS enum_name, e.enumlabel AS enum_value
     FROM pg_type t
     JOIN pg_enum e ON t.oid = e.enumtypid
     ORDER BY t.typname, e.enumsortorder
-  `))
-  console.log('[migrate] Current DB enums:', JSON.stringify(enumInfo.rows ?? enumInfo, null, 2))
-} catch (e: any) {
-  console.log('[migrate] Could not read enums:', e.message)
+  `)
+  console.log('[migrate] Current DB enums:')
+  for (const row of rows) {
+    console.log(`  ${row.enum_name}: ${row.enum_value}`)
+  }
+
+  // If the DB has .com values but our code expects non-.com values, rename them
+  const syndicateEnumTypes = [
+    'enum_articles_syndicate_to',
+    'enum_podcast_episodes_syndicate_to',
+  ]
+  const renames = [
+    ['jerribland.com', 'jerribland'],
+    ['unlimitedpowerhouse.com', 'unlimitedpowerhouse'],
+    ['agentpmo.com', 'agentpmo'],
+    ['prept.com', 'prept'],
+    ['lumynr.com', 'lumynr'],
+    ['vettersgroup.com', 'vettersgroup'],
+  ]
+  for (const enumType of syndicateEnumTypes) {
+    for (const [oldVal, newVal] of renames) {
+      try {
+        await client.query(`ALTER TYPE "${enumType}" RENAME VALUE '${oldVal}' TO '${newVal}'`)
+        console.log(`[migrate] Renamed ${enumType}: ${oldVal} → ${newVal}`)
+      } catch (e: any) {
+        // Ignore if the value doesn't exist or is already correct
+        if (e.code !== '42704' && !e.message?.includes('does not exist')) {
+          console.log(`[migrate] Rename warning for ${enumType} ${oldVal}: ${e.message}`)
+        }
+      }
+    }
+  }
+} finally {
+  await client.end()
 }
+
+// ── Phase 2: Normal Payload init + schema push ───────────────────────────
+const { getPayload } = await import('payload')
+const { default: config } = await import('./payload.config.ts')
+
+const payload = await getPayload({ config })
+const adapter = payload.db as any
 
 console.log('[migrate] Pushing schema to database...')
 const { pushSchema } = adapter.requireDrizzleKit()
-const { apply, hasDataLoss, warnings, statements } = await pushSchema(
+const { apply, hasDataLoss, warnings } = await pushSchema(
   adapter.schema,
   adapter.drizzle,
   adapter.schemaName ? [adapter.schemaName] : undefined,
@@ -37,9 +72,6 @@ if (warnings.length) {
     console.log('[migrate] DATA LOSS WARNING — proceeding anyway (CI)')
   }
 }
-
-// Log the SQL statements drizzle-kit will execute
-console.log('[migrate] Statements to apply:', JSON.stringify(statements, null, 2))
 
 await apply()
 console.log('[migrate] Schema push complete.')
