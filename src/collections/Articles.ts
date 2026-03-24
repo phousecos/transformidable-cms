@@ -6,7 +6,6 @@ export const Articles: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'author', 'status', 'publishDate'],
-    listSearchableFields: ['title', 'excerpt'],
   },
   versions: {
     drafts: true,
