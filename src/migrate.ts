@@ -136,58 +136,21 @@ try {
     }
   }
 
-  // Step 4: Backfill NULL required columns in versioned tables so SET NOT NULL doesn't fail
-  console.log('[migrate] Backfilling NULL required columns in versioned tables...')
-  const emptyDoc = JSON.stringify({ root: { type: 'root', children: [], direction: null, format: '', indent: 0, version: 1 } })
-
-  // For simple text/number fields, backfill with defaults
-  const backfills: Array<{ table: string; column: string; value: string; params?: any[] }> = [
-    // _articles_v required fields
-    { table: '_articles_v', column: 'version_body', value: '$1::jsonb', params: [emptyDoc] },
-    { table: '_articles_v', column: 'version_title', value: `'(untitled)'`, params: [] },
-    { table: '_articles_v', column: 'version_slug', value: `'untitled-' || id`, params: [] },
-    { table: '_articles_v', column: 'version_status', value: `'draft'`, params: [] },
-    // _podcast_episodes_v required fields
-    { table: '_podcast_episodes_v', column: 'version_title', value: `'(untitled)'`, params: [] },
-    { table: '_podcast_episodes_v', column: 'version_slug', value: `'untitled-' || id`, params: [] },
-    { table: '_podcast_episodes_v', column: 'version_episode_number', value: `0`, params: [] },
-    { table: '_podcast_episodes_v', column: 'version_season', value: `1`, params: [] },
-    { table: '_podcast_episodes_v', column: 'version_status', value: `'draft'`, params: [] },
-  ]
-
-  for (const { table, column, value, params } of backfills) {
+  // Step 4: Truncate version history tables to avoid SET NOT NULL failures
+  // during schema push. These tables only store historical snapshots — the
+  // actual articles/episodes in the main tables are unaffected.
+  // This is far more robust than trying to backfill every possible NULL column.
+  const versionTables = ['_articles_v', '_podcast_episodes_v']
+  for (const vt of versionTables) {
     try {
-      const res = await client.query(
-        `UPDATE "${table}" SET "${column}" = ${value} WHERE "${column}" IS NULL`,
-        params ?? []
-      )
-      if (res.rowCount && res.rowCount > 0) {
-        console.log(`  Backfilled ${res.rowCount} NULL ${table}.${column} rows`)
-      }
-    } catch (e: any) {
-      // Column may not exist yet — that's fine
-      if (!e.message.includes('does not exist')) {
-        console.log(`  Could not backfill ${table}.${column}: ${e.message}`)
-      }
-    }
-  }
-
-  // For FK columns (version_author_id etc.), we can't safely fabricate IDs.
-  // Delete incomplete version rows that would block SET NOT NULL on FK columns.
-  const fkCleanups: Array<{ table: string; column: string }> = [
-    { table: '_articles_v', column: 'version_author_id' },
-  ]
-  for (const { table, column } of fkCleanups) {
-    try {
-      const res = await client.query(
-        `DELETE FROM "${table}" WHERE "${column}" IS NULL`
-      )
-      if (res.rowCount && res.rowCount > 0) {
-        console.log(`  Deleted ${res.rowCount} version rows from ${table} with NULL ${column}`)
-      }
+      // Also truncate associated junction tables first (FK constraints)
+      const junctionTable = `${vt}_version_syndicate_to`
+      await client.query(`TRUNCATE TABLE "${junctionTable}" CASCADE`).catch(() => {})
+      const res = await client.query(`TRUNCATE TABLE "${vt}" CASCADE`)
+      console.log(`  Truncated ${vt} (version history cleared)`)
     } catch (e: any) {
       if (!e.message.includes('does not exist')) {
-        console.log(`  Could not clean ${table}.${column}: ${e.message}`)
+        console.log(`  Could not truncate ${vt}: ${e.message}`)
       }
     }
   }
