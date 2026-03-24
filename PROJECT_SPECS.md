@@ -171,7 +171,7 @@ Primary editorial content with multi-brand syndication.
 | `publishDate`    | date         | Day + time picker                            |
 | `featuredImage`  | upload       | → Media                                      |
 | `brandPillars`   | relationship | → Brand Pillars (many)                       |
-| `syndicateTo`    | select       | Multi-select: `jerribland.com` · `unlimitedpowerhouse.com` · `agentpmo.com` · `prept.com` · `lumynr.com` · `vettersgroup.com` |
+| `syndicateTo`    | select       | Multi-select: `jerribland` · `unlimitedpowerhouse` · `agentpmo` · `prept` · `lumynr` · `vettersgroup` |
 | `cycleNumber`    | number       | Content cycle number for editorial planning  |
 | `status`         | select       | `draft` → `review` → `scheduled` → `published` |
 | `seoTitle`       | text         | Override for `<title>` tag                   |
