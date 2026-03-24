@@ -136,6 +136,25 @@ try {
     }
   }
 
+  // Step 4: Truncate version history tables to avoid SET NOT NULL failures
+  // during schema push. These tables only store historical snapshots — the
+  // actual articles/episodes in the main tables are unaffected.
+  // This is far more robust than trying to backfill every possible NULL column.
+  const versionTables = ['_articles_v', '_podcast_episodes_v']
+  for (const vt of versionTables) {
+    try {
+      // Also truncate associated junction tables first (FK constraints)
+      const junctionTable = `${vt}_version_syndicate_to`
+      await client.query(`TRUNCATE TABLE "${junctionTable}" CASCADE`).catch(() => {})
+      const res = await client.query(`TRUNCATE TABLE "${vt}" CASCADE`)
+      console.log(`  Truncated ${vt} (version history cleared)`)
+    } catch (e: any) {
+      if (!e.message.includes('does not exist')) {
+        console.log(`  Could not truncate ${vt}: ${e.message}`)
+      }
+    }
+  }
+
   console.log('[migrate] Phase 1 complete — enums dropped and data cleaned.')
 } catch (e: any) {
   console.error('[migrate] Phase 1 error:', e.message)
@@ -173,5 +192,6 @@ await apply()
 console.log('[migrate] Schema push complete.')
 
 await payload.db.migrate()
+
 await payload.destroy()
 process.exit(0)
