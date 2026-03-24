@@ -136,6 +136,52 @@ try {
     }
   }
 
+  // Step 4: Backfill NULL required columns in versioned tables so SET NOT NULL doesn't fail
+  console.log('[migrate] Backfilling NULL required columns in versioned tables...')
+  const emptyDoc = JSON.stringify({ root: { type: 'root', children: [], direction: null, format: '', indent: 0, version: 1 } })
+
+  // Get a default author ID to use for backfilling
+  let defaultAuthorId: number | null = null
+  try {
+    const authorRes = await client.query(`SELECT id FROM "authors" LIMIT 1`)
+    if (authorRes.rows.length > 0) defaultAuthorId = authorRes.rows[0].id
+  } catch (_) {}
+
+  const backfills: Array<{ table: string; column: string; value: string; params?: any[] }> = [
+    // _articles_v required fields
+    { table: '_articles_v', column: 'version_body', value: '$1::jsonb', params: [emptyDoc] },
+    { table: '_articles_v', column: 'version_title', value: `'(untitled)'`, params: [] },
+    { table: '_articles_v', column: 'version_slug', value: `'untitled-' || id`, params: [] },
+    { table: '_articles_v', column: 'version_status', value: `'draft'`, params: [] },
+    // _podcast_episodes_v required fields
+    { table: '_podcast_episodes_v', column: 'version_title', value: `'(untitled)'`, params: [] },
+    { table: '_podcast_episodes_v', column: 'version_slug', value: `'untitled-' || id`, params: [] },
+    { table: '_podcast_episodes_v', column: 'version_episode_number', value: `0`, params: [] },
+    { table: '_podcast_episodes_v', column: 'version_season', value: `1`, params: [] },
+    { table: '_podcast_episodes_v', column: 'version_status', value: `'draft'`, params: [] },
+  ]
+
+  if (defaultAuthorId !== null) {
+    backfills.push({ table: '_articles_v', column: 'version_author_id', value: `$1`, params: [defaultAuthorId] })
+  }
+
+  for (const { table, column, value, params } of backfills) {
+    try {
+      const res = await client.query(
+        `UPDATE "${table}" SET "${column}" = ${value} WHERE "${column}" IS NULL`,
+        params ?? []
+      )
+      if (res.rowCount && res.rowCount > 0) {
+        console.log(`  Backfilled ${res.rowCount} NULL ${table}.${column} rows`)
+      }
+    } catch (e: any) {
+      // Column may not exist yet — that's fine
+      if (!e.message.includes('does not exist')) {
+        console.log(`  Could not backfill ${table}.${column}: ${e.message}`)
+      }
+    }
+  }
+
   console.log('[migrate] Phase 1 complete — enums dropped and data cleaned.')
 } catch (e: any) {
   console.error('[migrate] Phase 1 error:', e.message)
@@ -150,18 +196,6 @@ const { default: config } = await import('./payload.config.ts')
 
 const payload = await getPayload({ config })
 const adapter = payload.db as any
-
-// Backfill NULL version_body in _articles_v so SET NOT NULL doesn't fail
-console.log('[migrate] Backfilling NULL version_body in _articles_v...')
-try {
-  const emptyDoc = JSON.stringify({ root: { type: 'root', children: [], direction: null, format: '', indent: 0, version: 1 } })
-  const res = await adapter.drizzle.execute({
-    sql: `UPDATE "_articles_v" SET "version_body" = '${emptyDoc}'::jsonb WHERE "version_body" IS NULL`,
-  })
-  console.log('[migrate] Backfilled version_body NULLs')
-} catch (e: any) {
-  console.log('[migrate] Could not backfill version_body:', e.message)
-}
 
 console.log('[migrate] Pushing schema to database...')
 const { pushSchema } = adapter.requireDrizzleKit()
@@ -185,58 +219,6 @@ await apply()
 console.log('[migrate] Schema push complete.')
 
 await payload.db.migrate()
-
-// ── Phase 3: Sync _status with custom status field ──────────────────────
-// With versions.drafts enabled, Payload auto-filters by _status. Articles
-// where status='published' but _status='draft' won't appear in API results.
-// In Payload v3.77+ with localization, _status lives in the *_locales table.
-// Sync them so published articles are actually visible.
-console.log('[migrate] Syncing _status with editorial status...')
-for (const collection of ['articles', 'podcast_episodes']) {
-  const localesTable = `${collection}_locales`
-
-  // Try locales table first (Payload v3.77+ with localization)
-  try {
-    const res = await adapter.drizzle.execute({
-      sql: `UPDATE "${localesTable}" SET "_status" = 'published'
-            FROM "${collection}"
-            WHERE "${localesTable}"."_parent_id" = "${collection}"."id"
-              AND "${collection}"."status" = 'published'
-              AND ("${localesTable}"."_status" IS NULL OR "${localesTable}"."_status" != 'published')`,
-    })
-    console.log(`[migrate] Synced _status in ${localesTable}`)
-  } catch (e: any) {
-    console.log(`[migrate] Could not sync ${localesTable}._status: ${e.message}`)
-  }
-
-  // Also try the main table (older Payload without localized _status)
-  try {
-    const res = await adapter.drizzle.execute({
-      sql: `UPDATE "${collection}" SET "_status" = 'published' WHERE "status" = 'published' AND ("_status" IS NULL OR "_status" != 'published')`,
-    })
-    console.log(`[migrate] Synced _status for ${collection}`)
-  } catch (e: any) {
-    console.log(`[migrate] Could not sync ${collection}._status (main table): ${e.message}`)
-  }
-
-  // Also ensure locale rows exist for all published articles
-  try {
-    const res = await adapter.drizzle.execute({
-      sql: `INSERT INTO "${localesTable}" ("_locale", "_parent_id", "_status")
-            SELECT 'en', "${collection}"."id", 'published'
-            FROM "${collection}"
-            WHERE "${collection}"."status" = 'published'
-              AND NOT EXISTS (
-                SELECT 1 FROM "${localesTable}"
-                WHERE "${localesTable}"."_parent_id" = "${collection}"."id"
-                  AND "${localesTable}"."_locale" = 'en'
-              )`,
-    })
-    console.log(`[migrate] Ensured locale rows exist in ${localesTable}`)
-  } catch (e: any) {
-    console.log(`[migrate] Could not insert locale rows for ${collection}: ${e.message}`)
-  }
-}
 
 await payload.destroy()
 process.exit(0)
