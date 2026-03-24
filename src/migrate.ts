@@ -3,27 +3,13 @@ import pg from 'pg'
 // ── Phase 1: Raw PG connection to diagnose & fix enum mismatches ─────────
 // When pushSchema() recreates enum types and casts TEXT columns back,
 // any row with a value not in the new enum causes error 22P02 (enum_in).
-// We must convert columns to TEXT, clean up stale values, then drop the types.
+// We must convert ALL enum columns to TEXT, clean stale data, then drop types.
 const rawCS = process.env.POSTGRES_URL || process.env.DATABASE_URL || ''
 const connectionString = rawCS.includes('sslmode=')
   ? rawCS.replace(/sslmode=[^&]*/, 'sslmode=no-verify')
   : rawCS + (rawCS.includes('?') ? '&' : '?') + 'sslmode=no-verify'
 const client = new pg.Client({ connectionString })
 await client.connect()
-
-// Map of enum type name → valid values (must match the code in src/collections/)
-const expectedEnumValues: Record<string, string[]> = {
-  enum_articles_syndicate_to: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'],
-  enum_podcast_episodes_syndicate_to: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'],
-  enum_articles_status: ['draft', 'review', 'scheduled', 'published'],
-  enum_podcast_episodes_status: ['draft', 'review', 'scheduled', 'published'],
-  enum_newsletter_issues_status: ['draft', 'scheduled', 'sent'],
-  enum_users_role: ['admin', 'editor', 'brandContributor', 'sponsorManager'],
-  enum_authors_type: ['staff', 'guestContributor', 'podcastGuest'],
-  enum_authors_social_links_platform: ['linkedin', 'twitter', 'website', 'instagram', 'other'],
-  enum_sponsors_ad_creative_format: ['image', 'audio', 'html'],
-  enum_sponsors_placement_type: ['podcastMidRoll', 'articleSidebar', 'newsletter'],
-}
 
 // Known value renames (old DB value → new code value)
 const valueRenames: Record<string, string> = {
@@ -34,6 +20,33 @@ const valueRenames: Record<string, string> = {
   'lumynr.com': 'lumynr',
   'vettersgroup.com': 'vettersgroup',
 }
+
+// All tables+columns that hold enum data, with their valid values.
+// Includes main tables, junction tables (hasMany selects), and version tables.
+const enumColumns: { table: string; column: string; validValues: string[] }[] = [
+  // Articles
+  { table: 'articles_syndicate_to', column: 'value', validValues: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
+  { table: 'articles', column: 'status', validValues: ['draft', 'review', 'scheduled', 'published'] },
+  // Articles versions
+  { table: '_articles_v_version_syndicate_to', column: 'value', validValues: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
+  { table: '_articles_v', column: 'version_status', validValues: ['draft', 'review', 'scheduled', 'published'] },
+  // Podcast Episodes
+  { table: 'podcast_episodes_syndicate_to', column: 'value', validValues: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
+  { table: 'podcast_episodes', column: 'status', validValues: ['draft', 'review', 'scheduled', 'published'] },
+  // Podcast Episodes versions
+  { table: '_podcast_episodes_v_version_syndicate_to', column: 'value', validValues: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
+  { table: '_podcast_episodes_v', column: 'version_status', validValues: ['draft', 'review', 'scheduled', 'published'] },
+  // Newsletter Issues
+  { table: 'newsletter_issues', column: 'status', validValues: ['draft', 'scheduled', 'sent'] },
+  // Users
+  { table: 'users', column: 'role', validValues: ['admin', 'editor', 'brandContributor', 'sponsorManager'] },
+  // Authors
+  { table: 'authors', column: 'type', validValues: ['staff', 'guestContributor', 'podcastGuest'] },
+  { table: 'authors_social_links', column: 'platform', validValues: ['linkedin', 'twitter', 'website', 'instagram', 'other'] },
+  // Sponsors
+  { table: 'sponsors_ad_creative', column: 'format', validValues: ['image', 'audio', 'html'] },
+  { table: 'sponsors', column: 'placement_type', validValues: ['podcastMidRoll', 'articleSidebar', 'newsletter'] },
+]
 
 try {
   // Dump all enum types and values for diagnostics
@@ -48,73 +61,82 @@ try {
     console.log(`  ${row.enum_name}: ${row.enum_value}`)
   }
 
-  // Find all columns that use enum types
-  const { rows: enumCols } = await client.query(`
-    SELECT c.table_name, c.column_name, t.typname AS enum_name
+  // Step 1: Convert ALL enum columns to TEXT (so DROP TYPE doesn't fail)
+  // Query every column that uses a user-defined enum type
+  const { rows: allEnumCols } = await client.query(`
+    SELECT c.table_schema, c.table_name, c.column_name, c.udt_name
     FROM information_schema.columns c
-    JOIN pg_type t ON t.typname = c.udt_name
-    JOIN pg_enum e ON e.enumtypid = t.oid
-    WHERE c.table_schema = 'public'
-    GROUP BY c.table_name, c.column_name, t.typname
+    WHERE c.data_type = 'USER-DEFINED'
+      AND c.table_schema = 'public'
+      AND c.udt_name IN (SELECT typname FROM pg_type WHERE oid IN (SELECT enumtypid FROM pg_enum))
   `)
+  console.log(`[migrate] Found ${allEnumCols.length} enum columns to convert to TEXT`)
 
-  // Group columns by enum type
-  const enumUsages = new Map<string, { table: string; column: string }[]>()
-  for (const col of enumCols) {
-    const usages = enumUsages.get(col.enum_name) || []
-    usages.push({ table: col.table_name, column: col.column_name })
-    enumUsages.set(col.enum_name, usages)
+  for (const col of allEnumCols) {
+    try {
+      await client.query(
+        `ALTER TABLE "${col.table_name}" ALTER COLUMN "${col.column_name}" TYPE TEXT USING "${col.column_name}"::TEXT`
+      )
+      console.log(`  Converted ${col.table_name}.${col.column_name} (was ${col.udt_name}) to TEXT`)
+    } catch (e: any) {
+      console.log(`  Warning converting ${col.table_name}.${col.column_name}: ${e.message}`)
+    }
   }
 
-  const enumTypes = [...new Set(enumRows.map((r: any) => r.enum_name))]
-
-  for (const enumName of enumTypes) {
-    console.log(`[migrate] Resetting enum type: ${enumName}`)
-    const usages = enumUsages.get(enumName) || []
-
-    // Step 1: Convert columns to TEXT
-    for (const { table, column } of usages) {
-      await client.query(
-        `ALTER TABLE "${table}" ALTER COLUMN "${column}" TYPE TEXT USING "${column}"::TEXT`
-      )
-      console.log(`  Converted ${table}.${column} to TEXT`)
-    }
-
-    // Step 2: Drop the enum type
+  // Step 2: Drop ALL Payload enum types
+  const payloadEnumTypes = [...new Set(enumRows
+    .map((r: any) => r.enum_name as string)
+    .filter((n: string) => n.startsWith('enum_'))
+  )]
+  for (const enumName of payloadEnumTypes) {
     await client.query(`DROP TYPE IF EXISTS "${enumName}" CASCADE`)
     console.log(`  Dropped enum ${enumName}`)
+  }
 
-    // Step 3: Fix data — rename old values and null out anything invalid
-    const validValues = expectedEnumValues[enumName]
-    if (validValues) {
-      for (const { table, column } of usages) {
-        // Apply known renames
-        for (const [oldVal, newVal] of Object.entries(valueRenames)) {
-          const res = await client.query(
-            `UPDATE "${table}" SET "${column}" = $1 WHERE "${column}" = $2`,
-            [newVal, oldVal]
-          )
-          if (res.rowCount && res.rowCount > 0) {
-            console.log(`  Updated ${table}.${column}: '${oldVal}' → '${newVal}' (${res.rowCount} rows)`)
-          }
-        }
-        // Null out any remaining values that aren't in the valid set
-        const res = await client.query(
-          `UPDATE "${table}" SET "${column}" = NULL WHERE "${column}" IS NOT NULL AND "${column}" != ALL($1)`,
-          [validValues]
-        )
-        if (res.rowCount && res.rowCount > 0) {
-          console.log(`  Nulled ${res.rowCount} invalid values in ${table}.${column}`)
-        }
+  // Step 3: Clean data in ALL known tables — rename stale values, null invalids
+  for (const { table, column, validValues } of enumColumns) {
+    // Check if table exists
+    const { rows: tableExists } = await client.query(
+      `SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1`,
+      [table]
+    )
+    if (!tableExists.length) {
+      console.log(`  Table ${table} does not exist — skipping`)
+      continue
+    }
+
+    // Check if column exists
+    const { rows: colExists } = await client.query(
+      `SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 AND column_name = $2`,
+      [table, column]
+    )
+    if (!colExists.length) {
+      console.log(`  Column ${table}.${column} does not exist — skipping`)
+      continue
+    }
+
+    // Apply known renames
+    for (const [oldVal, newVal] of Object.entries(valueRenames)) {
+      const res = await client.query(
+        `UPDATE "${table}" SET "${column}" = $1 WHERE "${column}" = $2`,
+        [newVal, oldVal]
+      )
+      if (res.rowCount && res.rowCount > 0) {
+        console.log(`  Updated ${table}.${column}: '${oldVal}' → '${newVal}' (${res.rowCount} rows)`)
       }
-    } else {
-      // For version tables or other enums we don't have a map for,
-      // find the base enum name and use those values
-      console.log(`  No expected values mapped for ${enumName} — skipping data cleanup`)
+    }
+
+    // Null out any remaining values that aren't in the valid set
+    const res = await client.query(
+      `UPDATE "${table}" SET "${column}" = NULL WHERE "${column}" IS NOT NULL AND "${column}" != ALL($1)`,
+      [validValues]
+    )
+    if (res.rowCount && res.rowCount > 0) {
+      console.log(`  Nulled ${res.rowCount} invalid values in ${table}.${column}`)
     }
   }
 
-  console.log('[migrate] Phase 1 complete — all enums dropped and data cleaned.')
+  console.log('[migrate] Phase 1 complete — enums dropped and data cleaned.')
 } catch (e: any) {
   console.error('[migrate] Phase 1 error:', e.message)
   console.error(e)
