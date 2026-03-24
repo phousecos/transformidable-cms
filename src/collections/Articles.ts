@@ -139,7 +139,7 @@ export const Articles: CollectionConfig = {
       name: 'cycleNumber',
       type: 'number',
       admin: {
-        description: 'Content cycle number for editorial planning',
+        description: 'Editorial calendar cycle this article belongs to (e.g. 1, 2, 3).',
       },
     },
     {
