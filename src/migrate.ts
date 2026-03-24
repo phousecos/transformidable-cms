@@ -58,8 +58,8 @@ try {
       console.log(`  Converted ${table}.${column} to TEXT`)
     }
 
-    // Step 2: Drop the enum type
-    await client.query(`DROP TYPE IF EXISTS "${enumName}"`)
+    // Step 2: Drop the enum type (CASCADE handles views, defaults, etc.)
+    await client.query(`DROP TYPE IF EXISTS "${enumName}" CASCADE`)
     console.log(`  Dropped enum ${enumName}`)
   }
 
