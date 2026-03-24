@@ -189,16 +189,52 @@ await payload.db.migrate()
 // ── Phase 3: Sync _status with custom status field ──────────────────────
 // With versions.drafts enabled, Payload auto-filters by _status. Articles
 // where status='published' but _status='draft' won't appear in API results.
+// In Payload v3.77+ with localization, _status lives in the *_locales table.
 // Sync them so published articles are actually visible.
 console.log('[migrate] Syncing _status with editorial status...')
 for (const collection of ['articles', 'podcast_episodes']) {
+  const localesTable = `${collection}_locales`
+
+  // Try locales table first (Payload v3.77+ with localization)
+  try {
+    const res = await adapter.drizzle.execute({
+      sql: `UPDATE "${localesTable}" SET "_status" = 'published'
+            FROM "${collection}"
+            WHERE "${localesTable}"."_parent_id" = "${collection}"."id"
+              AND "${collection}"."status" = 'published'
+              AND ("${localesTable}"."_status" IS NULL OR "${localesTable}"."_status" != 'published')`,
+    })
+    console.log(`[migrate] Synced _status in ${localesTable}`)
+  } catch (e: any) {
+    console.log(`[migrate] Could not sync ${localesTable}._status: ${e.message}`)
+  }
+
+  // Also try the main table (older Payload without localized _status)
   try {
     const res = await adapter.drizzle.execute({
       sql: `UPDATE "${collection}" SET "_status" = 'published' WHERE "status" = 'published' AND ("_status" IS NULL OR "_status" != 'published')`,
     })
     console.log(`[migrate] Synced _status for ${collection}`)
   } catch (e: any) {
-    console.log(`[migrate] Could not sync ${collection}._status: ${e.message}`)
+    console.log(`[migrate] Could not sync ${collection}._status (main table): ${e.message}`)
+  }
+
+  // Also ensure locale rows exist for all published articles
+  try {
+    const res = await adapter.drizzle.execute({
+      sql: `INSERT INTO "${localesTable}" ("_locale", "_parent_id", "_status")
+            SELECT 'en', "${collection}"."id", 'published'
+            FROM "${collection}"
+            WHERE "${collection}"."status" = 'published'
+              AND NOT EXISTS (
+                SELECT 1 FROM "${localesTable}"
+                WHERE "${localesTable}"."_parent_id" = "${collection}"."id"
+                  AND "${localesTable}"."_locale" = 'en'
+              )`,
+    })
+    console.log(`[migrate] Ensured locale rows exist in ${localesTable}`)
+  } catch (e: any) {
+    console.log(`[migrate] Could not insert locale rows for ${collection}: ${e.message}`)
   }
 }
 
