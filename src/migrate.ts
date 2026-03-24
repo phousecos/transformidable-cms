@@ -136,17 +136,50 @@ try {
     }
   }
 
-  // Step 4: Backfill NULL version_body in _articles_v so SET NOT NULL doesn't fail
-  console.log('[migrate] Backfilling NULL version_body in _articles_v...')
+  // Step 4: Backfill NULL required columns in versioned tables so SET NOT NULL doesn't fail
+  console.log('[migrate] Backfilling NULL required columns in versioned tables...')
+  const emptyDoc = JSON.stringify({ root: { type: 'root', children: [], direction: null, format: '', indent: 0, version: 1 } })
+
+  // Get a default author ID to use for backfilling
+  let defaultAuthorId: number | null = null
   try {
-    const emptyDoc = JSON.stringify({ root: { type: 'root', children: [], direction: null, format: '', indent: 0, version: 1 } })
-    const backfillRes = await client.query(
-      `UPDATE "_articles_v" SET "version_body" = $1::jsonb WHERE "version_body" IS NULL`,
-      [emptyDoc]
-    )
-    console.log(`[migrate] Backfilled ${backfillRes.rowCount} NULL version_body rows`)
-  } catch (e: any) {
-    console.log(`[migrate] Could not backfill version_body: ${e.message}`)
+    const authorRes = await client.query(`SELECT id FROM "authors" LIMIT 1`)
+    if (authorRes.rows.length > 0) defaultAuthorId = authorRes.rows[0].id
+  } catch (_) {}
+
+  const backfills: Array<{ table: string; column: string; value: string; params?: any[] }> = [
+    // _articles_v required fields
+    { table: '_articles_v', column: 'version_body', value: '$1::jsonb', params: [emptyDoc] },
+    { table: '_articles_v', column: 'version_title', value: `'(untitled)'`, params: [] },
+    { table: '_articles_v', column: 'version_slug', value: `'untitled-' || id`, params: [] },
+    { table: '_articles_v', column: 'version_status', value: `'draft'`, params: [] },
+    // _podcast_episodes_v required fields
+    { table: '_podcast_episodes_v', column: 'version_title', value: `'(untitled)'`, params: [] },
+    { table: '_podcast_episodes_v', column: 'version_slug', value: `'untitled-' || id`, params: [] },
+    { table: '_podcast_episodes_v', column: 'version_episode_number', value: `0`, params: [] },
+    { table: '_podcast_episodes_v', column: 'version_season', value: `1`, params: [] },
+    { table: '_podcast_episodes_v', column: 'version_status', value: `'draft'`, params: [] },
+  ]
+
+  if (defaultAuthorId !== null) {
+    backfills.push({ table: '_articles_v', column: 'version_author_id', value: `$1`, params: [defaultAuthorId] })
+  }
+
+  for (const { table, column, value, params } of backfills) {
+    try {
+      const res = await client.query(
+        `UPDATE "${table}" SET "${column}" = ${value} WHERE "${column}" IS NULL`,
+        params ?? []
+      )
+      if (res.rowCount && res.rowCount > 0) {
+        console.log(`  Backfilled ${res.rowCount} NULL ${table}.${column} rows`)
+      }
+    } catch (e: any) {
+      // Column may not exist yet — that's fine
+      if (!e.message.includes('does not exist')) {
+        console.log(`  Could not backfill ${table}.${column}: ${e.message}`)
+      }
+    }
   }
 
   console.log('[migrate] Phase 1 complete — enums dropped and data cleaned.')
