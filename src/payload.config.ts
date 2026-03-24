@@ -36,6 +36,14 @@ const serverURL = process.env.VERCEL_PROJECT_PRODUCTION_URL
 export default buildConfig({
   serverURL,
 
+  cors: [
+    'https://jerribland.com',
+    'https://lumynr.com',
+    'https://agentpmo.com',
+    'https://unlimitedpowerhouse.com',
+    'https://vettersgroup.com',
+  ],
+
   admin: {
     user: Users.slug,
     meta: {
