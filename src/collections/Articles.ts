@@ -52,7 +52,6 @@ export const Articles: CollectionConfig = {
       name: 'issue',
       type: 'relationship',
       relationTo: 'issues',
-      required: true,
       admin: {
         description: 'Which issue this article belongs to',
       },
@@ -61,7 +60,6 @@ export const Articles: CollectionConfig = {
       name: 'vertical',
       type: 'relationship',
       relationTo: 'verticals',
-      required: true,
       admin: {
         description: 'Editorial vertical (e.g. Technology Strategy)',
       },
@@ -69,7 +67,6 @@ export const Articles: CollectionConfig = {
     {
       name: 'displayOrder',
       type: 'number',
-      required: true,
       admin: {
         description: '1 = flagship, 2–5 = supporting. Controls TOC layout order.',
       },
@@ -116,6 +113,7 @@ export const Articles: CollectionConfig = {
       options: [
         { label: 'Draft', value: 'draft' },
         { label: 'Review', value: 'review' },
+        { label: 'Scheduled', value: 'scheduled' },
         { label: 'Published', value: 'published' },
       ],
     },
