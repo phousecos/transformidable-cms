@@ -9,9 +9,15 @@ import sharp from 'sharp'
 import { Users } from './collections/Users.ts'
 import { Media } from './collections/Media.ts'
 import { Articles } from './collections/Articles.ts'
-import { PodcastEpisodes } from './collections/PodcastEpisodes.ts'
+import { Issues } from './collections/Issues.ts'
+import { Verticals } from './collections/Verticals.ts'
+import { SiteSettings } from './globals/SiteSettings.ts'
+
+// Legacy collections — kept so Payload can still read/write their DB tables.
+// Articles still references authors and brand-pillars via legacy fields.
 import { Authors } from './collections/Authors.ts'
 import { BrandPillars } from './collections/BrandPillars.ts'
+import { PodcastEpisodes } from './collections/PodcastEpisodes.ts'
 import { Sponsors } from './collections/Sponsors.ts'
 import { NewsletterIssues } from './collections/NewsletterIssues.ts'
 
@@ -59,15 +65,21 @@ export default buildConfig({
   editor: lexicalEditor(),
 
   collections: [
+    // Active collections
     Users,
     Media,
     Articles,
-    PodcastEpisodes,
-    Authors,
-    BrandPillars,
-    Sponsors,
-    NewsletterIssues,
+    Issues,
+    Verticals,
+    // Legacy collections — hidden from nav, kept for data access
+    { ...Authors, admin: { ...Authors.admin, hidden: true } },
+    { ...BrandPillars, admin: { ...BrandPillars.admin, hidden: true } },
+    { ...PodcastEpisodes, admin: { ...PodcastEpisodes.admin, hidden: true } },
+    { ...Sponsors, admin: { ...Sponsors.admin, hidden: true } },
+    { ...NewsletterIssues, admin: { ...NewsletterIssues.admin, hidden: true } },
   ],
+
+  globals: [SiteSettings],
 
   db: postgresAdapter({
     pool: {

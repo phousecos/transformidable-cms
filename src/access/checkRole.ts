@@ -1,11 +1,13 @@
 import type { Access, FieldAccess } from 'payload'
 
+export const isLoggedIn: Access = ({ req: { user } }) => Boolean(user)
+
+export const isLoggedInFieldAccess: FieldAccess = ({ req: { user } }) => Boolean(user)
+
+// ── Legacy role helpers (kept for hidden collections that still reference them) ──
+
 export type Role = 'admin' | 'editor' | 'brandContributor' | 'sponsorManager'
 
-/**
- * Check if a user has one of the specified roles.
- * Uses loose typing to work with Payload's UntypedUser.
- */
 export const checkRole = (allRoles: Role[], user: Record<string, unknown> | null): boolean => {
   if (!user) return false
   return allRoles.some((role) => user.role === role)
@@ -21,8 +23,6 @@ export const isAdminOrEditorOrContributor: Access = ({ req: { user } }) =>
 
 export const isSponsorManagerOrAdmin: Access = ({ req: { user } }) =>
   checkRole(['admin', 'sponsorManager'], user)
-
-export const isLoggedIn: Access = ({ req: { user } }) => Boolean(user)
 
 export const isAdminFieldAccess: FieldAccess = ({ req: { user } }) => checkRole(['admin'], user)
 
