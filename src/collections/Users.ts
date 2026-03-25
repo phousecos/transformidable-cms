@@ -1,22 +1,18 @@
 import type { CollectionConfig } from 'payload'
-import { isAdmin, isLoggedIn, isAdminFieldAccess } from '../access/checkRole.ts'
+import { isLoggedIn } from '../access/checkRole.ts'
 
 export const Users: CollectionConfig = {
   slug: 'users',
   auth: true,
   admin: {
     useAsTitle: 'email',
-    defaultColumns: ['email', 'firstName', 'lastName', 'role'],
+    defaultColumns: ['email', 'firstName', 'lastName'],
   },
   access: {
-    create: isAdmin,
+    create: isLoggedIn,
     read: isLoggedIn,
-    update: ({ req: { user } }) => {
-      if (!user) return false
-      if ((user as Record<string, unknown>).role === 'admin') return true
-      return { id: { equals: user.id } }
-    },
-    delete: isAdmin,
+    update: isLoggedIn,
+    delete: isLoggedIn,
   },
   fields: [
     {
@@ -27,19 +23,19 @@ export const Users: CollectionConfig = {
       name: 'lastName',
       type: 'text',
     },
+    // Legacy role field — kept so existing DB column is not orphaned
     {
       name: 'role',
       type: 'select',
-      required: true,
-      defaultValue: 'brandContributor',
+      defaultValue: 'admin',
       options: [
         { label: 'Admin', value: 'admin' },
         { label: 'Editor', value: 'editor' },
         { label: 'Brand Contributor', value: 'brandContributor' },
         { label: 'Sponsor Manager', value: 'sponsorManager' },
       ],
-      access: {
-        update: isAdminFieldAccess,
+      admin: {
+        description: '(Legacy) Role-based access has been simplified. All logged-in users have full access.',
       },
     },
     {
@@ -47,8 +43,7 @@ export const Users: CollectionConfig = {
       type: 'relationship',
       relationTo: 'brand-pillars',
       admin: {
-        condition: (data) => data?.role === 'brandContributor',
-        description: 'The brand pillar this contributor is assigned to (for Brand Contributors only)',
+        description: '(Legacy) Brand pillar assignment — data preserved for migration',
       },
     },
   ],

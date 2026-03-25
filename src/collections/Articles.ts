@@ -1,53 +1,27 @@
 import type { CollectionConfig, Where } from 'payload'
-import { isAdmin, isAdminOrEditorOrContributor, isAdminOrEditorFieldAccess } from '../access/checkRole.ts'
+import { isLoggedIn } from '../access/checkRole.ts'
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'author', 'status', 'publishDate'],
+    defaultColumns: ['title', 'issue', 'vertical', 'displayOrder', 'isFlagship', 'status'],
   },
   versions: true,
   access: {
-    create: isAdminOrEditorOrContributor,
+    create: isLoggedIn,
     read: ({ req: { user } }) => {
-      const publishedOnly: Where = { status: { equals: 'published' } }
-      if (!user) return publishedOnly
-      const u = user as Record<string, unknown>
-      if (u.role === 'admin' || u.role === 'editor') return true
-      if (u.role === 'brandContributor' && u.assignedBrandPillar) {
-        const pillarId =
-          typeof u.assignedBrandPillar === 'string'
-            ? u.assignedBrandPillar
-            : (u.assignedBrandPillar as Record<string, unknown>).id
-        const where: Where = {
-          or: [
-            { status: { equals: 'published' } },
-            { brandPillars: { equals: pillarId } },
-          ],
-        }
-        return where
+      if (!user) {
+        const publishedOnly: Where = { status: { equals: 'published' } }
+        return publishedOnly
       }
-      return publishedOnly
+      return true
     },
-    update: ({ req: { user } }) => {
-      if (!user) return false
-      const u = user as Record<string, unknown>
-      if (u.role === 'admin' || u.role === 'editor') return true
-      if (u.role === 'brandContributor' && u.assignedBrandPillar) {
-        const pillarId =
-          typeof u.assignedBrandPillar === 'string'
-            ? u.assignedBrandPillar
-            : (u.assignedBrandPillar as Record<string, unknown>).id
-        return {
-          brandPillars: { equals: pillarId },
-        }
-      }
-      return false
-    },
-    delete: isAdmin,
+    update: isLoggedIn,
+    delete: isLoggedIn,
   },
   fields: [
+    // ── New schema fields ──────────────────────────────────────
     {
       name: 'title',
       type: 'text',
@@ -56,7 +30,6 @@ export const Articles: CollectionConfig = {
     {
       name: 'slug',
       type: 'text',
-      required: true,
       unique: true,
       admin: {
         description: 'URL-friendly slug (auto-generated from title if left blank)',
@@ -76,27 +49,102 @@ export const Articles: CollectionConfig = {
       },
     },
     {
+      name: 'issue',
+      type: 'relationship',
+      relationTo: 'issues',
+      required: true,
+      admin: {
+        description: 'Which issue this article belongs to',
+      },
+    },
+    {
+      name: 'vertical',
+      type: 'relationship',
+      relationTo: 'verticals',
+      required: true,
+      admin: {
+        description: 'Editorial vertical (e.g. Technology Strategy)',
+      },
+    },
+    {
+      name: 'displayOrder',
+      type: 'number',
+      required: true,
+      admin: {
+        description: '1 = flagship, 2–5 = supporting. Controls TOC layout order.',
+      },
+    },
+    {
+      name: 'isFlagship',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        description: 'Check for the flagship article (large TOC treatment). One per issue.',
+      },
+    },
+    {
+      name: 'dek',
+      type: 'textarea',
+      admin: {
+        description: 'Short editorial summary written specifically for the TOC display',
+      },
+    },
+    {
       name: 'body',
       type: 'richText',
       required: true,
     },
     {
-      name: 'excerpt',
-      type: 'textarea',
+      name: 'readTime',
+      type: 'number',
       admin: {
-        description: '2-3 sentence summary for cards and previews',
+        description: 'Estimated read time in minutes',
       },
     },
+    {
+      name: 'citationsNotes',
+      type: 'textarea',
+      admin: {
+        description: 'Internal field — source verification notes. Not rendered publicly.',
+      },
+    },
+    {
+      name: 'status',
+      type: 'select',
+      required: true,
+      defaultValue: 'draft',
+      options: [
+        { label: 'Draft', value: 'draft' },
+        { label: 'Review', value: 'review' },
+        { label: 'Published', value: 'published' },
+      ],
+    },
+    {
+      name: 'publishedAt',
+      type: 'date',
+    },
+
+    // ── Legacy fields (kept for existing data) ─────────────────
     {
       name: 'author',
       type: 'relationship',
       relationTo: 'authors',
-      required: true,
+      admin: {
+        description: '(Legacy) Original author relationship — data preserved for migration',
+      },
+    },
+    {
+      name: 'excerpt',
+      type: 'textarea',
+      admin: {
+        description: '(Legacy) Replaced by dek — data preserved for migration',
+      },
     },
     {
       name: 'publishDate',
       type: 'date',
       admin: {
+        description: '(Legacy) Replaced by publishedAt — data preserved for migration',
         date: {
           pickerAppearance: 'dayAndTime',
         },
@@ -106,6 +154,9 @@ export const Articles: CollectionConfig = {
       name: 'featuredImage',
       type: 'upload',
       relationTo: 'media',
+      admin: {
+        description: '(Legacy) Hero/featured image — data preserved for migration',
+      },
     },
     {
       name: 'brandPillars',
@@ -113,7 +164,7 @@ export const Articles: CollectionConfig = {
       relationTo: 'brand-pillars',
       hasMany: true,
       admin: {
-        description: 'Tag with brand pillars to control where this article surfaces',
+        description: '(Legacy) Replaced by vertical — data preserved for migration',
       },
     },
     {
@@ -129,43 +180,28 @@ export const Articles: CollectionConfig = {
         { label: 'Vetters Group', value: 'vettersgroup' },
       ],
       admin: {
-        description: 'Which brand properties may republish this article',
+        description: '(Legacy) Brand syndication — data preserved for migration',
       },
     },
     {
       name: 'cycleNumber',
       type: 'number',
       admin: {
-        description: 'Editorial calendar cycle this article belongs to (e.g. 1, 2, 3).',
-      },
-    },
-    {
-      name: 'status',
-      type: 'select',
-      required: true,
-      defaultValue: 'draft',
-      options: [
-        { label: 'Draft', value: 'draft' },
-        { label: 'Review', value: 'review' },
-        { label: 'Scheduled', value: 'scheduled' },
-        { label: 'Published', value: 'published' },
-      ],
-      access: {
-        update: isAdminOrEditorFieldAccess,
+        description: '(Legacy) Editorial calendar cycle — data preserved for migration',
       },
     },
     {
       name: 'seoTitle',
       type: 'text',
       admin: {
-        description: 'Optional override for the page title tag',
+        description: '(Legacy) SEO title override — data preserved for migration',
       },
     },
     {
       name: 'seoDescription',
       type: 'textarea',
       admin: {
-        description: 'Optional override for the meta description',
+        description: '(Legacy) SEO description — data preserved for migration',
       },
     },
     {
@@ -173,7 +209,7 @@ export const Articles: CollectionConfig = {
       type: 'checkbox',
       defaultValue: false,
       admin: {
-        description: 'Flag for Lumynr exclusive content',
+        description: '(Legacy) Lumynr exclusive flag — data preserved for migration',
       },
     },
   ],
