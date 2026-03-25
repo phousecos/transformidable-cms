@@ -11,6 +11,7 @@ import { Media } from './collections/Media.ts'
 import { Articles } from './collections/Articles.ts'
 import { Issues } from './collections/Issues.ts'
 import { Verticals } from './collections/Verticals.ts'
+import { Books } from './collections/Books.ts'
 import { SiteSettings } from './globals/SiteSettings.ts'
 
 // Legacy collections — kept so Payload can still read/write their DB tables.
@@ -71,6 +72,7 @@ export default buildConfig({
     Articles,
     Issues,
     Verticals,
+    Books,
     // Legacy collections — hidden from nav, kept for data access
     { ...Authors, admin: { ...Authors.admin, hidden: true } },
     { ...BrandPillars, admin: { ...BrandPillars.admin, hidden: true } },
