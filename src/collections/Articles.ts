@@ -121,6 +121,22 @@ export const Articles: CollectionConfig = {
       name: 'publishedAt',
       type: 'date',
     },
+    {
+      name: 'syndicateTo',
+      type: 'select',
+      hasMany: true,
+      options: [
+        { label: 'Jerri Bland', value: 'jerribland' },
+        { label: 'UnlimITed Powerhouse', value: 'unlimitedpowerhouse' },
+        { label: 'AgentPMO', value: 'agentpmo' },
+        { label: 'Prept', value: 'prept' },
+        { label: 'Lumynr', value: 'lumynr' },
+        { label: 'Vetters Group', value: 'vettersgroup' },
+      ],
+      admin: {
+        description: 'Select which brand sites this article should be syndicated to',
+      },
+    },
 
     // ── Legacy fields (kept for existing data) ─────────────────
     {
@@ -163,22 +179,6 @@ export const Articles: CollectionConfig = {
       hasMany: true,
       admin: {
         description: '(Legacy) Replaced by vertical — data preserved for migration',
-      },
-    },
-    {
-      name: 'syndicateTo',
-      type: 'select',
-      hasMany: true,
-      options: [
-        { label: 'Jerri Bland', value: 'jerribland' },
-        { label: 'UnlimITed Powerhouse', value: 'unlimitedpowerhouse' },
-        { label: 'AgentPMO', value: 'agentpmo' },
-        { label: 'Prept', value: 'prept' },
-        { label: 'Lumynr', value: 'lumynr' },
-        { label: 'Vetters Group', value: 'vettersgroup' },
-      ],
-      admin: {
-        description: '(Legacy) Brand syndication — data preserved for migration',
       },
     },
     {
