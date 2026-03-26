@@ -10,10 +10,10 @@ export const NewsletterIssues: CollectionConfig = {
   access: {
     create: isAdminOrEditor,
     read: ({ req: { user } }) => {
-      if (!user) return { status: { equals: 'sent' } }
+      if (!user) return { status: { equals: 'published' } }
       const u = user as Record<string, unknown>
       if (u.role === 'admin' || u.role === 'editor') return true
-      return { status: { equals: 'sent' } }
+      return { status: { equals: 'published' } }
     },
     update: isAdminOrEditor,
     delete: isAdmin,
@@ -76,8 +76,7 @@ export const NewsletterIssues: CollectionConfig = {
       options: [
         { label: 'Draft', value: 'draft' },
         { label: 'Scheduled', value: 'scheduled' },
-        { label: 'Published', value: 'published' },
-        { label: 'Sent', value: 'sent' },
+        { label: 'Published / Sent', value: 'published' },
       ],
     },
   ],

@@ -7,7 +7,9 @@ export const Articles: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'issue', 'vertical', 'displayOrder', 'isFlagship', 'status'],
   },
-  versions: true,
+  versions: {
+    drafts: false,
+  },
   access: {
     create: isLoggedIn,
     read: ({ req: { user } }) => {
