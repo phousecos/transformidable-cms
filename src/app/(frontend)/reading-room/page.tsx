@@ -56,7 +56,7 @@ export default async function ReadingRoomPage() {
   ];
   if (sections.career_leadership.books.length > 0) navItems.push({ label: "Career Lists", href: "#career" });
   if (sections.pmo_technology.books.length > 0) navItems.push({ label: "PMO & Tech", href: "#pmo" });
-  if (transformidableFeature) navItems.push({ label: "Transformidable", href: "#transformidable" });
+  navItems.push({ label: "Transformidable", href: "/" });
   if (sections.staff_picks.books.length > 0) navItems.push({ label: "Picks", href: "#picks" });
 
   return (

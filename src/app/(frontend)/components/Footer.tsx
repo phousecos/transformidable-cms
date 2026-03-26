@@ -23,9 +23,9 @@ export default function Footer() {
             <Link href="/reading-room" className="text-xs font-medium uppercase tracking-[0.15em] text-parchment/50 transition-colors hover:text-gold">
               The Reading Room
             </Link>
-            <a href="#newsletter" className="text-xs font-medium uppercase tracking-[0.15em] text-parchment/50 transition-colors hover:text-gold">
+            <Link href="/subscribe" className="text-xs font-medium uppercase tracking-[0.15em] text-parchment/50 transition-colors hover:text-gold">
               Subscribe
-            </a>
+            </Link>
           </div>
         </div>
         <div className="mt-8 text-center sm:text-left">
