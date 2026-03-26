@@ -207,9 +207,9 @@ function BookSection({ id, label, books, getCoverUrl, showBadge = false }: {
         <div className="mt-2 h-px bg-oxblood/20" />
         <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
           {books.map((book: any) => (
-            <div key={book.id} className="flex flex-col">
+            <div key={book.id} className="group flex flex-col">
               {getCoverUrl(book) ? (
-                <div className="mb-4 aspect-[2/3] w-full overflow-hidden bg-obsidian/10">
+                <div className="relative mb-4 aspect-[2/3] w-full overflow-hidden bg-obsidian/10">
                   <img
                     src={getCoverUrl(book)}
                     alt={book.title}
@@ -218,10 +218,20 @@ function BookSection({ id, label, books, getCoverUrl, showBadge = false }: {
                   <p className="relative -mt-6 px-2 text-[9px] font-medium text-gold md:text-[10px]">
                     {book.title}
                   </p>
+                  {book.editorial_note && (
+                    <div className="absolute inset-0 flex items-end bg-obsidian/80 p-4 opacity-0 transition-opacity group-hover:opacity-100">
+                      <p className="text-xs leading-relaxed text-parchment/90">{book.editorial_note}</p>
+                    </div>
+                  )}
                 </div>
               ) : (
-                <div className="mb-4 flex aspect-[2/3] w-full items-end bg-obsidian/10 p-3">
+                <div className="relative mb-4 flex aspect-[2/3] w-full items-end bg-obsidian/10 p-3">
                   <p className="text-[9px] font-medium text-gold md:text-[10px]">{book.title}</p>
+                  {book.editorial_note && (
+                    <div className="absolute inset-0 flex items-end bg-obsidian/80 p-4 opacity-0 transition-opacity group-hover:opacity-100">
+                      <p className="text-xs leading-relaxed text-parchment/90">{book.editorial_note}</p>
+                    </div>
+                  )}
                 </div>
               )}
               {showBadge && book.illuminate_badge && (
