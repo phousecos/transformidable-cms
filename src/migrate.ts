@@ -181,16 +181,18 @@ const { apply, hasDataLoss, warnings, statements } = await pushSchema(
   adapter.extensions?.postgis ? ['postgis'] : undefined,
 )
 
+console.log('[migrate] Statements to apply:', JSON.stringify(statements, null, 2))
+
 if (warnings.length) {
   console.log('[migrate] Push warnings:', warnings.join('\n'))
-  if (hasDataLoss) {
-    console.log('[migrate] DATA LOSS WARNING — proceeding anyway (CI)')
-  }
 }
 
-console.log('[migrate] Statements to apply:', JSON.stringify(statements, null, 2))
-await apply()
-console.log('[migrate] Schema push complete.')
+if (hasDataLoss) {
+  console.log('[migrate] Skipping apply — would cause data loss (drop columns/tables). Existing DB columns preserved.')
+} else {
+  await apply()
+  console.log('[migrate] Schema push complete.')
+}
 
 await payload.db.migrate()
 
