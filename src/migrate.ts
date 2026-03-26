@@ -37,7 +37,7 @@ const enumColumns: { table: string; column: string; validValues: string[] }[] = 
   { table: '_podcast_episodes_v_version_syndicate_to', column: 'value', validValues: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
   { table: '_podcast_episodes_v', column: 'version_status', validValues: ['draft', 'review', 'scheduled', 'published'] },
   // Newsletter Issues
-  { table: 'newsletter_issues', column: 'status', validValues: ['draft', 'scheduled', 'sent'] },
+  { table: 'newsletter_issues', column: 'status', validValues: ['draft', 'scheduled', 'published', 'sent'] },
   // Users
   { table: 'users', column: 'role', validValues: ['admin', 'editor', 'brandContributor', 'sponsorManager'] },
   // Authors

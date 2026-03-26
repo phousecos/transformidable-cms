@@ -76,6 +76,7 @@ export const NewsletterIssues: CollectionConfig = {
       options: [
         { label: 'Draft', value: 'draft' },
         { label: 'Scheduled', value: 'scheduled' },
+        { label: 'Published', value: 'published' },
         { label: 'Sent', value: 'sent' },
       ],
     },
