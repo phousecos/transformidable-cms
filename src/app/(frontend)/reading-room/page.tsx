@@ -1,283 +1,202 @@
 // @ts-nocheck
-import React from 'react'
-import config from '@payload-config'
-import { getPayload } from 'payload'
+import config from "@payload-config";
+import { getPayload } from "payload";
+import SiteNav from "../components/SiteNav";
+import Footer from "../components/Footer";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 export default async function ReadingRoomPage() {
-  const payload = await getPayload({ config })
+  const payload = await getPayload({ config });
 
-  // Fetch all published books
   const booksResult = await payload.find({
-    collection: 'books',
-    where: { status: { equals: 'published' } },
-    sort: '-published_date',
+    collection: "books",
+    where: { status: { equals: "published" } },
+    sort: "-published_date",
     depth: 1,
-  })
-  const books = booksResult.docs
+    limit: 100,
+  });
+  const books = booksResult.docs;
 
-  // Fetch the Transformidable Feature global
-  let transformidableFeature: Record<string, unknown> | null = null
+  let transformidableFeature = null;
   try {
-    transformidableFeature = await payload.findGlobal({ slug: 'transformidable-feature' }) as Record<string, unknown>
-  } catch {
-    // Global may not have data yet
-  }
+    transformidableFeature = await payload.findGlobal({ slug: "transformidable-feature" });
+  } catch {}
 
-  // Find current Book Club selection
-  const currentSelection = books.find((b: any) => b.is_current_selection)
+  const currentSelection = books.find((b) => b.is_current_selection);
+  const pastSelections = books.filter((b) => !b.is_current_selection && b.section === "book_club");
 
-  // Group books by section
-  const sections: Record<string, { label: string; books: any[] }> = {
-    book_club: { label: 'Illuminate Book Club', books: [] },
-    career_leadership: { label: 'Career & Leadership', books: [] },
-    pmo_technology: { label: 'PMO & Technology', books: [] },
-    staff_picks: { label: 'Staff Picks', books: [] },
-  }
-  for (const book of books as any[]) {
-    if (book.section && sections[book.section]) {
-      sections[book.section].books.push(book)
+  const sections = {
+    career_leadership: { label: "Career & Leadership", books: [] },
+    pmo_technology: { label: "PMO & Technology", books: [] },
+    staff_picks: { label: "Staff Picks", books: [] },
+  };
+  for (const book of books) {
+    if (book.section && book.section !== "book_club" && sections[book.section]) {
+      sections[book.section].books.push(book);
     }
   }
 
-  function getCoverUrl(book: any): string | null {
-    if (!book.cover_image) return null
-    if (typeof book.cover_image === 'object' && book.cover_image.url) return book.cover_image.url
-    return null
-  }
-
-  function getBookLinks(book: any) {
-    const links: { label: string; url: string }[] = []
-    if (book.bookshop_url) links.push({ label: 'Bookshop.org', url: book.bookshop_url })
-    if (book.amazon_url) links.push({ label: 'Amazon', url: book.amazon_url })
-    if (book.payhip_url) links.push({ label: 'Buy Direct', url: book.payhip_url })
-    return links
-  }
+  const getCoverUrl = (book) => {
+    if (!book.cover_image) return null;
+    if (typeof book.cover_image === "object" && book.cover_image.url) return book.cover_image.url;
+    return null;
+  };
 
   return (
-    <div>
-      {/* Page Header */}
-      <section style={{
-        background: 'var(--color-card-bg)',
-        padding: '3rem 2rem',
-        textAlign: 'center',
-      }}>
-        <h1 style={{
-          fontFamily: 'var(--font-serif)',
-          fontSize: '2.5rem',
-          fontWeight: 400,
-          marginBottom: '0.5rem',
-        }}>
-          The Reading Room
-        </h1>
-        <p style={{ color: 'var(--color-text-muted)', maxWidth: '500px', margin: '0 auto' }}>
-          Curated reads for technology leaders, change-makers, and lifelong learners.
-        </p>
-      </section>
-
-      {/* Transformidable Feature Strip */}
-      {transformidableFeature && (transformidableFeature.tagline || transformidableFeature.cta_url) && (
-        <section style={{
-          background: 'var(--color-text)',
-          color: 'var(--color-white)',
-          padding: '1.5rem 2rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '2rem',
-          flexWrap: 'wrap',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            {transformidableFeature.cover_image && typeof transformidableFeature.cover_image === 'object' && (transformidableFeature.cover_image as any).url && (
-              <img
-                src={(transformidableFeature.cover_image as any).url}
-                alt="Transformidable"
-                style={{ height: '60px', width: 'auto' }}
-              />
-            )}
-            <div>
-              <strong style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem' }}>Transformidable</strong>
-              {transformidableFeature.tagline && (
-                <p style={{ fontSize: '0.85rem', opacity: 0.8 }}>{transformidableFeature.tagline as string}</p>
+    <>
+      <SiteNav />
+      <main className="min-h-[60vh]">
+        {/* Hero — Now Reading */}
+        {currentSelection && (
+          <section className="bg-obsidian">
+            <div className="mx-auto max-w-5xl px-6 pb-16 pt-12 md:flex md:gap-12 md:pt-16 md:pb-20">
+              {getCoverUrl(currentSelection) && (
+                <div className="mb-8 shrink-0 md:mb-0">
+                  <img
+                    src={getCoverUrl(currentSelection)}
+                    alt={currentSelection.title}
+                    className="mx-auto w-48 shadow-2xl md:mx-0 md:w-56"
+                  />
+                </div>
               )}
-              {transformidableFeature.launch_label && (
-                <p style={{ fontSize: '0.75rem', opacity: 0.6, marginTop: '0.2rem' }}>{transformidableFeature.launch_label as string}</p>
-              )}
-            </div>
-          </div>
-          {transformidableFeature.cta_url && (
-            <a
-              href={transformidableFeature.cta_url as string}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                background: 'var(--color-accent)',
-                color: 'var(--color-white)',
-                padding: '0.6rem 1.5rem',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                letterSpacing: '0.05em',
-              }}
-            >
-              {(transformidableFeature.cta_label as string) || 'Pre-Order →'}
-            </a>
-          )}
-        </section>
-      )}
-
-      {/* Current Book Club Selection Hero */}
-      {currentSelection && (
-        <section style={{
-          maxWidth: '900px',
-          margin: '0 auto',
-          padding: '3rem 2rem',
-          display: 'flex',
-          gap: '2.5rem',
-          alignItems: 'flex-start',
-          flexWrap: 'wrap',
-          borderBottom: '1px solid var(--color-border)',
-        }}>
-          {getCoverUrl(currentSelection) && (
-            <img
-              src={getCoverUrl(currentSelection)!}
-              alt={currentSelection.title as string}
-              style={{ width: '200px', boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}
-            />
-          )}
-          <div style={{ flex: 1, minWidth: '280px' }}>
-            <p style={{
-              fontSize: '0.7rem',
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              color: 'var(--color-accent)',
-              marginBottom: '0.5rem',
-            }}>
-              Current Book Club Selection
-            </p>
-            <h2 style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: '1.8rem',
-              fontWeight: 700,
-              lineHeight: 1.2,
-              marginBottom: '0.3rem',
-            }}>
-              {currentSelection.title as string}
-            </h2>
-            <p style={{ color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
-              by {currentSelection.author as string}
-            </p>
-            {currentSelection.editorial_note && (
-              <p style={{ fontFamily: 'var(--font-serif)', lineHeight: 1.7, marginBottom: '1.5rem' }}>
-                {currentSelection.editorial_note as string}
-              </p>
-            )}
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-              {getBookLinks(currentSelection).map((link) => (
-                <a
-                  key={link.label}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    padding: '0.5rem 1.2rem',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    background: link.label === 'Buy Direct' ? 'var(--color-accent)' : 'var(--color-text)',
-                    color: 'var(--color-white)',
-                    letterSpacing: '0.03em',
-                  }}
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Book Sections */}
-      {Object.entries(sections).map(([key, section]) => {
-        if (section.books.length === 0) return null
-        return (
-          <section key={key} style={{
-            maxWidth: '1100px',
-            margin: '0 auto',
-            padding: '2.5rem 2rem',
-            borderBottom: '1px solid var(--color-border)',
-          }}>
-            <h2 style={{
-              fontSize: '0.75rem',
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              color: 'var(--color-accent)',
-              marginBottom: '1.5rem',
-            }}>
-              {section.label}
-            </h2>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-              gap: '2rem',
-            }}>
-              {section.books.map((book: any) => (
-                <div key={book.id}>
-                  {getCoverUrl(book) && (
-                    <img
-                      src={getCoverUrl(book)!}
-                      alt={book.title}
-                      style={{
-                        width: '100%',
-                        aspectRatio: '2/3',
-                        objectFit: 'cover',
-                        marginBottom: '0.75rem',
-                        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-                      }}
-                    />
-                  )}
-                  <h3 style={{
-                    fontFamily: 'var(--font-serif)',
-                    fontSize: '1rem',
-                    fontWeight: 700,
-                    lineHeight: 1.3,
-                    marginBottom: '0.2rem',
-                  }}>
-                    {book.title}
-                  </h3>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-                    {book.author}
+              <div className="flex-1">
+                <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-gold md:text-xs">
+                  Now Reading
+                </p>
+                {currentSelection.illuminate_badge && (
+                  <span className="mt-2 inline-block rounded-full bg-gold px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-obsidian">
+                    ★ Illuminate Book Club
+                  </span>
+                )}
+                <h2 className="mt-4 font-serif text-3xl font-bold text-parchment md:text-4xl">
+                  {currentSelection.title}
+                </h2>
+                <p className="mt-2 text-sm text-parchment/60">{currentSelection.author}</p>
+                {currentSelection.editorial_note && (
+                  <p className="mt-4 font-serif text-base leading-relaxed text-parchment/80 md:text-lg">
+                    {currentSelection.editorial_note}
                   </p>
-                  {book.illuminate_badge && (
-                    <span style={{
-                      display: 'inline-block',
-                      marginTop: '0.4rem',
-                      fontSize: '0.6rem',
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase',
-                      background: 'var(--color-accent)',
-                      color: 'var(--color-white)',
-                      padding: '0.15rem 0.5rem',
-                    }}>
-                      Illuminate
-                    </span>
+                )}
+                <div className="mt-6 flex flex-wrap gap-3">
+                  {currentSelection.bookshop_url && (
+                    <a href={currentSelection.bookshop_url} target="_blank" rel="noopener noreferrer"
+                      className="rounded-sm bg-gold px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-obsidian transition-colors hover:bg-gold/90">
+                      Buy on Bookshop.org →
+                    </a>
+                  )}
+                  {currentSelection.amazon_url && (
+                    <a href={currentSelection.amazon_url} target="_blank" rel="noopener noreferrer"
+                      className="rounded-sm border border-parchment/30 px-6 py-3 text-xs font-medium uppercase tracking-[0.15em] text-parchment/70 transition-colors hover:text-parchment">
+                      Amazon
+                    </a>
+                  )}
+                  {currentSelection.payhip_url && (
+                    <a href={currentSelection.payhip_url} target="_blank" rel="noopener noreferrer"
+                      className="rounded-sm bg-oxblood px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-parchment transition-colors hover:bg-oxblood/90">
+                      Buy Direct
+                    </a>
                   )}
                 </div>
-              ))}
+              </div>
             </div>
           </section>
-        )
-      })}
+        )}
 
-      {/* Empty state */}
-      {books.length === 0 && (
-        <section style={{
-          textAlign: 'center',
-          padding: '4rem 2rem',
-          color: 'var(--color-text-muted)',
-        }}>
-          <p>The Reading Room is being curated. Check back soon.</p>
-        </section>
-      )}
-    </div>
-  )
+        {/* Past Selections */}
+        {pastSelections.length > 0 && (
+          <BookSection label="Past Selections" books={pastSelections} getCoverUrl={getCoverUrl} showBadge />
+        )}
+
+        {/* Career & Leadership */}
+        {sections.career_leadership.books.length > 0 && (
+          <BookSection label="Career & Leadership" books={sections.career_leadership.books} getCoverUrl={getCoverUrl} />
+        )}
+
+        {/* PMO & Technology */}
+        {sections.pmo_technology.books.length > 0 && (
+          <BookSection label="PMO & Technology" books={sections.pmo_technology.books} getCoverUrl={getCoverUrl} />
+        )}
+
+        {/* Transformidable strip */}
+        {transformidableFeature && (transformidableFeature.tagline || transformidableFeature.cta_url) && (
+          <section className="bg-oxblood">
+            <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 px-6 py-12 md:flex-row md:gap-12 md:py-16">
+              {transformidableFeature.cover_image && typeof transformidableFeature.cover_image === "object" && transformidableFeature.cover_image.url && (
+                <img src={transformidableFeature.cover_image.url} alt="Transformidable" className="w-32 shadow-xl md:w-40" />
+              )}
+              <div className="flex-1 text-center md:text-left">
+                <h3 className="font-serif text-2xl font-bold text-parchment md:text-3xl">Transformidable</h3>
+                {transformidableFeature.tagline && (
+                  <p className="mt-2 text-sm text-parchment/80 md:text-base">{transformidableFeature.tagline}</p>
+                )}
+                {transformidableFeature.launch_label && (
+                  <p className="mt-1 text-xs font-medium uppercase tracking-[0.15em] text-parchment/50">{transformidableFeature.launch_label}</p>
+                )}
+              </div>
+              {transformidableFeature.cta_url && (
+                <a href={transformidableFeature.cta_url} target="_blank" rel="noopener noreferrer"
+                  className="rounded-sm bg-gold px-8 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-obsidian transition-colors hover:bg-gold/90">
+                  {transformidableFeature.cta_label || "Pre-Order →"}
+                </a>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* Staff Picks */}
+        {sections.staff_picks.books.length > 0 && (
+          <BookSection label="Staff Picks" books={sections.staff_picks.books} getCoverUrl={getCoverUrl} />
+        )}
+
+        {/* Empty state */}
+        {books.length === 0 && !currentSelection && (
+          <section className="bg-parchment">
+            <div className="mx-auto max-w-3xl px-6 py-20 text-center">
+              <p className="font-serif text-lg text-obsidian/60 italic">The Reading Room is being curated. Check back soon.</p>
+            </div>
+          </section>
+        )}
+      </main>
+      <Footer />
+    </>
+  );
+}
+
+function BookSection({ label, books, getCoverUrl, showBadge = false }) {
+  return (
+    <section className="bg-parchment">
+      <div className="mx-auto max-w-5xl px-6 py-12 md:py-16">
+        <h2 className="text-[10px] font-medium uppercase tracking-[0.25em] text-oxblood md:text-xs">{label}</h2>
+        <div className="mt-4 h-[2px] w-16 bg-oxblood" />
+        <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6">
+          {books.map((book) => (
+            <div key={book.id} className="flex flex-col">
+              {getCoverUrl(book) && (
+                <img src={getCoverUrl(book)} alt={book.title} className="mb-4 w-full max-w-[200px] shadow-md" />
+              )}
+              {showBadge && book.illuminate_badge && (
+                <span className="mb-2 inline-block w-fit rounded-full bg-gold px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-obsidian">
+                  ★ Illuminate
+                </span>
+              )}
+              <h3 className="font-serif text-base font-semibold leading-snug text-obsidian md:text-lg">{book.title}</h3>
+              <p className="mt-1 text-xs text-obsidian/50">{book.author}</p>
+              {book.editorial_note && (
+                <p className="mt-2 text-xs leading-relaxed text-obsidian/60">{book.editorial_note}</p>
+              )}
+              <div className="mt-3 flex gap-2">
+                {book.bookshop_url && (
+                  <a href={book.bookshop_url} target="_blank" rel="noopener noreferrer"
+                    className="text-[10px] font-medium uppercase tracking-[0.15em] text-oxblood transition-colors hover:text-gold">
+                    Bookshop.org
+                  </a>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
