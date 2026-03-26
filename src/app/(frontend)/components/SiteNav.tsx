@@ -28,12 +28,12 @@ export default function SiteNav() {
               {link.label}
             </Link>
           ))}
-          <a
-            href="#newsletter"
+          <Link
+            href="/subscribe"
             className="text-xs font-medium uppercase tracking-[0.2em] text-parchment/70 transition-colors hover:text-gold"
           >
             Subscribe
-          </a>
+          </Link>
         </div>
         <div className="flex items-center gap-4 md:hidden">
           <button
