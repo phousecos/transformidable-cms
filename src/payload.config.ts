@@ -44,6 +44,8 @@ export default buildConfig({
   serverURL,
 
   cors: [
+    'https://transformidable.media',
+    'https://www.transformidable.media',
     'https://jerribland.com',
     'https://lumynr.com',
     'https://agentpmo.com',
