@@ -14,10 +14,10 @@ export default async function HomePage() {
     sort: '-issueNumber',
     limit: 1,
   })
-  const latestIssue = issuesResult.docs[0]
+  const latestIssue = issuesResult.docs[0] as Record<string, any> | undefined
 
   // Fetch site settings
-  const siteSettings = await payload.findGlobal({ slug: 'site-settings' })
+  const siteSettings = await payload.findGlobal({ slug: 'site-settings' }) as Record<string, any>
   const founderLetter = siteSettings.founderLetter as { title?: string; isVisible?: boolean } | undefined
 
   return (

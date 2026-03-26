@@ -26,7 +26,7 @@ function renderRichText(content: unknown): React.ReactNode {
   })
 }
 
-export default async function IssuePage({ params }: { params: Promise<{ issueNumber: string }> }) {
+export default async function IssuePage({ params }: { params: Promise<{ issueNumber: string }> }): Promise<React.JSX.Element> {
   const { issueNumber } = await params
   const payload = await getPayload({ config })
 
@@ -37,7 +37,7 @@ export default async function IssuePage({ params }: { params: Promise<{ issueNum
     limit: 1,
   })
 
-  const issue = issueResult.docs[0]
+  const issue = issueResult.docs[0] as Record<string, any>
   if (!issue) notFound()
 
   // Fetch articles for this issue with populated verticals
@@ -51,7 +51,7 @@ export default async function IssuePage({ params }: { params: Promise<{ issueNum
     depth: 1,
   })
 
-  const articles = articlesResult.docs
+  const articles = articlesResult.docs as Record<string, any>[]
   const editorLetter = issue.editorLetter as { title?: string; body?: unknown; signoff?: string } | undefined
 
   return (
