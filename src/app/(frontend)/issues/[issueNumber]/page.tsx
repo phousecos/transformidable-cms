@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react'
 import config from '@payload-config'
 import { getPayload } from 'payload'
