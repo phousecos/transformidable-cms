@@ -1,4 +1,4 @@
-import { getPayload } from 'payload'
+import { getPayload, type Where } from 'payload'
 import config from './payload.config.ts'
 
 const payload = await getPayload({ config })
@@ -29,7 +29,7 @@ function richText(paragraphs: string[]) {
 // ── Helper: find-or-create ───────────────────────────────────────────
 async function findOrCreate<T extends Record<string, unknown>>(
   collection: string,
-  where: Record<string, unknown>,
+  where: Where,
   data: T,
 ): Promise<{ id: number }> {
   const existing = await payload.find({
