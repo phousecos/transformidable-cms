@@ -3,6 +3,7 @@ import config from "@payload-config";
 import { getPayload } from "payload";
 import Footer from "../components/Footer";
 import BookGrid from "../components/BookGrid";
+import HeroBookClub from "../components/HeroBookClub";
 
 export const dynamic = "force-dynamic";
 
@@ -95,56 +96,20 @@ export default async function ReadingRoomPage() {
 
       <main className="min-h-[60vh]">
         {/* Hero — Now Reading */}
-        <section id="now-reading" className="bg-obsidian/95">
-          <div className="mx-auto max-w-5xl px-6 pb-12 pt-10 md:pb-16 md:pt-14">
-            {currentSelection ? (
-              <>
-                <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-gold md:text-xs">
-                  {heroDateLabel}
-                </p>
-                <div className="mt-6 flex flex-col items-start gap-6 md:flex-row md:gap-10">
-                  {getCoverUrl(currentSelection) && (
-                    <div className="shrink-0">
-                      <img
-                        src={getCoverUrl(currentSelection)}
-                        alt={currentSelection.title}
-                        className="w-40 shadow-xl md:w-48"
-                      />
-                    </div>
-                  )}
-                  <div className="flex-1">
-                    {currentSelection.illuminate_badge && (
-                      <span className="inline-block rounded-full bg-gold px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-obsidian">
-                        ★ Illuminate Book Club
-                      </span>
-                    )}
-                    <h2 className="mt-3 font-serif text-3xl font-bold text-parchment md:text-4xl">
-                      {currentSelection.title}
-                    </h2>
-                    <p className="mt-1 text-sm text-parchment/60">{currentSelection.author}</p>
-                    {currentSelection.editorial_note && (
-                      <p className="mt-4 text-sm leading-relaxed text-parchment/70 md:text-base">
-                        {currentSelection.editorial_note}
-                      </p>
-                    )}
-                    <div className="mt-6">
-                      {currentSelection.bookshop_url && (
-                        <a href={currentSelection.bookshop_url} target="_blank" rel="noopener noreferrer"
-                          className="inline-block rounded-sm border border-parchment/40 px-6 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-parchment transition-colors hover:bg-parchment/10 md:text-xs">
-                          Buy on Bookshop.org
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </>
-            ) : (
+        {currentSelection ? (
+          <HeroBookClub
+            book={serializeBook(currentSelection)}
+            dateLabel={heroDateLabel}
+          />
+        ) : (
+          <section id="now-reading" className="bg-obsidian/95">
+            <div className="mx-auto max-w-5xl px-6 pb-12 pt-10 md:pb-16 md:pt-14">
               <p className="font-serif text-lg text-parchment/60 italic">
                 The Reading Room is being curated. Check back soon.
               </p>
-            )}
-          </div>
-        </section>
+            </div>
+          </section>
+        )}
 
         {/* FTC Affiliate Disclosure */}
         <div className="bg-obsidian/90 border-t border-parchment/5">
