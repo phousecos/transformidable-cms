@@ -1,6 +1,7 @@
 // @ts-nocheck
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 import SiteNav from "./SiteNav";
 
 type View =
@@ -129,7 +130,7 @@ function CoverView({ issue, articles, issueNumber, onNavigate }: { issue: any; a
           {issueNumber}
         </p>
         <div className="mt-4">
-          <span className="font-serif text-2xl font-bold text-parchment/80 md:text-3xl">Transformidable</span>
+          <Image src="/logo-new.png" alt="Transformidable" width={800} height={200} className="h-16 w-auto opacity-80 md:h-20" />
         </div>
         <h1 className="mt-6 font-serif text-3xl font-bold italic leading-tight text-parchment md:mt-8 md:text-[40px] md:leading-[1.15]">
           {issue.themeTagline || issue.title}
@@ -209,7 +210,7 @@ function ThisIssueView({ issue, flagship, remaining, onOpenArticle }: { issue: a
     <section className="bg-parchment">
       <div className="mx-auto max-w-5xl px-6 pb-16 pt-10 md:pt-14 md:pb-20">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
-          <span className="font-serif text-2xl font-bold text-obsidian md:text-3xl">Transformidable</span>
+          <Image src="/logo-new.png" alt="Transformidable" width={800} height={200} className="h-16 w-auto brightness-0 md:h-20" />
           <p className="text-[10px] font-medium uppercase tracking-[0.15em] text-obsidian/40 md:text-xs">
             {issue.issueNumber != null && <>Issue {String(issue.issueNumber).padStart(2, "0")}</>}
             {issue.issueNumber != null && issue.volume != null && <> · </>}
