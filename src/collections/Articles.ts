@@ -139,5 +139,56 @@ export const Articles: CollectionConfig = {
         description: 'Select which brand sites this article should be syndicated to',
       },
     },
+    // ── Legacy fields (hidden — DB columns preserved) ────────────
+    {
+      name: 'author',
+      type: 'relationship',
+      relationTo: 'authors',
+      admin: { hidden: true },
+    },
+    {
+      name: 'excerpt',
+      type: 'textarea',
+      admin: { hidden: true },
+    },
+    {
+      name: 'publishDate',
+      type: 'date',
+      admin: { hidden: true },
+    },
+    {
+      name: 'featuredImage',
+      type: 'upload',
+      relationTo: 'media',
+      admin: { hidden: true },
+    },
+    {
+      name: 'brandPillars',
+      type: 'relationship',
+      relationTo: 'brand-pillars',
+      hasMany: true,
+      admin: { hidden: true },
+    },
+    {
+      name: 'cycleNumber',
+      type: 'number',
+      admin: { hidden: true },
+    },
+    {
+      name: 'seoTitle',
+      type: 'text',
+      admin: { hidden: true },
+    },
+    {
+      name: 'seoDescription',
+      type: 'textarea',
+      admin: { hidden: true },
+    },
+    {
+      name: 'isMemberOnly',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { hidden: true },
+    },
   ],
 }
