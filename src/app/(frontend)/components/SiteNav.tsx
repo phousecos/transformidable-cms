@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const navLinks = [
   { href: "/archive", label: "Archive" },
@@ -14,8 +15,8 @@ export default function SiteNav() {
   return (
     <nav className="sticky top-0 z-50 bg-obsidian">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-        <Link href="/" className="block shrink-0 font-serif text-2xl font-bold text-parchment md:text-3xl">
-          Transformidable
+        <Link href="/" className="block shrink-0">
+          <Image src="/logo-new.png" alt="Transformidable" width={800} height={200} className="h-16 w-auto md:h-20" priority />
         </Link>
         <div className="hidden items-center gap-6 md:flex lg:gap-8">
           {navLinks.map((link) => (
