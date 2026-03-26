@@ -7,9 +7,7 @@ export const Articles: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'issue', 'vertical', 'displayOrder', 'isFlagship', 'status'],
   },
-  versions: {
-    drafts: false,
-  },
+  versions: true,
   access: {
     create: isLoggedIn,
     read: ({ req: { user } }) => {
@@ -137,6 +135,79 @@ export const Articles: CollectionConfig = {
       ],
       admin: {
         description: 'Select which brand sites this article should be syndicated to',
+      },
+    },
+
+    // ── Legacy fields (kept for existing data) ─────────────────
+    {
+      name: 'author',
+      type: 'relationship',
+      relationTo: 'authors',
+      admin: {
+        description: '(Legacy) Original author relationship — data preserved for migration',
+      },
+    },
+    {
+      name: 'excerpt',
+      type: 'textarea',
+      admin: {
+        description: '(Legacy) Replaced by dek — data preserved for migration',
+      },
+    },
+    {
+      name: 'publishDate',
+      type: 'date',
+      admin: {
+        description: '(Legacy) Replaced by publishedAt — data preserved for migration',
+        date: {
+          pickerAppearance: 'dayAndTime',
+        },
+      },
+    },
+    {
+      name: 'featuredImage',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: '(Legacy) Hero/featured image — data preserved for migration',
+      },
+    },
+    {
+      name: 'brandPillars',
+      type: 'relationship',
+      relationTo: 'brand-pillars',
+      hasMany: true,
+      admin: {
+        description: '(Legacy) Replaced by vertical — data preserved for migration',
+      },
+    },
+    {
+      name: 'cycleNumber',
+      type: 'number',
+      admin: {
+        description: '(Legacy) Editorial calendar cycle — data preserved for migration',
+      },
+    },
+    {
+      name: 'seoTitle',
+      type: 'text',
+      admin: {
+        description: '(Legacy) SEO title override — data preserved for migration',
+      },
+    },
+    {
+      name: 'seoDescription',
+      type: 'textarea',
+      admin: {
+        description: '(Legacy) SEO description — data preserved for migration',
+      },
+    },
+    {
+      name: 'isMemberOnly',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        description: '(Legacy) Lumynr exclusive flag — data preserved for migration',
       },
     },
   ],

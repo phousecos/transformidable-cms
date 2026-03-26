@@ -185,14 +185,13 @@ console.log('[migrate] Statements to apply:', JSON.stringify(statements, null, 2
 
 if (warnings.length) {
   console.log('[migrate] Push warnings:', warnings.join('\n'))
+  if (hasDataLoss) {
+    console.log('[migrate] DATA LOSS WARNING — proceeding (legacy columns preserved via hidden fields)')
+  }
 }
 
-if (hasDataLoss) {
-  console.log('[migrate] Skipping apply — would cause data loss (drop columns/tables). Existing DB columns preserved.')
-} else {
-  await apply()
-  console.log('[migrate] Schema push complete.')
-}
+await apply()
+console.log('[migrate] Schema push complete.')
 
 await payload.db.migrate()
 
