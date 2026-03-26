@@ -65,6 +65,13 @@ export const Issues: CollectionConfig = {
       type: 'group',
       fields: [
         {
+          name: 'title',
+          type: 'text',
+          admin: {
+            description: 'e.g. "Letter to the Editor"',
+          },
+        },
+        {
           name: 'body',
           type: 'richText',
           admin: {
