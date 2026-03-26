@@ -13,6 +13,7 @@ import { Issues } from './collections/Issues.ts'
 import { Verticals } from './collections/Verticals.ts'
 import { Books } from './collections/Books.ts'
 import { SiteSettings } from './globals/SiteSettings.ts'
+import { TransformidableFeature } from './globals/TransformidableFeature.ts'
 
 // Legacy collections — kept so Payload can still read/write their DB tables.
 // Articles still references authors and brand-pillars via legacy fields.
@@ -83,7 +84,7 @@ export default buildConfig({
     { ...NewsletterIssues, admin: { ...NewsletterIssues.admin, hidden: true } },
   ],
 
-  globals: [SiteSettings],
+  globals: [SiteSettings, TransformidableFeature],
 
   db: postgresAdapter({
     pool: {
