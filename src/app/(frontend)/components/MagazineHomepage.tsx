@@ -27,7 +27,7 @@ function lexicalToHtml(node: any): string {
   const children = (node.children ?? []).map(lexicalToHtml).join("");
   switch (node.type) {
     case "root": return children;
-    case "paragraph": return `<p>${children}</p>`;
+    case "paragraph": return children ? `<p>${children}</p>` : `<p><br /></p>`;
     case "heading": return `<${node.tag ?? "h2"}>${children}</${node.tag ?? "h2"}>`;
     case "quote": return `<blockquote>${children}</blockquote>`;
     case "list": return node.listType === "number" ? `<ol>${children}</ol>` : `<ul>${children}</ul>`;
@@ -102,7 +102,7 @@ export default function MagazineHomepage({ issue, articles }: MagazineHomepagePr
 
       <main className="min-h-[60vh]">
         {view.kind === "cover" && (
-          <CoverView issue={issue} articles={sortedArticles} issueNumber={issueNumberFormatted} onNavigate={() => setView({ kind: "this-issue" })} />
+          <CoverView issue={issue} articles={sortedArticles} issueNumber={issueNumberFormatted} onNavigate={() => setView({ kind: "this-issue" })} onOpenArticle={openArticle} />
         )}
         {view.kind === "editors-letter" && (
           <EditorsLetterView issue={issue} />
@@ -118,7 +118,7 @@ export default function MagazineHomepage({ issue, articles }: MagazineHomepagePr
   );
 }
 
-function CoverView({ issue, articles, issueNumber, onNavigate }: { issue: any; articles: any[]; issueNumber: string; onNavigate: () => void }) {
+function CoverView({ issue, articles, issueNumber, onNavigate, onOpenArticle }: { issue: any; articles: any[]; issueNumber: string; onNavigate: () => void; onOpenArticle: (a: any, p: number) => void }) {
   return (
     <section className="bg-obsidian">
       <div className="mx-auto max-w-5xl px-6 pb-16 pt-12 md:pt-16 md:pb-20">
@@ -142,7 +142,11 @@ function CoverView({ issue, articles, issueNumber, onNavigate }: { issue: any; a
         <p className="mt-8 text-[10px] font-medium uppercase tracking-[0.25em] text-parchment/50 md:text-xs">In This Issue</p>
         <div className="mt-6 space-y-4">
           {articles.map((a) => (
-            <div key={a.id} className="flex items-baseline gap-4">
+            <button
+              key={a.id}
+              onClick={() => onOpenArticle(a, a.displayOrder ?? 0)}
+              className="flex w-full items-baseline gap-4 text-left transition-colors hover:opacity-80"
+            >
               <span className="w-6 shrink-0 text-right text-xs font-bold text-gold">
                 {String(a.displayOrder ?? 0).padStart(2, "0")}
               </span>
@@ -150,7 +154,7 @@ function CoverView({ issue, articles, issueNumber, onNavigate }: { issue: any; a
               <span className={`font-serif text-sm leading-snug md:text-base ${a.isFlagship ? "font-semibold text-parchment" : "font-normal text-parchment/70"}`}>
                 {a.title}
               </span>
-            </div>
+            </button>
           ))}
         </div>
         <button onClick={onNavigate} className="mt-10 rounded-sm border border-gold/60 px-8 py-3 text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors hover:bg-gold/10">
@@ -186,7 +190,7 @@ function EditorsLetterView({ issue }: { issue: any }) {
         <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-oxblood md:text-xs">From the Editor</p>
         <div className="mt-4 h-[2px] w-16 bg-oxblood" />
         <div
-          className="mt-10 space-y-6 font-serif text-lg leading-[1.8] text-obsidian md:mt-14 md:text-xl [&>p]:mb-6"
+          className="mt-10 font-serif text-lg leading-[1.8] text-obsidian md:mt-14 md:text-xl [&>p]:mb-6 [&>p:empty]:h-4"
           dangerouslySetInnerHTML={{ __html: body }}
         />
         <div className="mt-12 h-px w-full bg-obsidian/10 md:mt-16" />
@@ -308,7 +312,7 @@ function ArticleReadView({ article, position, issue, allArticles, onOpenArticle,
       <div className="bg-parchment">
         <div className="mx-auto max-w-3xl px-6 py-16 md:py-20">
           {body ? (
-            <div className="prose prose-lg max-w-none font-light text-obsidian/80" dangerouslySetInnerHTML={{ __html: body }} />
+            <div className="prose prose-lg max-w-none font-light text-obsidian/80 [&>p]:mb-6 [&>p:empty]:h-4" dangerouslySetInnerHTML={{ __html: body }} />
           ) : (
             <p className="font-serif text-lg text-obsidian/60 italic">Full article content coming soon.</p>
           )}
