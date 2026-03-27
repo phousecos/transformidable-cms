@@ -34,6 +34,7 @@ export default async function ReadingRoomPage() {
 
   const sections = {
     career_leadership: { label: "Career & Leadership", id: "career", books: [] as any[] },
+    professional_development: { label: "Professional Development", id: "professional-development", books: [] as any[] },
     pmo_technology: { label: "PMO & Technology", id: "pmo", books: [] as any[] },
     staff_picks: { label: "Staff Picks", id: "picks", books: [] as any[] },
   };
@@ -56,6 +57,7 @@ export default async function ReadingRoomPage() {
     { label: "Now Reading", href: "#now-reading" },
   ];
   if (sections.career_leadership.books.length > 0) navItems.push({ label: "Career Lists", href: "#career" });
+  if (sections.professional_development.books.length > 0) navItems.push({ label: "Pro Dev", href: "#professional-development" });
   if (sections.pmo_technology.books.length > 0) navItems.push({ label: "PMO & Tech", href: "#pmo" });
   navItems.push({ label: "Transformidable", href: "/" });
   if (sections.staff_picks.books.length > 0) navItems.push({ label: "Picks", href: "#picks" });
@@ -138,6 +140,17 @@ export default async function ReadingRoomPage() {
               <h2 className="font-serif text-xl font-bold italic text-oxblood md:text-2xl">Career &amp; Leadership</h2>
               <div className="mt-2 h-px bg-oxblood/20" />
               <BookGrid books={sections.career_leadership.books.map(serializeBook)} />
+            </div>
+          </section>
+        )}
+
+        {/* Professional Development */}
+        {sections.professional_development.books.length > 0 && (
+          <section id="professional-development" className="bg-parchment">
+            <div className="mx-auto max-w-5xl px-6 py-12 md:py-16">
+              <h2 className="font-serif text-xl font-bold italic text-oxblood md:text-2xl">Professional Development</h2>
+              <div className="mt-2 h-px bg-oxblood/20" />
+              <BookGrid books={sections.professional_development.books.map(serializeBook)} />
             </div>
           </section>
         )}

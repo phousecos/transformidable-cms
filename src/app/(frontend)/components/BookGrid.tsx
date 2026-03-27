@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 interface BookData {
   id: number;
@@ -19,54 +19,95 @@ interface BookGridProps {
 
 export default function BookGrid({ books, showBadge = false }: BookGridProps) {
   const [modalBook, setModalBook] = useState<BookData | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: "left" | "right") => {
+    if (!scrollRef.current) return;
+    const cardWidth = 220 + 24; // card min-width + gap
+    scrollRef.current.scrollBy({
+      left: direction === "left" ? -cardWidth * 2 : cardWidth * 2,
+      behavior: "smooth",
+    });
+  };
+
+  const showArrows = books.length > 3;
 
   return (
     <>
-      <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
-        {books.map((book) => (
-          <div key={book.id} className="flex flex-col">
-            {book.coverUrl ? (
-              <div className="mb-4 aspect-[2/3] w-full overflow-hidden bg-obsidian/10">
-                <img
-                  src={book.coverUrl}
-                  alt={book.title}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            ) : (
-              <div className="mb-4 flex aspect-[2/3] w-full items-end bg-obsidian/10 p-3">
-                <p className="text-[9px] font-medium text-gold md:text-[10px]">{book.title}</p>
-              </div>
-            )}
-            {showBadge && book.illuminate_badge && (
-              <span className="mb-2 inline-block w-fit rounded-full bg-gold px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-obsidian">
-                ★ Illuminate
-              </span>
-            )}
-            <h3 className="font-serif text-base font-semibold leading-snug text-obsidian">{book.title}</h3>
-            <p className="mt-0.5 text-xs text-obsidian/50">{book.author}</p>
-            <div className="mt-3 flex items-center gap-3">
-              {book.bookshop_url && (
-                <a
-                  href={book.bookshop_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="border-b border-oxblood/40 pb-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-oxblood transition-colors hover:text-gold md:text-xs"
-                >
-                  Buy on Bookshop
-                </a>
+      <div className="relative mt-8">
+        {/* Left arrow */}
+        {showArrows && (
+          <button
+            onClick={() => scroll("left")}
+            className="absolute -left-3 top-1/3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-obsidian/80 text-parchment shadow-lg transition-colors hover:bg-obsidian md:-left-4"
+            aria-label="Scroll left"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
+          </button>
+        )}
+
+        {/* Scrollable row */}
+        <div
+          ref={scrollRef}
+          className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {books.map((book) => (
+            <div key={book.id} className="flex w-[220px] shrink-0 flex-col">
+              {book.coverUrl ? (
+                <div className="mb-4 aspect-[2/3] w-full overflow-hidden bg-obsidian/10">
+                  <img
+                    src={book.coverUrl}
+                    alt={book.title}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="mb-4 flex aspect-[2/3] w-full items-end bg-obsidian/10 p-3">
+                  <p className="text-[9px] font-medium text-gold md:text-[10px]">{book.title}</p>
+                </div>
               )}
-              {book.editorial_note && (
-                <button
-                  onClick={() => setModalBook(book)}
-                  className="text-[10px] font-medium uppercase tracking-[0.15em] text-obsidian/40 transition-colors hover:text-obsidian md:text-xs"
-                >
-                  More
-                </button>
+              {showBadge && book.illuminate_badge && (
+                <span className="mb-2 inline-block w-fit rounded-full bg-gold px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-obsidian">
+                  ★ Illuminate
+                </span>
               )}
+              <h3 className="font-serif text-base font-semibold leading-snug text-obsidian">{book.title}</h3>
+              <p className="mt-0.5 text-xs text-obsidian/50">{book.author}</p>
+              <div className="mt-3 flex items-center gap-3">
+                {book.bookshop_url && (
+                  <a
+                    href={book.bookshop_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="border-b border-oxblood/40 pb-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-oxblood transition-colors hover:text-gold md:text-xs"
+                  >
+                    Buy on Bookshop
+                  </a>
+                )}
+                {book.editorial_note && (
+                  <button
+                    onClick={() => setModalBook(book)}
+                    className="text-[10px] font-medium uppercase tracking-[0.15em] text-obsidian/40 transition-colors hover:text-obsidian md:text-xs"
+                  >
+                    More
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+
+        {/* Right arrow */}
+        {showArrows && (
+          <button
+            onClick={() => scroll("right")}
+            className="absolute -right-3 top-1/3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-obsidian/80 text-parchment shadow-lg transition-colors hover:bg-obsidian md:-right-4"
+            aria-label="Scroll right"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
+          </button>
+        )}
       </div>
 
       {/* Description modal */}
