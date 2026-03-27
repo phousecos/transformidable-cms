@@ -129,9 +129,6 @@ function CoverView({ issue, articles, issueNumber, onNavigate, onOpenArticle }: 
         <p className="font-serif text-[64px] font-bold leading-none text-parchment/20 md:text-[96px]" aria-hidden="true">
           {issueNumber}
         </p>
-        <div className="mt-4">
-          <Image src="/logo-new.png" alt="Transformidable" width={800} height={200} className="h-16 w-auto opacity-80 md:h-20" />
-        </div>
         <h1 className="mt-6 font-serif text-3xl font-bold italic leading-tight text-parchment md:mt-8 md:text-[40px] md:leading-[1.15]">
           {issue.themeTagline || issue.title}
         </h1>
