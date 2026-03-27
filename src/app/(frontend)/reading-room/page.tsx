@@ -177,13 +177,14 @@ export default async function ReadingRoomPage() {
                   </p>
                 )}
                 <h3 className="mt-1 font-serif text-lg font-bold text-parchment md:text-xl">
-                  Transformidable
+                  TRANSFORMIDABLE: Leading Change with Clarity, Courage, and Conviction
                 </h3>
-                <p className="mt-0.5 text-xs text-parchment/70 md:text-sm">
-                  {transformidableFeature.tagline
-                    ? `Dr. Jerri Bland — ${transformidableFeature.tagline}`
-                    : "Dr. Jerri Bland"}
+                <p className="mt-1 text-xs text-parchment/70 md:text-sm">
+                  Dr. Jerri Bland{transformidableFeature.tagline ? ` — ${transformidableFeature.tagline}` : ""}
                 </p>
+                <span className="mt-2 inline-block rounded-sm border border-gold/60 px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-gold md:text-[10px]">
+                  Coming June 2026
+                </span>
               </div>
               {transformidableFeature.cta_url && (
                 <a href={transformidableFeature.cta_url} target="_blank" rel="noopener noreferrer"
