@@ -123,8 +123,7 @@ function CoverView({ issue, articles, issueNumber, onNavigate, onOpenArticle }: 
     <section className="bg-obsidian">
       <div className="mx-auto max-w-5xl px-6 pb-16 pt-12 md:pt-16 md:pb-20">
         <p className="mb-10 text-[10px] font-medium uppercase tracking-[0.25em] text-parchment/50 md:mb-14 md:text-xs">
-          {issue.volume != null && <>Volume {issue.volume} &nbsp;·&nbsp;</>}
-          Powerhouse Industries
+          {issue.title || "Transformidable"}
         </p>
         <p className="font-serif text-[64px] font-bold leading-none text-parchment/20 md:text-[96px]" aria-hidden="true">
           {issueNumber}
@@ -276,6 +275,16 @@ function ThisIssueView({ issue, flagship, remaining, onOpenArticle }: { issue: a
   );
 }
 
+function PullQuote({ quote }: { quote: string }) {
+  return (
+    <aside className="my-12 border-y border-oxblood/30 py-8 md:my-16 md:py-10">
+      <p className="font-serif text-xl font-semibold italic leading-relaxed text-obsidian md:text-2xl md:leading-relaxed">
+        &ldquo;{quote}&rdquo;
+      </p>
+    </aside>
+  );
+}
+
 function ArticleReadView({ article, position, issue, allArticles, onOpenArticle, onBackToIssue }: any) {
   const body = normalizeBody(article.body);
   const sorted = [...allArticles].sort((a: any, b: any) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
@@ -286,6 +295,55 @@ function ArticleReadView({ article, position, issue, allArticles, onOpenArticle,
   const verticalLabel = (a: any) => {
     if (a.vertical && typeof a.vertical === "object") return a.vertical.name;
     return "";
+  };
+
+  // Split body HTML into chunks to interleave pull quotes
+  const pullQuotes = Array.isArray(article.pullQuotes) ? article.pullQuotes : [];
+  const afterIntro = pullQuotes.filter((q: any) => q.position === "after_intro");
+  const mid = pullQuotes.filter((q: any) => q.position === "mid");
+  const nearEnd = pullQuotes.filter((q: any) => q.position === "near_end");
+
+  // Split paragraphs to insert quotes at appropriate positions
+  const paragraphs = body ? body.split("</p>").filter((p: string) => p.trim()).map((p: string) => p + "</p>") : [];
+  const totalParagraphs = paragraphs.length;
+  const introBreak = Math.max(2, Math.floor(totalParagraphs * 0.25));
+  const midBreak = Math.floor(totalParagraphs * 0.5);
+  const endBreak = Math.max(midBreak + 1, Math.floor(totalParagraphs * 0.75));
+
+  const renderBody = () => {
+    if (!body) return null;
+    if (pullQuotes.length === 0) {
+      return <div className="prose prose-lg max-w-none font-light text-obsidian/80 [&>p]:mb-6 [&>p:empty]:h-4" dangerouslySetInnerHTML={{ __html: body }} />;
+    }
+
+    const chunks: { type: "html" | "quote"; content: string }[] = [];
+    let current = "";
+
+    paragraphs.forEach((p: string, i: number) => {
+      current += p;
+      if (i === introBreak - 1 && afterIntro.length > 0) {
+        chunks.push({ type: "html", content: current });
+        current = "";
+        afterIntro.forEach((q: any) => chunks.push({ type: "quote", content: q.quote }));
+      } else if (i === midBreak - 1 && mid.length > 0) {
+        chunks.push({ type: "html", content: current });
+        current = "";
+        mid.forEach((q: any) => chunks.push({ type: "quote", content: q.quote }));
+      } else if (i === endBreak - 1 && nearEnd.length > 0) {
+        chunks.push({ type: "html", content: current });
+        current = "";
+        nearEnd.forEach((q: any) => chunks.push({ type: "quote", content: q.quote }));
+      }
+    });
+    if (current) chunks.push({ type: "html", content: current });
+
+    return chunks.map((chunk, i) =>
+      chunk.type === "quote" ? (
+        <PullQuote key={`q-${i}`} quote={chunk.content} />
+      ) : (
+        <div key={`h-${i}`} className="prose prose-lg max-w-none font-light text-obsidian/80 [&>p]:mb-6 [&>p:empty]:h-4" dangerouslySetInnerHTML={{ __html: chunk.content }} />
+      )
+    );
   };
 
   return (
@@ -309,7 +367,7 @@ function ArticleReadView({ article, position, issue, allArticles, onOpenArticle,
       <div className="bg-parchment">
         <div className="mx-auto max-w-3xl px-6 py-16 md:py-20">
           {body ? (
-            <div className="prose prose-lg max-w-none font-light text-obsidian/80 [&>p]:mb-6 [&>p:empty]:h-4" dangerouslySetInnerHTML={{ __html: body }} />
+            <>{renderBody()}</>
           ) : (
             <p className="font-serif text-lg text-obsidian/60 italic">Full article content coming soon.</p>
           )}
