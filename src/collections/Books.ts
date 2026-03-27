@@ -97,6 +97,7 @@ export const Books: CollectionConfig = {
       options: [
         { label: 'Book Club', value: 'book_club' },
         { label: 'Career & Leadership', value: 'career_leadership' },
+        { label: 'Professional Development', value: 'professional_development' },
         { label: 'PMO & Technology', value: 'pmo_technology' },
         { label: 'Staff Picks', value: 'staff_picks' },
       ],
