@@ -1,5 +1,6 @@
 import type { CollectionConfig, Where } from 'payload'
 import { isLoggedIn } from '../access/checkRole.ts'
+import { syndicateArticleAfterChange } from './hooks/syndicate.ts'
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
@@ -8,6 +9,9 @@ export const Articles: CollectionConfig = {
     defaultColumns: ['title', 'issue', 'vertical', 'displayOrder', 'isFlagship', 'status'],
   },
   versions: true,
+  hooks: {
+    afterChange: [syndicateArticleAfterChange],
+  },
   access: {
     create: isLoggedIn,
     read: ({ req: { user } }) => {
