@@ -95,7 +95,14 @@ export default buildConfig({
     push: false,
   }),
 
-  secret: process.env.PAYLOAD_SECRET || 'CHANGE-ME-IN-PRODUCTION',
+  secret: (() => {
+    const secret = process.env.PAYLOAD_SECRET
+    if (secret) return secret
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('PAYLOAD_SECRET is required in production')
+    }
+    return 'dev-only-insecure-secret'
+  })(),
 
   sharp,
 
