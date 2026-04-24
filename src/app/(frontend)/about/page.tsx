@@ -76,13 +76,14 @@ function BrandCard({ brand }: { brand: { name: string; url: string; domain: stri
       href={brand.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block rounded-lg border border-obsidian/10 p-6 transition-colors hover:border-obsidian/20"
+      aria-label={`${brand.name} — ${brand.domain} (opens in new window)`}
+      className="block rounded-lg border border-obsidian/20 p-6 transition-colors hover:border-obsidian/40 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-oxblood"
     >
       <h4 className="font-serif text-lg font-bold text-obsidian">{brand.name}</h4>
       <p className="mt-1 text-[10px] font-medium uppercase tracking-[0.15em] text-gold md:text-xs">
         {brand.domain}
       </p>
-      <p className="mt-3 text-sm leading-relaxed text-obsidian/60">{brand.description}</p>
+      <p className="mt-3 text-sm leading-relaxed text-obsidian/80">{brand.description}</p>
     </a>
   );
 }
@@ -91,7 +92,7 @@ export default function AboutPage() {
   return (
     <>
       <SiteNav />
-      <main>
+      <main id="main-content">
         {/* Dark hero */}
         <section className="bg-obsidian">
           <div className="mx-auto max-w-5xl px-6 pb-16 pt-12 md:pb-20 md:pt-16">

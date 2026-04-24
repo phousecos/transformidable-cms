@@ -77,7 +77,7 @@ export default async function ReadingRoomPage() {
   return (
     <>
       {/* Reading Room sub-nav */}
-      <nav className="sticky top-0 z-50 bg-obsidian">
+      <nav aria-label="Reading Room sections" className="sticky top-0 z-50 bg-obsidian">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <a href="/reading-room" className="block shrink-0 font-serif text-lg font-bold text-parchment md:text-xl">
             The Reading Room
@@ -96,7 +96,7 @@ export default async function ReadingRoomPage() {
         </div>
       </nav>
 
-      <main className="min-h-[60vh]">
+      <main id="main-content" className="min-h-[60vh]">
         {/* Hero — Now Reading */}
         {currentSelection ? (
           <HeroBookClub
@@ -188,8 +188,8 @@ export default async function ReadingRoomPage() {
               </div>
               {transformidableFeature.cta_url && (
                 <a href={transformidableFeature.cta_url} target="_blank" rel="noopener noreferrer"
-                  className="shrink-0 rounded-sm border border-parchment/50 px-5 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-parchment transition-colors hover:bg-parchment/10 md:text-xs">
-                  {transformidableFeature.cta_label || "Pre-Order →"}
+                  className="shrink-0 rounded-sm border border-parchment/60 px-5 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-parchment transition-colors hover:bg-parchment/10 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-gold md:text-xs">
+                  {transformidableFeature.cta_label || "Pre-Order →"}<span className="sr-only"> (opens in new window)</span>
                 </a>
               )}
             </div>
