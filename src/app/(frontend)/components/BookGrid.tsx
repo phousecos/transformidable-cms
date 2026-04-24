@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef } from "react";
+import { useDialog } from "./useDialog";
 
 interface BookData {
   id: number;
@@ -20,13 +21,17 @@ interface BookGridProps {
 export default function BookGrid({ books, showBadge = false }: BookGridProps) {
   const [modalBook, setModalBook] = useState<BookData | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useDialog(modalBook !== null, () => setModalBook(null));
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollRef.current) return;
     const cardWidth = 220 + 24; // card min-width + gap
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     scrollRef.current.scrollBy({
       left: direction === "left" ? -cardWidth * 2 : cardWidth * 2,
-      behavior: "smooth",
+      behavior: reduced ? "auto" : "smooth",
     });
   };
 
@@ -80,9 +85,9 @@ export default function BookGrid({ books, showBadge = false }: BookGridProps) {
                     href={book.bookshop_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="border-b border-oxblood/40 pb-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-oxblood transition-colors hover:text-gold md:text-xs"
+                    className="border-b border-oxblood/60 pb-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-oxblood transition-colors hover:text-gold focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-oxblood md:text-xs"
                   >
-                    Buy on Bookshop
+                    Buy on Bookshop<span className="sr-only"> (opens in new window)</span>
                   </a>
                 )}
                 {book.editorial_note && (
@@ -110,36 +115,41 @@ export default function BookGrid({ books, showBadge = false }: BookGridProps) {
         )}
       </div>
 
-      {/* Description modal */}
+      {/* Description dialog: focus-trapped, Escape closes, focus returns. */}
       {modalBook && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-obsidian/60 p-6"
           onClick={() => setModalBook(null)}
         >
           <div
-            className="relative max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-lg bg-parchment p-8 shadow-2xl"
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="bookgrid-dialog-title"
+            tabIndex={-1}
+            className="relative max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-lg bg-parchment p-8 shadow-2xl focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-oxblood"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setModalBook(null)}
-              className="absolute right-4 top-4 text-obsidian/40 transition-colors hover:text-obsidian"
-              aria-label="Close"
+              className="absolute right-4 top-4 text-obsidian/70 transition-colors hover:text-obsidian focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-oxblood"
+              aria-label="Close dialog"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
             <div className="flex items-start gap-5">
               {modalBook.coverUrl && (
-                <img src={modalBook.coverUrl} alt={modalBook.title} className="w-24 shrink-0 shadow-md" />
+                <img src={modalBook.coverUrl} alt="" className="w-24 shrink-0 shadow-md" />
               )}
               <div>
-                <h3 className="font-serif text-xl font-bold text-obsidian">{modalBook.title}</h3>
-                <p className="mt-1 text-sm text-obsidian/50">{modalBook.author}</p>
+                <h3 id="bookgrid-dialog-title" className="font-serif text-xl font-bold text-obsidian">{modalBook.title}</h3>
+                <p className="mt-1 text-sm text-obsidian/70">{modalBook.author}</p>
               </div>
             </div>
-            <p className="mt-6 text-sm leading-relaxed text-obsidian/70">
+            <p className="mt-6 text-sm leading-relaxed text-obsidian/80">
               {modalBook.editorial_note}
             </p>
             <div className="mt-6 flex gap-3">
@@ -148,9 +158,9 @@ export default function BookGrid({ books, showBadge = false }: BookGridProps) {
                   href={modalBook.bookshop_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-sm border border-oxblood/40 px-5 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-oxblood transition-colors hover:bg-oxblood/5 md:text-xs"
+                  className="rounded-sm border border-oxblood/60 px-5 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-oxblood transition-colors hover:bg-oxblood/5 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-oxblood md:text-xs"
                 >
-                  Buy on Bookshop.org
+                  Buy on Bookshop.org<span className="sr-only"> (opens in new window)</span>
                 </a>
               )}
               {modalBook.amazon_url && (
@@ -158,9 +168,9 @@ export default function BookGrid({ books, showBadge = false }: BookGridProps) {
                   href={modalBook.amazon_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-sm border border-obsidian/20 px-5 py-2 text-[10px] font-medium uppercase tracking-[0.15em] text-obsidian/50 transition-colors hover:text-obsidian md:text-xs"
+                  className="rounded-sm border border-obsidian/40 px-5 py-2 text-[10px] font-medium uppercase tracking-[0.15em] text-obsidian/80 transition-colors hover:text-obsidian focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-oxblood md:text-xs"
                 >
-                  Amazon
+                  Amazon<span className="sr-only"> (opens in new window)</span>
                 </a>
               )}
             </div>

@@ -1,6 +1,6 @@
 // @ts-nocheck
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import SiteNav from "./SiteNav";
 
@@ -61,8 +61,17 @@ function normalizeBody(body: any): string {
   return "";
 }
 
+// Honor prefers-reduced-motion when programmatically scrolling. Users who
+// opt into reduced motion get an instant jump instead of the smooth animation.
+function scrollToTopRespectingMotion() {
+  if (typeof window === "undefined") return;
+  const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+}
+
 export default function MagazineHomepage({ issue, articles }: MagazineHomepageProps) {
   const [view, setView] = useState<View>({ kind: "cover" });
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const num = issue.issueNumber ?? 1;
   const issueNumberFormatted = String(num).padStart(2, "0");
@@ -73,7 +82,7 @@ export default function MagazineHomepage({ issue, articles }: MagazineHomepagePr
 
   const openArticle = (article: any, position: number) => {
     setView({ kind: "article", article, position });
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollToTopRespectingMotion();
   };
 
   const tabs = [
@@ -84,23 +93,54 @@ export default function MagazineHomepage({ issue, articles }: MagazineHomepagePr
 
   const activeTabId = view.kind === "article" ? "this-issue" : view.kind;
 
+  // ARIA tab pattern: arrow keys move focus between tabs, Home/End jump to
+  // the first/last tab, and activating a tab both changes the panel and
+  // keeps focus on the tab (manual activation, per WAI-ARIA APG).
+  const onTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    let nextIndex: number | null = null;
+    if (e.key === "ArrowRight") nextIndex = (index + 1) % tabs.length;
+    else if (e.key === "ArrowLeft") nextIndex = (index - 1 + tabs.length) % tabs.length;
+    else if (e.key === "Home") nextIndex = 0;
+    else if (e.key === "End") nextIndex = tabs.length - 1;
+    if (nextIndex === null) return;
+    e.preventDefault();
+    const next = tabs[nextIndex];
+    setView({ kind: next.id });
+    tabRefs.current[next.id]?.focus();
+  };
+
   return (
     <>
       <SiteNav />
       <div className="sticky top-[56px] z-40 bg-obsidian md:top-[60px]">
         <div className="border-t border-parchment/10">
-          <div className="mx-auto flex max-w-5xl">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setView({ kind: tab.id })}
-                className={`flex-1 py-3 text-center text-xs font-medium tracking-[0.15em] transition-colors md:text-sm md:tracking-[0.2em] ${
-                  activeTabId === tab.id ? "bg-parchment/10 text-gold" : "text-parchment/60 hover:text-parchment"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+          <div
+            role="tablist"
+            aria-label="Issue sections"
+            className="mx-auto flex max-w-5xl"
+          >
+            {tabs.map((tab, i) => {
+              const isActive = activeTabId === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  ref={(el) => { tabRefs.current[tab.id] = el; }}
+                  role="tab"
+                  type="button"
+                  id={`tab-${tab.id}`}
+                  aria-selected={isActive}
+                  aria-controls={`panel-${tab.id}`}
+                  tabIndex={isActive ? 0 : -1}
+                  onClick={() => setView({ kind: tab.id })}
+                  onKeyDown={(e) => onTabKeyDown(e, i)}
+                  className={`flex-1 py-3 text-center text-xs font-medium tracking-[0.15em] transition-colors focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-gold md:text-sm md:tracking-[0.2em] ${
+                    isActive ? "bg-parchment/10 text-gold" : "text-parchment/80 hover:text-parchment"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
         </div>
         {view.kind === "article" && (
@@ -118,19 +158,43 @@ export default function MagazineHomepage({ issue, articles }: MagazineHomepagePr
         )}
       </div>
 
-      <main className="min-h-[60vh]">
-        {view.kind === "cover" && (
-          <CoverView issue={issue} articles={sortedArticles} issueNumber={issueNumberFormatted} onNavigate={() => setView({ kind: "this-issue" })} onOpenArticle={openArticle} />
-        )}
-        {view.kind === "editors-letter" && (
-          <EditorsLetterView issue={issue} />
-        )}
-        {view.kind === "this-issue" && (
-          <ThisIssueView issue={issue} flagship={flagship} remaining={remaining} onOpenArticle={openArticle} />
-        )}
-        {view.kind === "article" && (
-          <ArticleReadView article={view.article} position={view.position} issue={issue} allArticles={sortedArticles} onOpenArticle={openArticle} onBackToIssue={() => setView({ kind: "this-issue" })} />
-        )}
+      <main id="main-content" className="min-h-[60vh]">
+        {/* Each tab has exactly one panel. The "article read" view lives
+            inside the This Issue panel since that's the tab that stays
+            visually active while an article is open. */}
+        <div
+          role="tabpanel"
+          id="panel-cover"
+          aria-labelledby="tab-cover"
+          hidden={activeTabId !== "cover"}
+        >
+          {view.kind === "cover" && (
+            <CoverView issue={issue} articles={sortedArticles} issueNumber={issueNumberFormatted} onNavigate={() => setView({ kind: "this-issue" })} onOpenArticle={openArticle} />
+          )}
+        </div>
+        <div
+          role="tabpanel"
+          id="panel-editors-letter"
+          aria-labelledby="tab-editors-letter"
+          hidden={activeTabId !== "editors-letter"}
+        >
+          {view.kind === "editors-letter" && (
+            <EditorsLetterView issue={issue} />
+          )}
+        </div>
+        <div
+          role="tabpanel"
+          id="panel-this-issue"
+          aria-labelledby="tab-this-issue"
+          hidden={activeTabId !== "this-issue"}
+        >
+          {view.kind === "this-issue" && (
+            <ThisIssueView issue={issue} flagship={flagship} remaining={remaining} onOpenArticle={openArticle} />
+          )}
+          {view.kind === "article" && (
+            <ArticleReadView article={view.article} position={view.position} issue={issue} allArticles={sortedArticles} onOpenArticle={openArticle} onBackToIssue={() => setView({ kind: "this-issue" })} />
+          )}
+        </div>
       </main>
     </>
   );
