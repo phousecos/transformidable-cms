@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin, isAdminOrEditor } from '../access/checkRole.ts'
+import { validateHttpUrl } from '../access/validateUrl.ts'
 
 export const PodcastEpisodes: CollectionConfig = {
   slug: 'podcast-episodes',
@@ -68,6 +69,7 @@ export const PodcastEpisodes: CollectionConfig = {
     {
       name: 'audioUrl',
       type: 'text',
+      validate: validateHttpUrl,
       admin: {
         description: 'Embed URL or hosted file path for the episode audio',
       },

@@ -15,10 +15,25 @@ interface MagazineHomepageProps {
   articles: any[];
 }
 
+// HTML-escape untrusted text so it cannot break out of attribute or element
+// context. Lexical text nodes are author-controlled, but we still treat them
+// as untrusted: the rendered HTML feeds dangerouslySetInnerHTML, so any
+// unescaped `<` or `&` becomes a stored XSS sink.
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+const ALLOWED_HEADING_TAGS = new Set(["h1", "h2", "h3", "h4", "h5", "h6"]);
+
 function lexicalToHtml(node: any): string {
   if (!node) return "";
   if (node.type === "text" || (!node.type && typeof node.text === "string")) {
-    let text = node.text ?? "";
+    let text = escapeHtml(node.text ?? "");
     const fmt = typeof node.format === "number" ? node.format : 0;
     if (fmt & 1) text = `<strong>${text}</strong>`;
     if (fmt & 2) text = `<em>${text}</em>`;
@@ -28,7 +43,10 @@ function lexicalToHtml(node: any): string {
   switch (node.type) {
     case "root": return children;
     case "paragraph": return children ? `<p>${children}</p>` : `<p><br /></p>`;
-    case "heading": return `<${node.tag ?? "h2"}>${children}</${node.tag ?? "h2"}>`;
+    case "heading": {
+      const tag = ALLOWED_HEADING_TAGS.has(node.tag) ? node.tag : "h2";
+      return `<${tag}>${children}</${tag}>`;
+    }
     case "quote": return `<blockquote>${children}</blockquote>`;
     case "list": return node.listType === "number" ? `<ol>${children}</ol>` : `<ul>${children}</ul>`;
     case "listitem": return `<li>${children}</li>`;

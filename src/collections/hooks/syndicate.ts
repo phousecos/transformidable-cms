@@ -38,6 +38,9 @@ async function notifyBrand(
   }
 
   try {
+    // Cap each notify call so a slow or hung brand endpoint cannot block the
+    // article-save lambda. Promise.allSettled below means one slow brand can
+    // still delay the others until they all return or time out.
     const res = await fetch(url, {
       method: 'POST',
       headers: {
@@ -45,6 +48,7 @@ async function notifyBrand(
         ...(secret ? { Authorization: `Bearer ${secret}` } : {}),
       },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(5000),
     })
 
     if (!res.ok) {
