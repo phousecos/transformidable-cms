@@ -1,4 +1,5 @@
 import type { GlobalConfig } from 'payload'
+import { validateHttpUrl } from '../access/validateUrl.ts'
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
@@ -57,10 +58,12 @@ export const SiteSettings: GlobalConfig = {
         {
           name: 'linkedin',
           type: 'text',
+          validate: validateHttpUrl,
         },
         {
           name: 'website',
           type: 'text',
+          validate: validateHttpUrl,
         },
       ],
     },

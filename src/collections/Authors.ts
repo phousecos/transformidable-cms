@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin, isAdminOrEditor } from '../access/checkRole.ts'
+import { validateHttpUrl } from '../access/validateUrl.ts'
 
 export const Authors: CollectionConfig = {
   slug: 'authors',
@@ -77,6 +78,7 @@ export const Authors: CollectionConfig = {
           name: 'url',
           type: 'text',
           required: true,
+          validate: validateHttpUrl,
         },
       ],
     },

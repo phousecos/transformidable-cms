@@ -1,5 +1,6 @@
 import type { CollectionConfig, Where } from 'payload'
 import { isLoggedIn } from '../access/checkRole.ts'
+import { validateHttpUrl } from '../access/validateUrl.ts'
 
 export const Books: CollectionConfig = {
   slug: 'books',
@@ -125,6 +126,7 @@ export const Books: CollectionConfig = {
     {
       name: 'bookshop_url',
       type: 'text',
+      validate: validateHttpUrl,
       admin: {
         description: 'Full Bookshop.org affiliate URL — required for third-party titles',
       },
@@ -132,6 +134,7 @@ export const Books: CollectionConfig = {
     {
       name: 'amazon_url',
       type: 'text',
+      validate: validateHttpUrl,
       admin: {
         description: 'Amazon affiliate URL — optional. Secondary CTA only.',
       },
@@ -139,6 +142,7 @@ export const Books: CollectionConfig = {
     {
       name: 'payhip_url',
       type: 'text',
+      validate: validateHttpUrl,
       admin: {
         description: 'Payhip product URL — for titles sold directly (e.g. Transformidable)',
       },

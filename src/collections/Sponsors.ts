@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin, isSponsorManagerOrAdmin } from '../access/checkRole.ts'
+import { validateHttpUrl } from '../access/validateUrl.ts'
 
 export const Sponsors: CollectionConfig = {
   slug: 'sponsors',
@@ -84,6 +85,7 @@ export const Sponsors: CollectionConfig = {
       name: 'linkUrl',
       type: 'text',
       required: true,
+      validate: validateHttpUrl,
       admin: {
         description: 'Click destination URL',
       },
