@@ -2,6 +2,8 @@
 import config from "@payload-config";
 import { getPayload } from "payload";
 import Footer from "../components/Footer";
+import BookGrid from "../components/BookGrid";
+import HeroBookClub from "../components/HeroBookClub";
 
 export const dynamic = "force-dynamic";
 
@@ -31,9 +33,10 @@ export default async function ReadingRoomPage() {
   const pastSelections = books.filter((b) => !b.is_current_selection && b.section === "book_club");
 
   const sections = {
-    career_leadership: { label: "Career & Leadership", id: "career", navLabel: "Career Lists", books: [] as any[] },
-    pmo_technology: { label: "PMO & Technology", id: "pmo", navLabel: "PMO & Tech", books: [] as any[] },
-    staff_picks: { label: "Staff Picks", id: "picks", navLabel: "Picks", books: [] as any[] },
+    career_leadership: { label: "Career & Leadership", id: "career", books: [] as any[] },
+    professional_development: { label: "Professional Development", id: "professional-development", books: [] as any[] },
+    pmo_technology: { label: "PMO & Technology", id: "pmo", books: [] as any[] },
+    staff_picks: { label: "Staff Picks", id: "picks", books: [] as any[] },
   };
   for (const book of books) {
     if (book.section && book.section !== "book_club" && sections[book.section]) {
@@ -50,19 +53,31 @@ export default async function ReadingRoomPage() {
   const now = new Date();
   const heroDateLabel = `Now Reading — ${now.toLocaleDateString("en-US", { month: "long", year: "numeric" })}`;
 
-  // Build nav items — only show sections that have content
   const navItems: { label: string; href: string }[] = [
     { label: "Now Reading", href: "#now-reading" },
   ];
   if (sections.career_leadership.books.length > 0) navItems.push({ label: "Career Lists", href: "#career" });
+  if (sections.professional_development.books.length > 0) navItems.push({ label: "Pro Dev", href: "#professional-development" });
   if (sections.pmo_technology.books.length > 0) navItems.push({ label: "PMO & Tech", href: "#pmo" });
   navItems.push({ label: "Transformidable", href: "/" });
   if (sections.staff_picks.books.length > 0) navItems.push({ label: "Picks", href: "#picks" });
 
+  // Serialize books for client component
+  const serializeBook = (book: any) => ({
+    id: book.id,
+    title: book.title,
+    author: book.author,
+    editorial_note: book.editorial_note || "",
+    coverUrl: getCoverUrl(book),
+    bookshop_url: book.bookshop_url || "",
+    amazon_url: book.amazon_url || "",
+    illuminate_badge: book.illuminate_badge || false,
+  });
+
   return (
     <>
       {/* Reading Room sub-nav */}
-      <nav className="sticky top-0 z-50 bg-obsidian">
+      <nav aria-label="Reading Room sections" className="sticky top-0 z-50 bg-obsidian">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <a href="/reading-room" className="block shrink-0 font-serif text-lg font-bold text-parchment md:text-xl">
             The Reading Room
@@ -81,63 +96,27 @@ export default async function ReadingRoomPage() {
         </div>
       </nav>
 
-      <main className="min-h-[60vh]">
+      <main id="main-content" className="min-h-[60vh]">
         {/* Hero — Now Reading */}
-        <section id="now-reading" className="bg-obsidian/95">
-          <div className="mx-auto max-w-5xl px-6 pb-12 pt-10 md:pb-16 md:pt-14">
-            {currentSelection ? (
-              <>
-                <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-gold md:text-xs">
-                  {heroDateLabel}
-                </p>
-                <div className="mt-6 flex flex-col gap-6 md:flex-row md:gap-10">
-                  {getCoverUrl(currentSelection) && (
-                    <div className="shrink-0">
-                      <img
-                        src={getCoverUrl(currentSelection)}
-                        alt={currentSelection.title}
-                        className="w-28 shadow-xl md:w-36"
-                      />
-                    </div>
-                  )}
-                  <div className="flex-1">
-                    {currentSelection.illuminate_badge && (
-                      <span className="inline-block rounded-full bg-gold px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-obsidian">
-                        ★ Illuminate Book Club
-                      </span>
-                    )}
-                    <h2 className="mt-3 font-serif text-2xl font-bold text-parchment md:text-3xl">
-                      {currentSelection.title}
-                    </h2>
-                    <p className="mt-1 text-sm text-parchment/60">{currentSelection.author}</p>
-                    {currentSelection.editorial_note && (
-                      <p className="mt-4 text-sm leading-relaxed text-parchment/70 md:text-base">
-                        {currentSelection.editorial_note}
-                      </p>
-                    )}
-                    <div className="mt-5">
-                      {currentSelection.bookshop_url && (
-                        <a href={currentSelection.bookshop_url} target="_blank" rel="noopener noreferrer"
-                          className="inline-block rounded-sm border border-parchment/40 px-6 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-parchment transition-colors hover:bg-parchment/10 md:text-xs">
-                          Buy on Bookshop.org
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </>
-            ) : (
+        {currentSelection ? (
+          <HeroBookClub
+            book={serializeBook(currentSelection)}
+            dateLabel={heroDateLabel}
+          />
+        ) : (
+          <section id="now-reading" className="bg-obsidian/95">
+            <div className="mx-auto max-w-5xl px-6 pb-12 pt-10 md:pb-16 md:pt-14">
               <p className="font-serif text-lg text-parchment/60 italic">
                 The Reading Room is being curated. Check back soon.
               </p>
-            )}
-          </div>
-        </section>
+            </div>
+          </section>
+        )}
 
         {/* FTC Affiliate Disclosure */}
         <div className="bg-obsidian/90 border-t border-parchment/5">
           <div className="mx-auto max-w-5xl px-6 py-3">
-            <p className="text-[9px] leading-relaxed text-parchment/30 md:text-[10px]">
+            <p className="text-[9px] leading-relaxed text-parchment/50 md:text-[10px]">
               The Reading Room contains affiliate links to Bookshop.org and Amazon. When you purchase through these links, we earn a small commission at no additional cost to you. As a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com. Our editorial selections are independent of these relationships — we recommend what we believe in.
             </p>
           </div>
@@ -145,17 +124,46 @@ export default async function ReadingRoomPage() {
 
         {/* Past Selections */}
         {pastSelections.length > 0 && (
-          <BookSection id="past-selections" label="Past Selections" books={pastSelections} getCoverUrl={getCoverUrl} showBadge />
+          <section id="past-selections" className="bg-parchment">
+            <div className="mx-auto max-w-5xl px-6 py-12 md:py-16">
+              <h2 className="font-serif text-xl font-bold italic text-oxblood md:text-2xl">Past Selections</h2>
+              <div className="mt-2 h-px bg-oxblood/20" />
+              <BookGrid books={pastSelections.map(serializeBook)} showBadge />
+            </div>
+          </section>
         )}
 
         {/* Career & Leadership */}
         {sections.career_leadership.books.length > 0 && (
-          <BookSection id="career" label="Career & Leadership" books={sections.career_leadership.books} getCoverUrl={getCoverUrl} />
+          <section id="career" className="bg-parchment">
+            <div className="mx-auto max-w-5xl px-6 py-12 md:py-16">
+              <h2 className="font-serif text-xl font-bold italic text-oxblood md:text-2xl">Career &amp; Leadership</h2>
+              <div className="mt-2 h-px bg-oxblood/20" />
+              <BookGrid books={sections.career_leadership.books.map(serializeBook)} />
+            </div>
+          </section>
+        )}
+
+        {/* Professional Development */}
+        {sections.professional_development.books.length > 0 && (
+          <section id="professional-development" className="bg-parchment">
+            <div className="mx-auto max-w-5xl px-6 py-12 md:py-16">
+              <h2 className="font-serif text-xl font-bold italic text-oxblood md:text-2xl">Professional Development</h2>
+              <div className="mt-2 h-px bg-oxblood/20" />
+              <BookGrid books={sections.professional_development.books.map(serializeBook)} />
+            </div>
+          </section>
         )}
 
         {/* PMO & Technology */}
         {sections.pmo_technology.books.length > 0 && (
-          <BookSection id="pmo" label="PMO & Technology" books={sections.pmo_technology.books} getCoverUrl={getCoverUrl} />
+          <section id="pmo" className="bg-parchment">
+            <div className="mx-auto max-w-5xl px-6 py-12 md:py-16">
+              <h2 className="font-serif text-xl font-bold italic text-oxblood md:text-2xl">PMO &amp; Technology</h2>
+              <div className="mt-2 h-px bg-oxblood/20" />
+              <BookGrid books={sections.pmo_technology.books.map(serializeBook)} />
+            </div>
+          </section>
         )}
 
         {/* Transformidable strip */}
@@ -169,18 +177,19 @@ export default async function ReadingRoomPage() {
                   </p>
                 )}
                 <h3 className="mt-1 font-serif text-lg font-bold text-parchment md:text-xl">
-                  Transformidable
+                  TRANSFORMIDABLE: Leading Change with Clarity, Courage, and Conviction
                 </h3>
-                <p className="mt-0.5 text-xs text-parchment/70 md:text-sm">
-                  {transformidableFeature.tagline
-                    ? `Dr. Jerri Bland — ${transformidableFeature.tagline}`
-                    : "Dr. Jerri Bland"}
+                <p className="mt-1 text-xs text-parchment/70 md:text-sm">
+                  Dr. Jerri Bland{transformidableFeature.tagline ? ` — ${transformidableFeature.tagline}` : ""}
                 </p>
+                <span className="mt-2 inline-block rounded-sm border border-gold/60 px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-gold md:text-[10px]">
+                  Coming June 2026
+                </span>
               </div>
               {transformidableFeature.cta_url && (
                 <a href={transformidableFeature.cta_url} target="_blank" rel="noopener noreferrer"
-                  className="shrink-0 rounded-sm border border-parchment/50 px-5 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-parchment transition-colors hover:bg-parchment/10 md:text-xs">
-                  {transformidableFeature.cta_label || "Pre-Order →"}
+                  className="shrink-0 rounded-sm border border-parchment/60 px-5 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-parchment transition-colors hover:bg-parchment/10 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-gold md:text-xs">
+                  {transformidableFeature.cta_label || "Pre-Order →"}<span className="sr-only"> (opens in new window)</span>
                 </a>
               )}
             </div>
@@ -189,62 +198,16 @@ export default async function ReadingRoomPage() {
 
         {/* Staff Picks */}
         {sections.staff_picks.books.length > 0 && (
-          <BookSection id="picks" label="Staff Picks" books={sections.staff_picks.books} getCoverUrl={getCoverUrl} />
+          <section id="picks" className="bg-parchment">
+            <div className="mx-auto max-w-5xl px-6 py-12 md:py-16">
+              <h2 className="font-serif text-xl font-bold italic text-oxblood md:text-2xl">Staff Picks</h2>
+              <div className="mt-2 h-px bg-oxblood/20" />
+              <BookGrid books={sections.staff_picks.books.map(serializeBook)} />
+            </div>
+          </section>
         )}
       </main>
       <Footer />
     </>
-  );
-}
-
-function BookSection({ id, label, books, getCoverUrl, showBadge = false }: {
-  id: string; label: string; books: any[]; getCoverUrl: (b: any) => string | null; showBadge?: boolean;
-}) {
-  return (
-    <section id={id} className="bg-parchment">
-      <div className="mx-auto max-w-5xl px-6 py-12 md:py-16">
-        <h2 className="font-serif text-xl font-bold italic text-oxblood md:text-2xl">{label}</h2>
-        <div className="mt-2 h-px bg-oxblood/20" />
-        <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
-          {books.map((book: any) => (
-            <div key={book.id} className="flex flex-col">
-              {getCoverUrl(book) ? (
-                <div className="mb-4 aspect-[2/3] w-full overflow-hidden bg-obsidian/10">
-                  <img
-                    src={getCoverUrl(book)}
-                    alt={book.title}
-                    className="h-full w-full object-cover"
-                  />
-                  <p className="relative -mt-6 px-2 text-[9px] font-medium text-gold md:text-[10px]">
-                    {book.title}
-                  </p>
-                </div>
-              ) : (
-                <div className="mb-4 flex aspect-[2/3] w-full items-end bg-obsidian/10 p-3">
-                  <p className="text-[9px] font-medium text-gold md:text-[10px]">{book.title}</p>
-                </div>
-              )}
-              {showBadge && book.illuminate_badge && (
-                <span className="mb-2 inline-block w-fit rounded-full bg-gold px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-obsidian">
-                  ★ Illuminate
-                </span>
-              )}
-              <h3 className="font-serif text-base font-semibold leading-snug text-obsidian">{book.title}</h3>
-              <p className="mt-0.5 text-xs text-obsidian/50">{book.author}</p>
-              {book.bookshop_url && (
-                <a
-                  href={book.bookshop_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-block border-b border-oxblood/40 pb-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-oxblood transition-colors hover:text-gold md:text-xs"
-                >
-                  Buy on Bookshop
-                </a>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
   );
 }

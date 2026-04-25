@@ -1,4 +1,5 @@
 import type { GlobalConfig } from 'payload'
+import { validateHttpUrl } from '../access/validateUrl.ts'
 
 export const TransformidableFeature: GlobalConfig = {
   slug: 'transformidable-feature',
@@ -41,6 +42,7 @@ export const TransformidableFeature: GlobalConfig = {
     {
       name: 'cta_url',
       type: 'text',
+      validate: validateHttpUrl,
       admin: {
         description: 'Payhip pre-order or purchase URL',
       },

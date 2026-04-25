@@ -1,5 +1,8 @@
 'use client'
 
+// Top-level error boundary. Same rationale as the admin error page: never
+// render error.message to the client. Real diagnostics live in server logs and
+// can be correlated to a user report via the digest.
 export default function GlobalError({
   error,
   reset,
@@ -11,11 +14,16 @@ export default function GlobalError({
     <html lang="en">
       <body style={{ fontFamily: 'system-ui, sans-serif', padding: '2rem' }}>
         <h1>Something went wrong</h1>
-        <pre style={{ whiteSpace: 'pre-wrap', background: '#f5f5f5', padding: '1rem' }}>
-          {error.message}
-        </pre>
-        {error.digest && <p>Digest: {error.digest}</p>}
-        <button onClick={reset}>Try again</button>
+        <p>An unexpected error occurred. Please try again.</p>
+        {error.digest && (
+          <p style={{ color: '#666', fontSize: '0.85rem' }}>Reference: {error.digest}</p>
+        )}
+        <button
+          onClick={reset}
+          style={{ marginTop: '1rem', padding: '0.5rem 1rem', cursor: 'pointer' }}
+        >
+          Try again
+        </button>
       </body>
     </html>
   )

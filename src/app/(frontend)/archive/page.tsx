@@ -27,7 +27,7 @@ export default async function ArchivePage() {
   return (
     <>
       <SiteNav />
-      <main className="bg-parchment">
+      <main id="main-content" className="bg-parchment">
         <div className="mx-auto max-w-5xl px-6 py-16 md:py-20">
           <h1 className="font-serif text-4xl font-bold italic text-obsidian md:text-5xl">
             Archive

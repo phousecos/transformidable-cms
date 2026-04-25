@@ -14,22 +14,22 @@ export default function Footer() {
             <Image src="/logo-new.png" alt="Transformidable" width={800} height={200} className="h-16 w-auto md:h-20" />
           </Link>
           <div className="flex items-center gap-6 md:gap-8">
-            <Link href="/archive" className="text-xs font-medium uppercase tracking-[0.15em] text-parchment/50 transition-colors hover:text-gold">
+            <Link href="/archive" className="text-xs font-medium uppercase tracking-[0.15em] text-parchment/80 transition-colors hover:text-gold focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-gold">
               Archive
             </Link>
-            <Link href="/about" className="text-xs font-medium uppercase tracking-[0.15em] text-parchment/50 transition-colors hover:text-gold">
+            <Link href="/about" className="text-xs font-medium uppercase tracking-[0.15em] text-parchment/80 transition-colors hover:text-gold focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-gold">
               About
             </Link>
-            <Link href="/reading-room" className="text-xs font-medium uppercase tracking-[0.15em] text-parchment/50 transition-colors hover:text-gold">
+            <Link href="/reading-room" className="text-xs font-medium uppercase tracking-[0.15em] text-parchment/80 transition-colors hover:text-gold focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-gold">
               The Reading Room
             </Link>
-            <Link href="/subscribe" className="text-xs font-medium uppercase tracking-[0.15em] text-parchment/50 transition-colors hover:text-gold">
+            <Link href="/subscribe" className="text-xs font-medium uppercase tracking-[0.15em] text-parchment/80 transition-colors hover:text-gold focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-gold">
               Subscribe
             </Link>
           </div>
         </div>
         <div className="mt-8 text-center sm:text-left">
-          <p className="text-xs text-gold/40">
+          <p className="text-xs text-gold/80">
             &copy; {year} Transformidable. A publication of Powerhouse Industries, Inc.
           </p>
         </div>

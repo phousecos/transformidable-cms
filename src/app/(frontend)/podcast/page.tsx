@@ -27,7 +27,7 @@ export default async function PodcastPage() {
   return (
     <>
       <SiteNav />
-      <main className="bg-parchment">
+      <main id="main-content" className="bg-parchment">
         <div className="mx-auto max-w-5xl px-6 py-16 md:py-20">
           <h1 className="font-serif text-4xl font-bold italic text-obsidian md:text-5xl">
             Podcast
@@ -78,9 +78,10 @@ export default async function PodcastPage() {
                           href={episode.audioUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-block rounded-sm border border-oxblood/40 px-6 py-2 text-[10px] font-medium uppercase tracking-[0.2em] text-oxblood transition-colors hover:bg-oxblood/5 md:text-xs"
+                          aria-label={`Listen to ${episode.title} (opens in new window)`}
+                          className="inline-block rounded-sm border border-oxblood/60 px-6 py-2 text-[10px] font-medium uppercase tracking-[0.2em] text-oxblood transition-colors hover:bg-oxblood/5 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-oxblood md:text-xs"
                         >
-                          Listen →
+                          Listen <span aria-hidden="true">→</span>
                         </a>
                       </div>
                     )}

@@ -42,9 +42,19 @@ const serverURL = process.env.VERCEL_PROJECT_PRODUCTION_URL
   ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
   : process.env.NEXT_PUBLIC_SERVER_URL || ''
 
+// Origins that own the admin session cookie. CSRF-validated state-changing
+// requests must come from one of these. Keep this list tight — adding an
+// origin here lets it issue authenticated cookie-bearing requests.
+const csrfOrigins = [
+  serverURL,
+  'https://cms.transformidable.media',
+].filter(Boolean) as string[]
+
 export default buildConfig({
   serverURL,
 
+  // CORS: origins permitted to read responses from the Payload REST/GraphQL
+  // API. These are the public brand sites that may call the read-only API.
   cors: [
     'https://transformidable.media',
     'https://www.transformidable.media',
@@ -54,6 +64,11 @@ export default buildConfig({
     'https://unlimitedpowerhouse.com',
     'https://vettersgroup.com',
   ],
+
+  // CSRF: only requests from these origins can carry the admin session cookie
+  // and mutate data. Without this, any site a logged-in admin visits could
+  // POST to the CMS API on their behalf.
+  csrf: csrfOrigins,
 
   admin: {
     user: Users.slug,
@@ -95,7 +110,14 @@ export default buildConfig({
     push: false,
   }),
 
-  secret: process.env.PAYLOAD_SECRET || 'CHANGE-ME-IN-PRODUCTION',
+  secret: (() => {
+    const secret = process.env.PAYLOAD_SECRET
+    if (secret) return secret
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('PAYLOAD_SECRET is required in production')
+    }
+    return 'dev-only-insecure-secret'
+  })(),
 
   sharp,
 

@@ -1,5 +1,6 @@
 import type { CollectionConfig, Where } from 'payload'
 import { isLoggedIn } from '../access/checkRole.ts'
+import { syndicateArticleAfterChange } from './hooks/syndicate.ts'
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
@@ -8,6 +9,9 @@ export const Articles: CollectionConfig = {
     defaultColumns: ['title', 'issue', 'vertical', 'displayOrder', 'isFlagship', 'status'],
   },
   versions: true,
+  hooks: {
+    afterChange: [syndicateArticleAfterChange],
+  },
   access: {
     create: isLoggedIn,
     read: ({ req: { user } }) => {
@@ -97,6 +101,36 @@ export const Articles: CollectionConfig = {
       admin: {
         description: 'Estimated read time in minutes',
       },
+    },
+    {
+      name: 'pullQuotes',
+      type: 'array',
+      admin: {
+        description: 'Callout quotes displayed within the article body. 1–2 per article.',
+      },
+      fields: [
+        {
+          name: 'quote',
+          type: 'textarea',
+          required: true,
+          admin: {
+            description: 'The highlighted quote text',
+          },
+        },
+        {
+          name: 'position',
+          type: 'select',
+          defaultValue: 'after_intro',
+          options: [
+            { label: 'After introduction (top third)', value: 'after_intro' },
+            { label: 'Mid-article', value: 'mid' },
+            { label: 'Near conclusion', value: 'near_end' },
+          ],
+          admin: {
+            description: 'Where to insert this quote within the article',
+          },
+        },
+      ],
     },
     {
       name: 'citationsNotes',
