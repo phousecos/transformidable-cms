@@ -4,13 +4,12 @@ import Footer from "../components/Footer";
 
 export const metadata = {
   title: "About — Transformidable",
-  description: "Ideas worth leading with. Transformidable Media is a publication of Powerhouse Industries.",
+  description: "Ideas worth leading with. Transformidable Media.",
 };
 
 const brandGroups = [
   {
     parent: "The Holding Company",
-    description: "The strategic parent that oversees Powerhouse Industries and its portfolio of technology leadership brands.",
     brands: [
       {
         name: "Transformidable Media",
@@ -105,14 +104,7 @@ export default function AboutPage() {
             <div className="mt-8 max-w-3xl space-y-6 text-base leading-relaxed text-parchment/70 md:text-lg">
               <p>
                 <strong className="font-semibold text-parchment">Transformidable Media</strong> is a publication of{" "}
-                <a
-                  href="https://phousecos.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-semibold text-parchment underline decoration-parchment/40 underline-offset-2 transition-colors hover:text-gold"
-                >
-                  Powerhouse Industries
-                </a>
+                <span className="font-semibold text-parchment">Transformidable LLC</span>
                 , bringing together the brands and perspectives of The Holding Company, Unlimited Powerhouse, and Vetters Group — along with those of our partners at Velorum Software, including AgentPMO and Prept.
               </p>
               <p>
@@ -134,9 +126,11 @@ export default function AboutPage() {
                 <h3 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-oxblood md:text-xs">
                   {group.parent}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-obsidian/60 md:text-base">
-                  {group.description}
-                </p>
+                {group.description && (
+                  <p className="mt-2 text-sm leading-relaxed text-obsidian/60 md:text-base">
+                    {group.description}
+                  </p>
+                )}
                 <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
                   {group.brands.map((brand) => (
                     <BrandCard key={brand.domain} brand={brand} />

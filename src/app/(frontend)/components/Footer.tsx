@@ -30,7 +30,7 @@ export default function Footer() {
         </div>
         <div className="mt-8 text-center sm:text-left">
           <p className="text-xs text-gold/80">
-            &copy; {year} Transformidable. A publication of Powerhouse Industries, Inc.
+            &copy; {year} Transformidable LLC.
           </p>
         </div>
       </div>

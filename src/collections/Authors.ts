@@ -33,7 +33,7 @@ export const Authors: CollectionConfig = {
       name: 'role',
       type: 'text',
       admin: {
-        description: 'e.g., "Founder & CEO, Powerhouse Industries"',
+        description: 'e.g., "Founder and Editor-in-Chief, Transformidable LLC"',
       },
     },
     {
