@@ -7,47 +7,30 @@ export const metadata = {
   description: "Ideas worth leading with. Transformidable Media.",
 };
 
-const brandGroups = [
+const brands = [
   {
-    parent: "The Holding Company",
-    brands: [
-      {
-        name: "Transformidable Media",
-        url: "https://transformidable.media",
-        domain: "transformidable.media",
-        description: "C-suite strategy, transformational leadership philosophy, and the art of leading through change.",
-      },
-    ],
+    name: "Transformidable Media",
+    url: "https://transformidable.media",
+    domain: "transformidable.media",
+    description: "C-suite strategy, transformational leadership philosophy, and the art of leading through change.",
   },
   {
-    parent: "Unlimited Powerhouse",
-    description: "Fractional CIO leadership and enterprise technology strategy for organizations navigating transformation.",
-    brands: [
-      {
-        name: "Unlimited Powerhouse",
-        url: "https://unlimitedpowerhouse.com",
-        domain: "unlimitedpowerhouse.com",
-        description: "Fractional CIO leadership, enterprise IT strategy, and technology-driven transformation.",
-      },
-      {
-        name: "Lumynr",
-        url: "https://lumynr.com",
-        domain: "lumynr.com",
-        description: "Career relaunch, DEI in IT, and building community for women in technology leadership.",
-      },
-    ],
+    name: "Unlimited Powerhouse",
+    url: "https://unlimitedpowerhouse.com",
+    domain: "unlimitedpowerhouse.com",
+    description: "Fractional CIO leadership, enterprise IT strategy, and technology-driven transformation.",
   },
   {
-    parent: "Vetters Group",
-    description: "Background checks and screening services that improve HR processes and staffing decisions.",
-    brands: [
-      {
-        name: "Vetters Group",
-        url: "https://vettersgroup.com",
-        domain: "vettersgroup.com",
-        description: "Background checks, HR process improvement, and staffing verification.",
-      },
-    ],
+    name: "Lumynr",
+    url: "https://lumynr.com",
+    domain: "lumynr.com",
+    description: "A vibrant and growing community for Black women in the technology profession.",
+  },
+  {
+    name: "Vetters Group",
+    url: "https://vettersgroup.com",
+    domain: "vettersgroup.com",
+    description: "Background checks, HR process improvement, and staffing verification.",
   },
 ];
 
@@ -58,13 +41,14 @@ function BrandCard({ brand }: { brand: { name: string; url: string; domain: stri
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${brand.name} — ${brand.domain} (opens in new window)`}
-      className="block rounded-lg border border-obsidian/20 p-6 transition-colors hover:border-obsidian/40 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-oxblood"
+      className="flex h-full flex-col rounded-lg border border-obsidian/15 bg-white/40 p-7 transition-all hover:border-oxblood/40 hover:shadow-sm focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-oxblood md:p-8"
     >
-      <h4 className="font-serif text-lg font-bold text-obsidian">{brand.name}</h4>
-      <p className="mt-1 text-[10px] font-medium uppercase tracking-[0.15em] text-gold md:text-xs">
+      <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-gold md:text-xs">
         {brand.domain}
       </p>
-      <p className="mt-3 text-sm leading-relaxed text-obsidian/80">{brand.description}</p>
+      <h3 className="mt-3 font-serif text-xl font-bold text-obsidian md:text-2xl">{brand.name}</h3>
+      <div className="mt-4 h-[2px] w-10 bg-oxblood" />
+      <p className="mt-5 text-sm leading-relaxed text-obsidian/75 md:text-base">{brand.description}</p>
     </a>
   );
 }
@@ -103,23 +87,11 @@ export default function AboutPage() {
               Our Brands
             </h2>
 
-            {brandGroups.map((group) => (
-              <div key={group.parent} className="mt-12">
-                <h3 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-oxblood md:text-xs">
-                  {group.parent}
-                </h3>
-                {group.description && (
-                  <p className="mt-2 text-sm leading-relaxed text-obsidian/60 md:text-base">
-                    {group.description}
-                  </p>
-                )}
-                <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {group.brands.map((brand) => (
-                    <BrandCard key={brand.domain} brand={brand} />
-                  ))}
-                </div>
-              </div>
-            ))}
+            <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
+              {brands.map((brand) => (
+                <BrandCard key={brand.domain} brand={brand} />
+              ))}
+            </div>
           </div>
         </section>
       </main>
