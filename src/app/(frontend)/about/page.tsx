@@ -51,24 +51,6 @@ const brandGroups = [
   },
 ];
 
-const partnerBrands = {
-  parent: "Velorum Software",
-  brands: [
-    {
-      name: "AgentPMO",
-      url: "https://agentpmo.com",
-      domain: "agentpmo.com",
-      description: "AI-driven delivery, PMO transformation, and execution discipline.",
-    },
-    {
-      name: "Prept",
-      url: "https://prept.com",
-      domain: "prept.com",
-      description: "AI-driven interview practice for interviews and work conversations.",
-    },
-  ],
-};
-
 function BrandCard({ brand }: { brand: { name: string; url: string; domain: string; description: string } }) {
   return (
     <a
@@ -105,7 +87,7 @@ export default function AboutPage() {
               <p>
                 <strong className="font-semibold text-parchment">Transformidable Media</strong> is a publication of{" "}
                 <span className="font-semibold text-parchment">Transformidable LLC</span>
-                , bringing together the brands and perspectives of The Holding Company, Unlimited Powerhouse, and Vetters Group — along with those of our partners at Velorum Software, including AgentPMO and Prept.
+                , bringing together the brands and perspectives of Jerri Bland, Ed.D., Unlimited Powerhouse, and Vetters Group — along with those of our partners at Kade Advisory.
               </p>
               <p>
                 Together, these properties cover the full spectrum of technology leadership — from enterprise strategy and project execution to talent development, executive coaching, and community building for women in tech.
@@ -138,25 +120,6 @@ export default function AboutPage() {
                 </div>
               </div>
             ))}
-
-            {/* Divider */}
-            <div className="mt-16 h-px bg-obsidian/10" />
-
-            {/* Partner Brands */}
-            <h2 className="mt-16 font-serif text-3xl font-bold text-obsidian md:text-4xl">
-              Partner Brands
-            </h2>
-
-            <div className="mt-12">
-              <h3 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-oxblood md:text-xs">
-                {partnerBrands.parent}
-              </h3>
-              <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-                {partnerBrands.brands.map((brand) => (
-                  <BrandCard key={brand.domain} brand={brand} />
-                ))}
-              </div>
-            </div>
           </div>
         </section>
       </main>
