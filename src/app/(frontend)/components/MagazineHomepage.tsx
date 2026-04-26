@@ -241,7 +241,7 @@ function CoverView({ issue, articles, issueNumber, onNavigate, onOpenArticle }: 
       </div>
       <div className="border-t border-parchment/10">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <p className="text-[10px] font-medium tracking-[0.15em] text-parchment/40 md:text-xs">A publication of Powerhouse Industries</p>
+          <p className="text-[10px] font-medium tracking-[0.15em] text-parchment/40 md:text-xs">A publication of Transformidable LLC</p>
         </div>
       </div>
     </section>
@@ -350,7 +350,7 @@ function ThisIssueView({ issue, flagship, remaining, onOpenArticle }: { issue: a
         </div>
 
         <div className="mt-14 flex items-center justify-between border-t border-obsidian/10 pt-4 md:mt-20">
-          <p className="text-[10px] font-medium tracking-[0.15em] text-obsidian/40 md:text-xs">A publication of Powerhouse Industries</p>
+          <p className="text-[10px] font-medium tracking-[0.15em] text-obsidian/40 md:text-xs">A publication of Transformidable LLC</p>
         </div>
       </div>
     </section>
