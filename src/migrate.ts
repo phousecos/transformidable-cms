@@ -195,5 +195,30 @@ console.log('[migrate] Schema push complete.')
 
 await payload.db.migrate()
 
+// ── Phase 3: Enable Row Level Security on all public tables ──────────────
+// Supabase exposes the public schema through PostgREST. Without RLS, the
+// anon/authenticated API roles can read every row. Payload connects as the
+// schema owner / a BYPASSRLS role, so enabling RLS without any policies
+// locks out the API while leaving Payload unaffected. Don't FORCE RLS —
+// that would apply it to the owner too and break Payload.
+const rlsClient = new pg.Client({ connectionString })
+await rlsClient.connect()
+try {
+  const { rows: publicTables } = await rlsClient.query(`
+    SELECT tablename
+    FROM pg_tables
+    WHERE schemaname = 'public'
+  `)
+  for (const { tablename } of publicTables) {
+    await rlsClient.query(`ALTER TABLE "public"."${tablename}" ENABLE ROW LEVEL SECURITY`)
+  }
+  console.log(`[migrate] RLS enabled on ${publicTables.length} public tables.`)
+} catch (e: any) {
+  console.error('[migrate] RLS enablement error:', e.message)
+  throw e
+} finally {
+  await rlsClient.end()
+}
+
 await payload.destroy()
 process.exit(0)
