@@ -3,7 +3,9 @@ import { isLoggedIn } from '../access/checkRole.ts'
 
 export const Users: CollectionConfig = {
   slug: 'users',
-  auth: true,
+  auth: {
+    useAPIKey: true,
+  },
   admin: {
     useAsTitle: 'email',
     defaultColumns: ['email', 'firstName', 'lastName'],
