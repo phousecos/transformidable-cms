@@ -91,6 +91,14 @@ export const Articles: CollectionConfig = {
       },
     },
     {
+  name: 'bodyMarkdown',
+  type: 'textarea',
+  required: true,
+  admin: {
+    description: 'Raw markdown — used by automated pipeline. Will be rendered to richText on save if needed.',
+  },
+},
+    {
       name: 'body',
       type: 'richText',
       required: true,
