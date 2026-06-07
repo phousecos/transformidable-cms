@@ -1,6 +1,7 @@
 import type { CollectionConfig, Where } from 'payload'
 import { isLoggedIn } from '../access/checkRole.ts'
 import { syndicateArticleAfterChange } from './hooks/syndicate.ts'
+import { deriveBodyFromMarkdown } from './hooks/markdownToBody.ts'
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
@@ -10,6 +11,7 @@ export const Articles: CollectionConfig = {
   },
   versions: true,
   hooks: {
+    beforeValidate: [deriveBodyFromMarkdown],
     afterChange: [syndicateArticleAfterChange],
   },
   access: {
@@ -69,6 +71,16 @@ export const Articles: CollectionConfig = {
       },
     },
     {
+      name: 'topics',
+      type: 'relationship',
+      relationTo: 'topics',
+      hasMany: true,
+      admin: {
+        description:
+          'Subject-area tags (e.g. AI, Cybersecurity). Drives topic matching on downstream sites like CIO Advisra.',
+      },
+    },
+    {
       name: 'displayOrder',
       type: 'number',
       admin: {
@@ -91,17 +103,21 @@ export const Articles: CollectionConfig = {
       },
     },
     {
-  name: 'bodyMarkdown',
-  type: 'textarea',
-  required: true,
-  admin: {
-    description: 'Raw markdown — used by automated pipeline. Will be rendered to richText on save if needed.',
-  },
-},
+      name: 'bodyMarkdown',
+      type: 'textarea',
+      required: true,
+      admin: {
+        description:
+          'Raw markdown — the source of truth for article content (used by the n8n pipeline and editors). The rich-text Body below is generated from this on save.',
+      },
+    },
     {
       name: 'body',
       type: 'richText',
-      required: true,
+      admin: {
+        readOnly: true,
+        description: 'Auto-generated from Body (Markdown) on save. Rendered by the site.',
+      },
     },
     {
       name: 'readTime',
