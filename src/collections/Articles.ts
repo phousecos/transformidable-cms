@@ -190,6 +190,7 @@ export const Articles: CollectionConfig = {
         { label: 'Prept', value: 'prept' },
         { label: 'Lumynr', value: 'lumynr' },
         { label: 'Vetters Group', value: 'vettersgroup' },
+        { label: 'CIO Advisra', value: 'cio-advisra' },
       ],
       admin: {
         description: 'Select which brand sites this article should be syndicated to',

@@ -140,18 +140,24 @@ the markdown an editor or n8n submits is always reflected in the rich-text
 
 ---
 
-## 7. Open decision — how CIO Advisra content is designated
+## 7. How CIO Advisra content is designated
 
-Today there is **no per-article "this belongs to CIO Advisra" flag**. Options,
-in order of preference:
+`cio-advisra` is a value in the Articles **Syndicate To** field, so editors can
+explicitly mark an article for CIO Advisra. You can consume in two
+complementary ways:
 
-1. **Consume by Topic** (no Payload change). CIO Advisra pulls all published
-   articles and filters/ranks by the topic slugs in §3. Simplest; ship now.
-2. **Add a brand designation.** If you need an explicit "publish to CIO
-   Advisra" switch (and a push notification when one is published), the
-   Transformidable team can add `cio-advisra` to the existing **Syndicate To**
-   field and register a CIO Advisra revalidate webhook — same mechanism the
-   other brand sites use (see `docs/syndication-integration.md`).
+1. **By Topic** (recommended for the feed). Pull published articles and
+   filter/rank by the topic slugs in §3. Good for the "everything relevant"
+   surface.
+2. **By syndication designation.** Articles flagged for CIO Advisra carry
+   `cio-advisra` in `syndicateTo`, and on publish Payload POSTs a webhook to a
+   revalidate endpoint you provide — the same push mechanism the other brand
+   sites use (see `docs/syndication-integration.md` and
+   `docs/syndication-operations.md`). Use this if you want editor-controlled
+   targeting and push-based revalidation rather than polling.
 
-Pick (1) to launch; move to (2) if/when you want editor-controlled targeting
-and push-based revalidation.
+**To turn on the push webhook**, give the Transformidable team a revalidate URL
+and a shared secret; they set `SYNDICATE_CIO_ADVISRA_URL` and
+`SYNDICATE_CIO_ADVISRA_SECRET`. Until those env vars are set, the
+`cio-advisra` flag is simply stored and queryable (you can still filter on
+`?where[syndicateTo][in]=cio-advisra`) with no webhook fired.

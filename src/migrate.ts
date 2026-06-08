@@ -26,10 +26,10 @@ const valueRenames: Record<string, string> = {
 // Includes main tables, junction tables (hasMany selects), and version tables.
 const enumColumns: { table: string; column: string; validValues: string[] }[] = [
   // Articles
-  { table: 'articles_syndicate_to', column: 'value', validValues: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
+  { table: 'articles_syndicate_to', column: 'value', validValues: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup', 'cio-advisra'] },
   { table: 'articles', column: 'status', validValues: ['draft', 'review', 'scheduled', 'published'] },
   // Articles versions
-  { table: '_articles_v_version_syndicate_to', column: 'value', validValues: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
+  { table: '_articles_v_version_syndicate_to', column: 'value', validValues: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup', 'cio-advisra'] },
   { table: '_articles_v', column: 'version_status', validValues: ['draft', 'review', 'scheduled', 'published'] },
   // Podcast Episodes
   { table: 'podcast_episodes_syndicate_to', column: 'value', validValues: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
