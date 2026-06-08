@@ -4,11 +4,11 @@ This document is for the teams running the brand sites that receive
 syndicated content from the Transformidable Payload CMS:
 
 - Jerri Bland (`jerribland`)
-- UnlimITed Powerhouse (`unlimitedpowerhouse`)
 - AgentPMO (`agentpmo`)
 - Prept (`prept`)
 - Lumynr (`lumynr`)
 - Vetters Group (`vettersgroup`)
+- CIO Advisra (`cio-advisra`)
 
 It explains how the syndication webhook works, what your site needs to
 expose, and how to pull full article content from the Payload API.

@@ -1,6 +1,7 @@
 import type { CollectionConfig, Where } from 'payload'
 import { isLoggedIn } from '../access/checkRole.ts'
 import { syndicateArticleAfterChange } from './hooks/syndicate.ts'
+import { deriveBodyFromMarkdown } from './hooks/markdownToBody.ts'
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
@@ -10,6 +11,7 @@ export const Articles: CollectionConfig = {
   },
   versions: true,
   hooks: {
+    beforeValidate: [deriveBodyFromMarkdown],
     afterChange: [syndicateArticleAfterChange],
   },
   access: {
@@ -69,6 +71,16 @@ export const Articles: CollectionConfig = {
       },
     },
     {
+      name: 'topics',
+      type: 'relationship',
+      relationTo: 'topics',
+      hasMany: true,
+      admin: {
+        description:
+          'Subject-area tags (e.g. AI, Cybersecurity). Drives topic matching on downstream sites like CIO Advisra.',
+      },
+    },
+    {
       name: 'displayOrder',
       type: 'number',
       admin: {
@@ -91,17 +103,20 @@ export const Articles: CollectionConfig = {
       },
     },
     {
-  name: 'bodyMarkdown',
-  type: 'textarea',
-  required: true,
-  admin: {
-    description: 'Raw markdown — used by automated pipeline. Will be rendered to richText on save if needed.',
-  },
-},
+      name: 'bodyMarkdown',
+      type: 'textarea',
+      admin: {
+        description:
+          'Optional raw markdown. When present (e.g. from the n8n pipeline), the rich-text Body below is generated from it on save. Leave blank to author directly in Body.',
+      },
+    },
     {
       name: 'body',
       type: 'richText',
-      required: true,
+      admin: {
+        description:
+          'Article content. Auto-generated when Body (Markdown) is provided; otherwise edit here directly.',
+      },
     },
     {
       name: 'readTime',
@@ -169,11 +184,11 @@ export const Articles: CollectionConfig = {
       hasMany: true,
       options: [
         { label: 'Jerri Bland', value: 'jerribland' },
-        { label: 'UnlimITed Powerhouse', value: 'unlimitedpowerhouse' },
         { label: 'AgentPMO', value: 'agentpmo' },
         { label: 'Prept', value: 'prept' },
         { label: 'Lumynr', value: 'lumynr' },
         { label: 'Vetters Group', value: 'vettersgroup' },
+        { label: 'CIO Advisra', value: 'cio-advisra' },
       ],
       admin: {
         description: 'Select which brand sites this article should be syndicated to',

@@ -11,6 +11,7 @@ import { Media } from './collections/Media.ts'
 import { Articles } from './collections/Articles.ts'
 import { Issues } from './collections/Issues.ts'
 import { Verticals } from './collections/Verticals.ts'
+import { Topics } from './collections/Topics.ts'
 import { Books } from './collections/Books.ts'
 import { Subscribers } from './collections/Subscribers.ts'
 import { SiteSettings } from './globals/SiteSettings.ts'
@@ -61,7 +62,6 @@ export default buildConfig({
     'https://jerribland.com',
     'https://lumynr.com',
     'https://agentpmo.com',
-    'https://unlimitedpowerhouse.com',
     'https://vettersgroup.com',
   ],
 
@@ -91,6 +91,7 @@ export default buildConfig({
     Articles,
     Issues,
     Verticals,
+    Topics,
     Books,
     Subscribers,
     // Legacy collections — hidden from nav, kept for data access

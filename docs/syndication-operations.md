@@ -33,11 +33,11 @@ non-alphanumerics replaced by `_`. Current brands:
 | `syndicateTo` value    | Env prefix              |
 | ---------------------- | ----------------------- |
 | `jerribland`           | `SYNDICATE_JERRIBLAND_` |
-| `unlimitedpowerhouse`  | `SYNDICATE_UNLIMITEDPOWERHOUSE_` |
 | `agentpmo`             | `SYNDICATE_AGENTPMO_`   |
 | `prept`                | `SYNDICATE_PREPT_`      |
 | `lumynr`               | `SYNDICATE_LUMYNR_`     |
 | `vettersgroup`         | `SYNDICATE_VETTERSGROUP_` |
+| `cio-advisra`          | `SYNDICATE_CIO_ADVISRA_` |
 
 Example:
 
@@ -52,7 +52,11 @@ with the brand team out of band, and rotate if ever exposed.
 ## Adding a new brand
 
 1. Add the brand to the `syndicateTo` options in
-   `src/collections/Articles.ts` (around `Articles.ts:155-169`).
+   `src/collections/Articles.ts`.
+1a. Add the same value to the `articles_syndicate_to` and
+   `_articles_v_version_syndicate_to` `validValues` arrays in
+   `src/migrate.ts` — otherwise the migration nulls out the new value as
+   "invalid" on the next deploy.
 2. Deploy.
 3. Have the brand team stand up a revalidate endpoint per the
    integration guide.
