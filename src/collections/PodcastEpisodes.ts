@@ -128,7 +128,6 @@ export const PodcastEpisodes: CollectionConfig = {
       hasMany: true,
       options: [
         { label: 'Jerri Bland', value: 'jerribland' },
-        { label: 'UnlimITed Powerhouse', value: 'unlimitedpowerhouse' },
         { label: 'AgentPMO', value: 'agentpmo' },
         { label: 'Prept', value: 'prept' },
         { label: 'Lumynr', value: 'lumynr' },

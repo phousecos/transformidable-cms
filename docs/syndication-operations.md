@@ -33,7 +33,6 @@ non-alphanumerics replaced by `_`. Current brands:
 | `syndicateTo` value    | Env prefix              |
 | ---------------------- | ----------------------- |
 | `jerribland`           | `SYNDICATE_JERRIBLAND_` |
-| `unlimitedpowerhouse`  | `SYNDICATE_UNLIMITEDPOWERHOUSE_` |
 | `agentpmo`             | `SYNDICATE_AGENTPMO_`   |
 | `prept`                | `SYNDICATE_PREPT_`      |
 | `lumynr`               | `SYNDICATE_LUMYNR_`     |

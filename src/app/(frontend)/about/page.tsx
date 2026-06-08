@@ -15,12 +15,6 @@ const brands = [
     description: "C-suite strategy, transformational leadership philosophy, and the art of leading through change.",
   },
   {
-    name: "Unlimited Powerhouse",
-    url: "https://unlimitedpowerhouse.com",
-    domain: "unlimitedpowerhouse.com",
-    description: "Fractional CIO leadership, enterprise IT strategy, and technology-driven transformation.",
-  },
-  {
     name: "Lumynr",
     url: "https://lumynr.com",
     domain: "lumynr.com",
@@ -71,7 +65,7 @@ export default function AboutPage() {
               <p>
                 <strong className="font-semibold text-parchment">Transformidable Media</strong> is a publication of{" "}
                 <span className="font-semibold text-parchment">Transformidable LLC</span>
-                , bringing together the brands and perspectives of Jerri Bland, Ed.D., Unlimited Powerhouse, and Vetters Group — along with those of our partners at Kade Advisory.
+                , bringing together the brands and perspectives of Jerri Bland, Ed.D., and Vetters Group — along with those of our partners at Kade Advisory.
               </p>
               <p>
                 Together, these properties cover the full spectrum of technology leadership — from enterprise strategy and project execution to talent development, executive coaching, and community building for women in tech.

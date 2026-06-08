@@ -14,7 +14,6 @@ await client.connect()
 // Known value renames (old DB value → new code value)
 const valueRenames: Record<string, string> = {
   'jerribland.com': 'jerribland',
-  'unlimitedpowerhouse.com': 'unlimitedpowerhouse',
   'agentpmo.com': 'agentpmo',
   'prept.com': 'prept',
   'lumynr.com': 'lumynr',
@@ -26,16 +25,16 @@ const valueRenames: Record<string, string> = {
 // Includes main tables, junction tables (hasMany selects), and version tables.
 const enumColumns: { table: string; column: string; validValues: string[] }[] = [
   // Articles
-  { table: 'articles_syndicate_to', column: 'value', validValues: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup', 'cio-advisra'] },
+  { table: 'articles_syndicate_to', column: 'value', validValues: ['jerribland', 'agentpmo', 'prept', 'lumynr', 'vettersgroup', 'cio-advisra'] },
   { table: 'articles', column: 'status', validValues: ['draft', 'review', 'scheduled', 'published'] },
   // Articles versions
-  { table: '_articles_v_version_syndicate_to', column: 'value', validValues: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup', 'cio-advisra'] },
+  { table: '_articles_v_version_syndicate_to', column: 'value', validValues: ['jerribland', 'agentpmo', 'prept', 'lumynr', 'vettersgroup', 'cio-advisra'] },
   { table: '_articles_v', column: 'version_status', validValues: ['draft', 'review', 'scheduled', 'published'] },
   // Podcast Episodes
-  { table: 'podcast_episodes_syndicate_to', column: 'value', validValues: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
+  { table: 'podcast_episodes_syndicate_to', column: 'value', validValues: ['jerribland', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
   { table: 'podcast_episodes', column: 'status', validValues: ['draft', 'review', 'scheduled', 'published'] },
   // Podcast Episodes versions
-  { table: '_podcast_episodes_v_version_syndicate_to', column: 'value', validValues: ['jerribland', 'unlimitedpowerhouse', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
+  { table: '_podcast_episodes_v_version_syndicate_to', column: 'value', validValues: ['jerribland', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
   { table: '_podcast_episodes_v', column: 'version_status', validValues: ['draft', 'review', 'scheduled', 'published'] },
   // Newsletter Issues
   { table: 'newsletter_issues', column: 'status', validValues: ['draft', 'scheduled', 'published'] },
@@ -203,6 +202,15 @@ try {
 } catch (e: any) {
   // Never let seeding break the deploy.
   console.error('[migrate] Topic seed error:', e.message)
+}
+
+// ── Phase 2.6: Retire Unlimited Powerhouse (authors + brand pillars) ─────
+try {
+  const { retireUnlimitedPowerhouse } = await import('./seed/retire-unlimited-powerhouse.ts')
+  await retireUnlimitedPowerhouse(payload)
+  console.log('[migrate] Unlimited Powerhouse retirement complete.')
+} catch (e: any) {
+  console.error('[migrate] Unlimited Powerhouse retirement error:', e.message)
 }
 
 // ── Phase 3: Enable Row Level Security on all public tables ──────────────

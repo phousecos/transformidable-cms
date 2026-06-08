@@ -105,18 +105,17 @@ export const Articles: CollectionConfig = {
     {
       name: 'bodyMarkdown',
       type: 'textarea',
-      required: true,
       admin: {
         description:
-          'Raw markdown — the source of truth for article content (used by the n8n pipeline and editors). The rich-text Body below is generated from this on save.',
+          'Optional raw markdown. When present (e.g. from the n8n pipeline), the rich-text Body below is generated from it on save. Leave blank to author directly in Body.',
       },
     },
     {
       name: 'body',
       type: 'richText',
       admin: {
-        readOnly: true,
-        description: 'Auto-generated from Body (Markdown) on save. Rendered by the site.',
+        description:
+          'Article content. Auto-generated when Body (Markdown) is provided; otherwise edit here directly.',
       },
     },
     {
@@ -185,7 +184,6 @@ export const Articles: CollectionConfig = {
       hasMany: true,
       options: [
         { label: 'Jerri Bland', value: 'jerribland' },
-        { label: 'UnlimITed Powerhouse', value: 'unlimitedpowerhouse' },
         { label: 'AgentPMO', value: 'agentpmo' },
         { label: 'Prept', value: 'prept' },
         { label: 'Lumynr', value: 'lumynr' },

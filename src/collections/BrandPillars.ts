@@ -47,7 +47,7 @@ export const BrandPillars: CollectionConfig = {
       type: 'text',
       required: true,
       admin: {
-        description: 'The brand domain this pillar maps to (e.g., unlimitedpowerhouse.com)',
+        description: 'The brand domain this pillar maps to (e.g., transformidable.media)',
       },
     },
     {

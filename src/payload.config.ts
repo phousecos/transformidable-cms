@@ -62,7 +62,6 @@ export default buildConfig({
     'https://jerribland.com',
     'https://lumynr.com',
     'https://agentpmo.com',
-    'https://unlimitedpowerhouse.com',
     'https://vettersgroup.com',
   ],
 
