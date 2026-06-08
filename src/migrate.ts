@@ -195,6 +195,16 @@ console.log('[migrate] Schema push complete.')
 
 await payload.db.migrate()
 
+// ── Phase 2.5: Seed the Topic vocabulary (idempotent) ────────────────────
+try {
+  const { seedTopics } = await import('./seed/topics.ts')
+  await seedTopics(payload)
+  console.log('[migrate] Topic seed complete.')
+} catch (e: any) {
+  // Never let seeding break the deploy.
+  console.error('[migrate] Topic seed error:', e.message)
+}
+
 // ── Phase 3: Enable Row Level Security on all public tables ──────────────
 // Supabase exposes the public schema through PostgREST. Without RLS, the
 // anon/authenticated API roles can read every row. Payload connects as the
