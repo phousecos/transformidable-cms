@@ -1,18 +1,15 @@
 // @ts-nocheck
 "use client";
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import SiteNav from "./SiteNav";
-
-type View =
-  | { kind: "cover" }
-  | { kind: "editors-letter" }
-  | { kind: "this-issue" }
-  | { kind: "article"; article: any; position: number };
+import Link from "next/link";
+import "./magazine.css";
 
 interface MagazineHomepageProps {
   issue: any;
   articles: any[];
+  issues?: any[];
+  books?: any[];
+  latestPodcast?: any;
 }
 
 // HTML-escape untrusted text so it cannot break out of attribute or element
@@ -61,309 +58,444 @@ function normalizeBody(body: any): string {
   return "";
 }
 
-// Honor prefers-reduced-motion when programmatically scrolling. Users who
-// opt into reduced motion get an instant jump instead of the smooth animation.
+function mediaUrl(m: any): string | null {
+  if (m && typeof m === "object" && typeof m.url === "string") return m.url;
+  return null;
+}
+
+// The theme accent: the last word of a title picks up the wine accent, the way
+// the mockup colors "needs." Falls back gracefully on one-word titles.
+function AccentTitle({ text }: { text: string }) {
+  const words = (text || "").trim().split(/\s+/);
+  if (words.length <= 1) return <>{text}</>;
+  const last = words.pop();
+  return (
+    <>
+      {words.join(" ")} <span style={{ color: "var(--wine)" }}>{last}</span>
+    </>
+  );
+}
+
 function scrollToTopRespectingMotion() {
   if (typeof window === "undefined") return;
   const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
 }
 
-export default function MagazineHomepage({ issue, articles }: MagazineHomepageProps) {
-  const [view, setView] = useState<View>({ kind: "cover" });
-  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+type View = { kind: "index" } | { kind: "article"; article: any; position: number };
+
+export default function MagazineHomepage({ issue, articles, issues = [], books = [], latestPodcast = null }: MagazineHomepageProps) {
+  const [view, setView] = useState<View>({ kind: "index" });
+  const [navOpen, setNavOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const issuesToggleRef = useRef<HTMLButtonElement | null>(null);
 
   const num = issue.issueNumber ?? 1;
   const issueNumberFormatted = String(num).padStart(2, "0");
 
   const sortedArticles = [...articles].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
-  const flagship = sortedArticles.find((a) => a.isFlagship);
-  const remaining = sortedArticles.filter((a) => !a.isFlagship);
+  const flagship = sortedArticles.find((a) => a.isFlagship) ?? sortedArticles[0] ?? null;
+  const remaining = sortedArticles.filter((a) => a !== flagship);
+
+  // The column: prefer a guest-contributed piece so the guest byline pattern is
+  // exercised; otherwise the next article in order.
+  const isGuest = (a: any) => a?.author && typeof a.author === "object" && a.author.type === "guestContributor";
+  const column = remaining.find(isGuest) ?? remaining[0] ?? null;
+
+  const sortedIssues = [...issues].sort((a, b) => (b.issueNumber ?? 0) - (a.issueNumber ?? 0));
+  const issueCount = sortedIssues.length || issue.volume || 1;
 
   const openArticle = (article: any, position: number) => {
     setView({ kind: "article", article, position });
+    setNavOpen(false);
+    setDrawerOpen(false);
     scrollToTopRespectingMotion();
   };
 
-  const tabs = [
-    { id: "cover" as const, label: "COVER" },
-    { id: "editors-letter" as const, label: "EDITOR\u2019S LETTER" },
-    { id: "this-issue" as const, label: "THIS ISSUE" },
-  ];
+  // Escape closes the issues drawer and returns focus to its toggle.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (drawerOpen) {
+        setDrawerOpen(false);
+        issuesToggleRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [drawerOpen]);
 
-  const activeTabId = view.kind === "article" ? "this-issue" : view.kind;
-
-  // ARIA tab pattern: arrow keys move focus between tabs, Home/End jump to
-  // the first/last tab, and activating a tab both changes the panel and
-  // keeps focus on the tab (manual activation, per WAI-ARIA APG).
-  const onTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
-    let nextIndex: number | null = null;
-    if (e.key === "ArrowRight") nextIndex = (index + 1) % tabs.length;
-    else if (e.key === "ArrowLeft") nextIndex = (index - 1 + tabs.length) % tabs.length;
-    else if (e.key === "Home") nextIndex = 0;
-    else if (e.key === "End") nextIndex = tabs.length - 1;
-    if (nextIndex === null) return;
-    e.preventDefault();
-    const next = tabs[nextIndex];
-    setView({ kind: next.id });
-    tabRefs.current[next.id]?.focus();
+  const monthYear = (d: any) => {
+    if (!d) return "";
+    const date = new Date(d);
+    if (isNaN(date.getTime())) return "";
+    return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
   };
+
+  return (
+    <div className="mag">
+      <div className="page">
+        {/* Utility bar — the one wine surface. Exits to commerce, subordinate. */}
+        <nav className="utility" aria-label="Shop">
+          <Link href="/reading-room">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M4 19V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14M4 19h6M14 5.5l2-.5a1.5 1.5 0 0 1 1.8 1.1l3 11.6a1.5 1.5 0 0 1-1 1.8l-2 .5" /></svg>
+            <span><span className="long">Shop The </span>Reading Room</span>
+          </Link>
+          <span className="sep" aria-hidden="true"></span>
+          <Link href="/reading-room">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" /></svg>
+            <span className="long">The Transformidable Leader</span>
+            <span className="short">The Book</span>
+          </Link>
+        </nav>
+
+        {/* Masthead + nav */}
+        <div className="masthead-row">
+          <header className="w masthead" style={{ flex: 1 }}>
+            <Link className="wordmark" href="/">
+              <span className="mark" aria-hidden="true"></span>
+              <span className="name">TRANSFORMIDABLE</span>
+            </Link>
+            <button
+              className="burger"
+              id="menu-toggle"
+              aria-expanded={navOpen}
+              aria-controls="nav"
+              aria-label="Menu"
+              onClick={() => setNavOpen((v) => !v)}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+            </button>
+          </header>
+
+          <nav className={`nav${navOpen ? " is-open" : ""}`} id="nav" aria-label="Main">
+            <button
+              className="nav-item"
+              id="issues-toggle"
+              ref={issuesToggleRef}
+              aria-expanded={drawerOpen}
+              aria-controls="issues-drawer"
+              onClick={() => setDrawerOpen((v) => !v)}
+            >
+              Issues
+              <svg className="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+            </button>
+            <Link className="nav-item" href="/podcast">Podcast</Link>
+            <Link className="nav-item" href="/about">About</Link>
+            <Link className="nav-item" href="/archive">
+              Archive
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
+            </Link>
+          </nav>
+        </div>
+
+        {/* Issues archive drawer */}
+        <div className={`drawer${drawerOpen ? " is-open" : ""}`} id="issues-drawer">
+          <div className="drawer-inner">
+            <div className="w drawer-head">
+              <h2 className="kicker">The archive</h2>
+              <Link className="link" href="/archive">All {issueCount} issues
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </Link>
+            </div>
+            <div className="shelf">
+              {(sortedIssues.length ? sortedIssues : [issue]).map((it) => {
+                const cover = mediaUrl(it.seo?.ogImage);
+                const isCurrent = it.issueNumber === issue.issueNumber;
+                const n = String(it.issueNumber ?? 0).padStart(2, "0");
+                return (
+                  <Link className="shelf-item" href={`/issues/${it.issueNumber}`} key={it.id ?? it.issueNumber} aria-current={isCurrent ? "page" : undefined}>
+                    {cover ? <img className="cover cover--issue" src={cover} alt="" /> : <div className="ph ph--issue">cover</div>}
+                    <div className="shelf-current" style={isCurrent ? undefined : { color: "var(--ink-mute)" }}>
+                      {isCurrent ? `${n} · CURRENT` : n}
+                    </div>
+                    <div className="shelf-title" style={{ marginTop: 0 }}>{it.themeTagline || it.title}</div>
+                    <div className="meta">{monthYear(it.publicationDate)}</div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <main id="main-content">
+          {view.kind === "index" ? (
+            <IndexView
+              issue={issue}
+              flagship={flagship}
+              column={column}
+              books={books}
+              latestPodcast={latestPodcast}
+              issueCount={issueCount}
+              onOpenArticle={openArticle}
+            />
+          ) : (
+            <ArticleReadView
+              article={view.article}
+              position={view.position}
+              issue={issue}
+              allArticles={sortedArticles}
+              onOpenArticle={openArticle}
+              onBackToIssue={() => { setView({ kind: "index" }); scrollToTopRespectingMotion(); }}
+            />
+          )}
+        </main>
+
+        <footer className="w">
+          <SubscribeForm />
+          <div className="colophon">
+            <div>
+              <h2 className="kicker" style={{ marginBottom: 12 }}>Colophon</h2>
+              <p>
+                Edited by <strong>Jerri Bland, Ed.D.</strong> Set in Archivo and Source Serif.
+                Published monthly from Durham, North Carolina. {numberWord(issueCount)} issue{issueCount === 1 ? "" : "s"} and counting.
+              </p>
+            </div>
+            <div className="colophon-brand">
+              <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 8 }}>
+                <span style={{ width: 12, height: 12, background: "var(--wine)", transform: "rotate(45deg)" }} aria-hidden="true"></span>
+                <span style={{ fontFamily: "var(--display)", fontSize: 12, letterSpacing: "0.04em" }}>TRANSFORMIDABLE</span>
+              </div>
+              <div className="meta">© {new Date().getFullYear()} · All rights reserved</div>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+// Spell out small issue counts so the colophon reads like prose ("Twelve
+// issues and counting") rather than a stat.
+function numberWord(n: number): string {
+  const words = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve"];
+  return n >= 0 && n <= 12 ? words[n] : String(n);
+}
+
+function SubscribeForm() {
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
+  const [message, setMessage] = useState("");
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (state === "sending") return;
+    setState("sending");
+    setMessage("");
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source: "website" }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setState("done");
+        setMessage(data.message || "Thanks — you are subscribed.");
+        setEmail("");
+      } else {
+        setState("error");
+        setMessage(data.error || "Something went wrong. Please try again.");
+      }
+    } catch {
+      setState("error");
+      setMessage("Something went wrong. Please try again.");
+    }
+  };
+
+  return (
+    <div className="subscribe">
+      <div>
+        <div style={{ fontFamily: "var(--display)", fontSize: 15, marginBottom: 4 }}>Get the next issue</div>
+        <div className="meta" style={{ marginBottom: 14 }}>One email. Monthly. No filler.</div>
+        {message && (
+          <div className="meta" role="status" style={{ marginBottom: 12, color: state === "error" ? "var(--wine)" : "var(--ink)" }}>{message}</div>
+        )}
+      </div>
+      <form className="subscribe-form" onSubmit={onSubmit}>
+        <label className="sr-only" htmlFor="email">Email address</label>
+        <input id="email" type="email" name="email" placeholder="you@company.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+        <button className="btn" type="submit" disabled={state === "sending"}>{state === "sending" ? "Joining…" : "Join"}</button>
+      </form>
+    </div>
+  );
+}
+
+function Byline({ author, fallbackName, meta, affiliation, forOutlet }: { author?: any; fallbackName?: string; meta?: string; affiliation?: string; forOutlet?: string }) {
+  const name = (author && typeof author === "object" && author.name) || fallbackName || "Jerri Bland";
+  const headshot = author && typeof author === "object" ? mediaUrl(author.headshot) : null;
+  const role = affiliation || (author && typeof author === "object" ? author.role : null);
+  const guest = author && typeof author === "object" && author.type === "guestContributor";
+  const authorSlug = author && typeof author === "object" ? author.slug : null;
+  return (
+    <div className="byline" style={{ marginBottom: 18 }}>
+      {headshot ? <img className="avatar" src={headshot} alt="" /> : <div className="ph avatar" aria-hidden="true"></div>}
+      {guest && authorSlug ? (
+        <Link className="who" href={`/contributors/${authorSlug}`}>{name}</Link>
+      ) : (
+        <span className="who">{name}</span>
+      )}
+      {forOutlet && <span className="what">for <span className="outlet">{forOutlet}</span></span>}
+      {role && !forOutlet && (
+        <>
+          <span className="dot" aria-hidden="true"></span>
+          <span className="what">{role}</span>
+        </>
+      )}
+      {meta && (
+        <>
+          <span className="dot" aria-hidden="true"></span>
+          <span className="what">{meta}</span>
+        </>
+      )}
+    </div>
+  );
+}
+
+function IndexView({ issue, flagship, column, books, latestPodcast, issueCount, onOpenArticle }: any) {
+  const heroPhoto = mediaUrl(flagship?.featuredImage);
+  const columnPhoto = mediaUrl(column?.featuredImage);
+  const readingBooks = (books || []).slice(0, 3);
+  const podGuest = latestPodcast?.guest && typeof latestPodcast.guest === "object" ? latestPodcast.guest : null;
+  const podArt = mediaUrl(latestPodcast?.featuredImage) || (podGuest && mediaUrl(podGuest.headshot));
 
   return (
     <>
-      <SiteNav />
-      <div className="sticky top-[56px] z-40 bg-obsidian md:top-[60px]">
-        <div className="border-t border-parchment/10">
-          <div
-            role="tablist"
-            aria-label="Issue sections"
-            className="mx-auto flex max-w-5xl"
-          >
-            {tabs.map((tab, i) => {
-              const isActive = activeTabId === tab.id;
+      {/* HERO — the lead essay. This is the issue INDEX; the essay reads on its
+          own view. */}
+      <article className="w" style={{ paddingTop: "var(--section)", paddingBottom: 22 }}>
+        <h2 className="kicker">The lead essay</h2>
+        <h1 className="display hero-title" style={{ fontSize: 31, margin: "14px 0 16px" }}>
+          <AccentTitle text={flagship?.title || issue.themeTagline || issue.title || "This issue"} />
+        </h1>
+        {(flagship?.dek || issue.themeSubheading) && (
+          <p className="body" style={{ marginBottom: 20 }}>{flagship?.dek || issue.themeSubheading}</p>
+        )}
+        <Byline author={flagship?.author} fallbackName="Jerri Bland" meta={flagship?.readTime ? `${flagship.readTime} min` : undefined} />
+        <div className="hero-actions">
+          {flagship ? (
+            <button className="btn btn--block" onClick={() => onOpenArticle(flagship, flagship.displayOrder ?? 1)}>
+              Read the essay
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </button>
+          ) : null}
+        </div>
+      </article>
+      {heroPhoto ? <img className="cover--bleed" src={heroPhoto} alt="" /> : <div className="ph ph--bleed">photo — full bleed</div>}
+
+      <hr className="rule" style={{ marginTop: "var(--section)" }} />
+
+      {/* COMMENTARY — audio. Static mockup; wire to a real <audio> element and an
+          issue-level commentary field when the model exists. */}
+      <section className="w section">
+        <h2 className="kicker">Commentary</h2>
+        <h3 className="display section-title">Why the pilot always survives the audit</h3>
+        <Byline fallbackName="Jerri Bland" meta="6 min listen" />
+        <div className="player">
+          <button className="play" aria-label="Play commentary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+          </button>
+          <div className="wave" aria-hidden="true">
+            {[40, 75, 95, 55, 80, 30, 62, 88, 45, 70, 35, 92, 58, 25, 66, 84, 42, 74, 50, 30, 68, 90, 38, 60].map((h, i) => (
+              <span key={i} className={i < 6 ? "played" : undefined} style={{ height: `${h}%` }} />
+            ))}
+          </div>
+          <span className="meta player-time">6:12</span>
+        </div>
+      </section>
+
+      <hr className="rule" />
+
+      {/* THE COLUMN — a guest byline where available. Photo sits above, full-bleed. */}
+      {column && (
+        <>
+          {columnPhoto ? <img className="cover--bleed" src={columnPhoto} alt="" style={{ height: 170 }} /> : <div className="ph ph--bleed" style={{ height: 170 }}>photo</div>}
+          <section className="w" style={{ paddingTop: 24, paddingBottom: "var(--section)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <h2 className="kicker">The column</h2>
+              {column.vertical && typeof column.vertical === "object" && column.vertical.name && (
+                <span className="tag">{column.vertical.name}</span>
+              )}
+            </div>
+            <h3 className="display section-title">{column.title}</h3>
+            <Byline author={column.author} fallbackName="Jerri Bland" meta={column.readTime ? `${column.readTime} min` : undefined} />
+            {column.dek && <p className="body" style={{ marginBottom: 16 }}>{column.dek}</p>}
+            <button className="link link--rule" onClick={() => onOpenArticle(column, column.displayOrder ?? 0)} style={{ background: "none", border: 0, cursor: "pointer" }}>Keep reading</button>
+          </section>
+        </>
+      )}
+
+      {/* ELSEWHERE — pointer to a syndicated piece. Static mockup content. */}
+      <section className="w section section--inset">
+        <h2 className="kicker">Elsewhere</h2>
+        <h3 className="display section-title">The meeting nobody documented</h3>
+        <div className="byline" style={{ marginBottom: 20 }}>
+          <div className="ph avatar" aria-hidden="true"></div>
+          <span className="who">Jerri Bland</span>
+          <span className="what">for <span className="outlet">CUSO Magazine</span></span>
+          <span className="dot" aria-hidden="true"></span>
+          <span className="what">July 9, 2026</span>
+        </div>
+        <blockquote className="pullquote">
+          <p>&ldquo;A $400M credit union doesn&rsquo;t fail its core conversion on day one. It fails it eleven months earlier, in a meeting nobody documented.&rdquo;</p>
+        </blockquote>
+        <a className="link" href="https://cusomag.com/" rel="noopener" target="_blank">
+          Read the full piece at CUSO
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" /></svg>
+        </a>
+      </section>
+
+      {/* PODCAST */}
+      {latestPodcast && (
+        <section className="w section">
+          <h2 className="kicker">Transformidable Thinking · Ep. {latestPodcast.episodeNumber}</h2>
+          <div className="split" style={{ marginTop: 18 }}>
+            {podArt ? <img className="ph--round cover" src={podArt} alt="" style={{ width: 96, height: 96, borderRadius: "50%", marginBottom: 16 }} /> : <div className="ph ph--round" style={{ marginBottom: 16 }}>guest</div>}
+            <div style={{ flex: 1 }}>
+              <h3 className="display section-title" style={{ marginTop: 0 }}>{latestPodcast.title}</h3>
+              {latestPodcast.description && <p className="body" style={{ marginBottom: 16 }}>{latestPodcast.description}</p>}
+              <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+                <Link className="btn" href="/podcast">
+                  Play
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      <hr className="rule" />
+
+      {/* THE READING ROOM — curated shelf. Lands last. */}
+      {readingBooks.length > 0 && (
+        <section style={{ paddingTop: "var(--section)", paddingBottom: 20 }}>
+          <div className="w drawer-head" style={{ marginBottom: 6 }}>
+            <h2 className="kicker">From the Reading Room</h2>
+            <Link className="link" href="/reading-room">Shop all
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </Link>
+          </div>
+          <p className="body w" style={{ marginBottom: 18 }}>Behind this issue. Chosen, not sponsored.</p>
+          <div className="shelf">
+            {readingBooks.map((b: any) => {
+              const cover = mediaUrl(b.cover_image);
+              const href = b.bookshop_url || b.payhip_url || "/reading-room";
+              const external = href.startsWith("http");
+              const Comp: any = external ? "a" : Link;
+              const props = external ? { href, rel: "noopener", target: "_blank" } : { href };
               return (
-                <button
-                  key={tab.id}
-                  ref={(el) => { tabRefs.current[tab.id] = el; }}
-                  role="tab"
-                  type="button"
-                  id={`tab-${tab.id}`}
-                  aria-selected={isActive}
-                  aria-controls={`panel-${tab.id}`}
-                  tabIndex={isActive ? 0 : -1}
-                  onClick={() => setView({ kind: tab.id })}
-                  onKeyDown={(e) => onTabKeyDown(e, i)}
-                  className={`flex-1 py-3 text-center text-xs font-medium tracking-[0.15em] transition-colors focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-gold md:text-sm md:tracking-[0.2em] ${
-                    isActive ? "bg-parchment/10 text-gold" : "text-parchment/80 hover:text-parchment"
-                  }`}
-                >
-                  {tab.label}
-                </button>
+                <Comp className="shelf-item" key={b.id} {...props}>
+                  {cover ? <img className="cover cover--cover" src={cover} alt="" /> : <div className="ph ph--cover">cover</div>}
+                  <div className="shelf-title">{b.title}</div>
+                  <div className="meta">{b.author}</div>
+                </Comp>
               );
             })}
           </div>
-        </div>
-        {view.kind === "article" && (
-          <div className="border-t border-parchment/10 bg-obsidian/80">
-            <div className="mx-auto flex max-w-5xl items-center gap-3 px-6 py-2">
-              <button onClick={() => setView({ kind: "this-issue" })} className="text-[10px] font-medium uppercase tracking-[0.2em] text-gold transition-colors hover:text-parchment md:text-xs">
-                &larr; Back to Issue
-              </button>
-              <span className="text-parchment/20">|</span>
-              <span className="truncate text-[10px] font-medium tracking-[0.1em] text-parchment/50 md:text-xs">
-                {String(view.position).padStart(2, "0")} &middot; {view.article.title}
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <main id="main-content" className="min-h-[60vh]">
-        {/* Each tab has exactly one panel. The "article read" view lives
-            inside the This Issue panel since that's the tab that stays
-            visually active while an article is open. */}
-        <div
-          role="tabpanel"
-          id="panel-cover"
-          aria-labelledby="tab-cover"
-          hidden={activeTabId !== "cover"}
-        >
-          {view.kind === "cover" && (
-            <CoverView issue={issue} articles={sortedArticles} issueNumber={issueNumberFormatted} onNavigate={() => setView({ kind: "this-issue" })} onOpenArticle={openArticle} />
-          )}
-        </div>
-        <div
-          role="tabpanel"
-          id="panel-editors-letter"
-          aria-labelledby="tab-editors-letter"
-          hidden={activeTabId !== "editors-letter"}
-        >
-          {view.kind === "editors-letter" && (
-            <EditorsLetterView issue={issue} />
-          )}
-        </div>
-        <div
-          role="tabpanel"
-          id="panel-this-issue"
-          aria-labelledby="tab-this-issue"
-          hidden={activeTabId !== "this-issue"}
-        >
-          {view.kind === "this-issue" && (
-            <ThisIssueView issue={issue} flagship={flagship} remaining={remaining} onOpenArticle={openArticle} />
-          )}
-          {view.kind === "article" && (
-            <ArticleReadView article={view.article} position={view.position} issue={issue} allArticles={sortedArticles} onOpenArticle={openArticle} onBackToIssue={() => setView({ kind: "this-issue" })} />
-          )}
-        </div>
-      </main>
+        </section>
+      )}
     </>
-  );
-}
-
-function CoverView({ issue, articles, issueNumber, onNavigate, onOpenArticle }: { issue: any; articles: any[]; issueNumber: string; onNavigate: () => void; onOpenArticle: (a: any, p: number) => void }) {
-  return (
-    <section className="bg-obsidian">
-      <div className="mx-auto max-w-5xl px-6 pb-16 pt-12 md:pt-16 md:pb-20">
-        <p className="mb-10 text-[10px] font-medium uppercase tracking-[0.25em] text-parchment/50 md:mb-14 md:text-xs">
-          {issue.title || "Transformidable"}
-        </p>
-        <p className="font-serif text-[64px] font-bold leading-none text-parchment/20 md:text-[96px]" aria-hidden="true">
-          {issueNumber}
-        </p>
-        <h1 className="mt-6 font-serif text-3xl font-bold italic leading-tight text-parchment md:mt-8 md:text-[40px] md:leading-[1.15]">
-          {issue.themeTagline || issue.title}
-        </h1>
-        {issue.themeSubheading && (
-          <p className="mt-4 text-sm font-light text-parchment/50 md:text-base">{issue.themeSubheading}</p>
-        )}
-        <div className="mt-10 h-px w-16 bg-gold md:mt-14" />
-        <p className="mt-8 text-[10px] font-medium uppercase tracking-[0.25em] text-parchment/50 md:text-xs">In This Issue</p>
-        <div className="mt-6 space-y-4">
-          {articles.map((a) => (
-            <button
-              key={a.id}
-              onClick={() => onOpenArticle(a, a.displayOrder ?? 0)}
-              className="flex w-full items-baseline gap-4 text-left transition-colors hover:opacity-80"
-            >
-              <span className="w-6 shrink-0 text-right text-xs font-bold text-gold">
-                {String(a.displayOrder ?? 0).padStart(2, "0")}
-              </span>
-              {a.isFlagship && <span className="text-xs text-gold" aria-label="Flagship">★</span>}
-              <span className={`font-serif text-sm leading-snug md:text-base ${a.isFlagship ? "font-semibold text-parchment" : "font-normal text-parchment/70"}`}>
-                {a.title}
-              </span>
-            </button>
-          ))}
-        </div>
-        <button onClick={onNavigate} className="mt-10 rounded-sm border border-gold/60 px-8 py-3 text-xs font-medium uppercase tracking-[0.2em] text-gold transition-colors hover:bg-gold/10">
-          Read This Issue →
-        </button>
-      </div>
-      <div className="border-t border-parchment/10">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <p className="text-[10px] font-medium tracking-[0.15em] text-parchment/40 md:text-xs">A publication of Transformidable LLC</p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function EditorsLetterView({ issue }: { issue: any }) {
-  const editorLetter = issue.editorLetter;
-  const body = editorLetter?.body ? normalizeBody(editorLetter.body) : "";
-
-  if (!body) {
-    return (
-      <section className="bg-parchment">
-        <div className="mx-auto max-w-3xl px-6 py-16">
-          <p className="font-serif text-lg text-obsidian/60 italic">Editor&apos;s letter coming soon.</p>
-        </div>
-      </section>
-    );
-  }
-
-  return (
-    <section className="bg-parchment">
-      <div className="mx-auto max-w-3xl px-6 pb-16 pt-12 md:pt-16 md:pb-20">
-        <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-oxblood md:text-xs">From the Editor</p>
-        <div className="mt-4 h-[2px] w-16 bg-oxblood" />
-        <div
-          className="mt-10 font-serif text-lg leading-[1.8] text-obsidian md:mt-14 md:text-xl [&>p]:mb-6 [&>p:empty]:h-4"
-          dangerouslySetInnerHTML={{ __html: body }}
-        />
-        <div className="mt-12 h-px w-full bg-obsidian/10 md:mt-16" />
-        {editorLetter.signoff && (
-          <div className="mt-8">
-            <p className="text-sm font-semibold text-obsidian">— {editorLetter.signoff}</p>
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
-
-function ThisIssueView({ issue, flagship, remaining, onOpenArticle }: { issue: any; flagship: any; remaining: any[]; onOpenArticle: (a: any, p: number) => void }) {
-  const verticalLabel = (article: any) => {
-    if (article.vertical && typeof article.vertical === "object") return article.vertical.name?.toUpperCase();
-    return "";
-  };
-
-  return (
-    <section className="bg-parchment">
-      <div className="mx-auto max-w-5xl px-6 pb-16 pt-10 md:pt-14 md:pb-20">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
-          <Image src="/logo-new.png" alt="Transformidable" width={800} height={200} className="h-16 w-auto brightness-0 md:h-20" />
-          <p className="text-[10px] font-medium uppercase tracking-[0.15em] text-obsidian/40 md:text-xs">
-            {issue.issueNumber != null && <>Issue {String(issue.issueNumber).padStart(2, "0")}</>}
-            {issue.issueNumber != null && issue.volume != null && <> · </>}
-            {issue.volume != null && <>Volume {issue.volume}</>}
-          </p>
-        </div>
-        <div className="mt-4 h-[2px] bg-oxblood" />
-        <h2 className="mt-8 font-serif text-2xl font-bold italic leading-snug text-obsidian md:mt-10 md:text-[32px] md:leading-tight">
-          {issue.themeTagline || issue.title}
-        </h2>
-        {issue.themeSubheading && (
-          <p className="mt-3 text-[10px] font-medium uppercase tracking-[0.25em] text-obsidian/50 md:text-xs">
-            {issue.themeSubheading.toUpperCase()}
-          </p>
-        )}
-        <p className="mt-10 text-[10px] font-medium uppercase tracking-[0.25em] text-oxblood md:mt-14 md:text-xs">In This Issue</p>
-
-        {flagship && (
-          <div className="mt-6 flex flex-col gap-4 md:mt-8 md:flex-row md:gap-8">
-            <p className="hidden font-serif text-[72px] font-bold leading-none text-obsidian/15 md:block md:text-[96px]" aria-hidden="true">
-              {String(flagship.displayOrder ?? 1).padStart(2, "0")}
-            </p>
-            <div className="flex-1">
-              <div className="flex items-center gap-3">
-                <span className="rounded-sm border border-obsidian/20 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.15em] text-obsidian/60 md:text-[10px]">Flagship</span>
-                <span className="text-[9px] font-medium uppercase tracking-[0.2em] text-obsidian/40 md:text-[10px]">{verticalLabel(flagship)}</span>
-              </div>
-              <h3 className="mt-3 font-serif text-xl font-semibold leading-snug text-obsidian md:text-2xl">
-                <button onClick={() => onOpenArticle(flagship, flagship.displayOrder ?? 1)} className="text-left transition-colors hover:text-oxblood">
-                  {flagship.title}
-                </button>
-              </h3>
-              {flagship.dek && <p className="mt-3 text-sm leading-relaxed text-obsidian/60 md:text-base">{flagship.dek}</p>}
-            </div>
-          </div>
-        )}
-
-        <div className="mt-8 h-px bg-obsidian/10 md:mt-10" />
-
-        <div className="mt-8 grid gap-8 md:mt-10 md:grid-cols-3 md:gap-6">
-          {remaining.map((article) => (
-            <article key={article.id}>
-              <p className="font-serif text-[36px] font-bold leading-none text-obsidian/15 md:text-[48px]" aria-hidden="true">
-                {String(article.displayOrder ?? 0).padStart(2, "0")}
-              </p>
-              <p className="mt-2 text-[9px] font-medium uppercase tracking-[0.2em] text-obsidian/40 md:text-[10px]">{verticalLabel(article)}</p>
-              <h3 className="mt-2 font-serif text-base font-semibold leading-snug text-obsidian md:text-lg">
-                <button onClick={() => onOpenArticle(article, article.displayOrder ?? 0)} className="text-left transition-colors hover:text-oxblood">
-                  {article.title}
-                </button>
-              </h3>
-              {article.dek && <p className="mt-2 text-xs leading-relaxed text-obsidian/50 md:text-sm">{article.dek}</p>}
-            </article>
-          ))}
-        </div>
-
-        <div className="mt-14 flex items-center justify-between border-t border-obsidian/10 pt-4 md:mt-20">
-          <p className="text-[10px] font-medium tracking-[0.15em] text-obsidian/40 md:text-xs">A publication of Transformidable LLC</p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function PullQuote({ quote }: { quote: string }) {
-  return (
-    <aside className="my-12 border-y border-oxblood/30 py-8 md:my-16 md:py-10">
-      <p className="font-serif text-xl font-semibold italic leading-relaxed text-obsidian md:text-2xl md:leading-relaxed">
-        &ldquo;{quote}&rdquo;
-      </p>
-    </aside>
   );
 }
 
@@ -374,104 +506,88 @@ function ArticleReadView({ article, position, issue, allArticles, onOpenArticle,
   const prev = currentIdx > 0 ? sorted[currentIdx - 1] : null;
   const next = currentIdx < sorted.length - 1 ? sorted[currentIdx + 1] : null;
 
-  const verticalLabel = (a: any) => {
-    if (a.vertical && typeof a.vertical === "object") return a.vertical.name;
-    return "";
-  };
+  const verticalLabel = (a: any) => (a.vertical && typeof a.vertical === "object" ? a.vertical.name : "");
 
-  // Split body HTML into chunks to interleave pull quotes
   const pullQuotes = Array.isArray(article.pullQuotes) ? article.pullQuotes : [];
   const afterIntro = pullQuotes.filter((q: any) => q.position === "after_intro");
   const mid = pullQuotes.filter((q: any) => q.position === "mid");
   const nearEnd = pullQuotes.filter((q: any) => q.position === "near_end");
 
-  // Split paragraphs to insert quotes at appropriate positions
   const paragraphs = body ? body.split("</p>").filter((p: string) => p.trim()).map((p: string) => p + "</p>") : [];
   const totalParagraphs = paragraphs.length;
   const introBreak = Math.max(2, Math.floor(totalParagraphs * 0.25));
   const midBreak = Math.floor(totalParagraphs * 0.5);
   const endBreak = Math.max(midBreak + 1, Math.floor(totalParagraphs * 0.75));
 
+  const PullQuote = ({ quote }: { quote: string }) => (
+    <aside className="article-pullquote"><p>&ldquo;{quote}&rdquo;</p></aside>
+  );
+
   const renderBody = () => {
     if (!body) return null;
     if (pullQuotes.length === 0) {
-      return <div className="prose prose-lg max-w-none font-light text-obsidian/80 [&>p]:mb-6 [&>p:empty]:h-4" dangerouslySetInnerHTML={{ __html: body }} />;
+      return <div className="prose" dangerouslySetInnerHTML={{ __html: body }} />;
     }
-
     const chunks: { type: "html" | "quote"; content: string }[] = [];
     let current = "";
-
     paragraphs.forEach((p: string, i: number) => {
       current += p;
       if (i === introBreak - 1 && afterIntro.length > 0) {
-        chunks.push({ type: "html", content: current });
-        current = "";
+        chunks.push({ type: "html", content: current }); current = "";
         afterIntro.forEach((q: any) => chunks.push({ type: "quote", content: q.quote }));
       } else if (i === midBreak - 1 && mid.length > 0) {
-        chunks.push({ type: "html", content: current });
-        current = "";
+        chunks.push({ type: "html", content: current }); current = "";
         mid.forEach((q: any) => chunks.push({ type: "quote", content: q.quote }));
       } else if (i === endBreak - 1 && nearEnd.length > 0) {
-        chunks.push({ type: "html", content: current });
-        current = "";
+        chunks.push({ type: "html", content: current }); current = "";
         nearEnd.forEach((q: any) => chunks.push({ type: "quote", content: q.quote }));
       }
     });
     if (current) chunks.push({ type: "html", content: current });
-
     return chunks.map((chunk, i) =>
-      chunk.type === "quote" ? (
-        <PullQuote key={`q-${i}`} quote={chunk.content} />
-      ) : (
-        <div key={`h-${i}`} className="prose prose-lg max-w-none font-light text-obsidian/80 [&>p]:mb-6 [&>p:empty]:h-4" dangerouslySetInnerHTML={{ __html: chunk.content }} />
-      )
+      chunk.type === "quote"
+        ? <PullQuote key={`q-${i}`} quote={chunk.content} />
+        : <div key={`h-${i}`} className="prose" dangerouslySetInnerHTML={{ __html: chunk.content }} />
     );
   };
 
   return (
     <>
-      <div className="bg-obsidian">
-        <div className="mx-auto max-w-3xl px-6 pb-12 pt-10 md:pt-14 md:pb-16">
-          <div className="flex items-center gap-3">
-            <span className="font-serif text-2xl font-bold text-parchment/20 md:text-3xl">{String(position).padStart(2, "0")}</span>
-            {verticalLabel(article) && (
-              <span className="text-xs font-medium uppercase tracking-[0.2em] text-gold">{verticalLabel(article)}</span>
-            )}
+      <div className="article-hero">
+        <div className="w">
+          <button className="article-back" onClick={onBackToIssue}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6" /></svg>
+            Back to issue
+          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+            <span className="kicker">{String(position).padStart(2, "0")}</span>
+            {verticalLabel(article) && <span className="kicker">· {verticalLabel(article)}</span>}
           </div>
-          <h1 className="mt-4 font-serif text-3xl font-bold leading-tight text-parchment md:text-5xl md:leading-[1.1]">{article.title}</h1>
-          {article.dek && <p className="mt-6 text-lg leading-relaxed text-parchment/65 font-light">{article.dek}</p>}
-          <p className="mt-4 text-[10px] font-medium uppercase tracking-[0.2em] text-parchment/30 md:text-xs">
+          <h1 className="display" style={{ fontSize: 30, lineHeight: 1.02 }}>{article.title}</h1>
+          {article.dek && <p className="dek">{article.dek}</p>}
+          <p className="meta" style={{ marginTop: 14 }}>
             {issue.issueNumber != null && <>Issue {String(issue.issueNumber).padStart(2, "0")}</>}
             {issue.volume != null && <> · Volume {issue.volume}</>}
+            {article.readTime ? <> · {article.readTime} min</> : null}
           </p>
         </div>
       </div>
-      <div className="bg-parchment">
-        <div className="mx-auto max-w-3xl px-6 py-16 md:py-20">
-          {body ? (
-            <>{renderBody()}</>
-          ) : (
-            <p className="font-serif text-lg text-obsidian/60 italic">Full article content coming soon.</p>
-          )}
-          <div className="mt-16 border-t border-obsidian/10 pt-8">
-            <div className="flex items-center justify-between">
-              {prev ? (
-                <button onClick={() => { onOpenArticle(prev, prev.displayOrder ?? 0); window.scrollTo({ top: 0, behavior: "smooth" }); }} className="text-left">
-                  <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-obsidian/40 md:text-xs">Previous</span>
-                  <p className="mt-1 font-serif text-sm font-semibold text-oxblood md:text-base">{prev.title}</p>
-                </button>
-              ) : <div />}
-              <button onClick={onBackToIssue} className="rounded-sm border border-obsidian/20 px-4 py-2 text-[10px] font-medium uppercase tracking-[0.2em] text-obsidian/60 transition-colors hover:border-oxblood hover:text-oxblood md:text-xs">
-                This Issue
-              </button>
-              {next ? (
-                <button onClick={() => { onOpenArticle(next, next.displayOrder ?? 0); window.scrollTo({ top: 0, behavior: "smooth" }); }} className="text-right">
-                  <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-obsidian/40 md:text-xs">Next</span>
-                  <p className="mt-1 font-serif text-sm font-semibold text-oxblood md:text-base">{next.title}</p>
-                </button>
-              ) : <div />}
-            </div>
-          </div>
+      <div className="w" style={{ paddingBlock: "var(--section)" }}>
+        {body ? renderBody() : <p className="body" style={{ fontStyle: "italic" }}>Full article content coming soon.</p>}
+        <div className="article-nav">
+          {prev ? (
+            <button className="navtitle-wrap" onClick={() => onOpenArticle(prev, prev.displayOrder ?? 0)} style={{ background: "none", border: 0, cursor: "pointer", textAlign: "left", padding: 0 }}>
+              <span className="navlabel">Previous</span>
+              <span className="navtitle" style={{ display: "block" }}>{prev.title}</span>
+            </button>
+          ) : <span />}
+          <button className="link" onClick={onBackToIssue} style={{ background: "none", border: 0, cursor: "pointer" }}>This issue</button>
+          {next ? (
+            <button onClick={() => onOpenArticle(next, next.displayOrder ?? 0)} style={{ background: "none", border: 0, cursor: "pointer", textAlign: "right", padding: 0 }}>
+              <span className="navlabel">Next</span>
+              <span className="navtitle" style={{ display: "block" }}>{next.title}</span>
+            </button>
+          ) : <span />}
         </div>
       </div>
     </>
