@@ -409,7 +409,7 @@ function IndexView({ issue, flagship, column, books, latestPodcast, issueCount, 
       {/* THE COLUMN — a guest byline where available. Photo sits above, full-bleed. */}
       {column && (
         <>
-          {columnPhoto ? <img className="cover--bleed" src={columnPhoto} alt="" style={{ height: 170 }} /> : <div className="ph ph--bleed" style={{ height: 170 }}>photo</div>}
+          {columnPhoto ? <img className="cover--bleed-col" src={columnPhoto} alt="" /> : <div className="ph ph--bleed-col">photo</div>}
           <section className="w" style={{ paddingTop: 24, paddingBottom: "var(--section)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <h2 className="kicker">The column</h2>

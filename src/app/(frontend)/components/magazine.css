@@ -145,11 +145,14 @@
 .mag .cover--issue { height: 112px; }
 .mag .cover--cover { height: 150px; }
 .mag .cover--bleed { width: 100%; height: 200px; object-fit: cover; display: block; }
+/* The column photo runs a touch shorter than the hero at every width. */
+.mag .cover--bleed-col { width: 100%; height: 170px; object-fit: cover; display: block; }
 
 /* --- Photo placeholders -------------------------------------------------- */
 
 .mag .ph { background: var(--wine); display: flex; align-items: center; justify-content: center; color: var(--ph-label); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; }
 .mag .ph--bleed { height: 200px; }
+.mag .ph--bleed-col { height: 170px; }
 .mag .ph--cover { height: 150px; }
 .mag .ph--issue { height: 112px; }
 .mag .ph--round { border-radius: 50%; flex: none; width: 96px; height: 96px; }
@@ -237,6 +240,10 @@
 @media (min-width: 720px) {
   .mag { --gut: 48px; --section: 52px; }
 
+  /* Fill the screen on desktop, capped so lines and the hero don't stretch
+     on ultra-wide monitors. Body copy stays capped at --measure regardless. */
+  .mag .page { max-width: 1200px; }
+
   .mag .utility { justify-content: flex-end; gap: 24px; height: 34px; }
   .mag .utility a { font-size: 11px; letter-spacing: 0.1em; }
   .mag .utility .long { display: inline; }
@@ -268,6 +275,8 @@
 
   .mag .ph--bleed { height: 280px; }
   .mag .cover--bleed { height: 280px; }
+  .mag .ph--bleed-col { height: 230px; }
+  .mag .cover--bleed-col { height: 230px; }
   .mag .ph--round { width: 112px; height: 112px; }
 
   .mag .shelf-item { width: 148px; }
@@ -295,4 +304,20 @@
   .mag .article-hero { padding-block: 48px; }
   .mag .prose { font-size: 17px; }
   .mag .prose h2 { font-size: 26px; }
+}
+
+/* ==========================================================================
+   WIDE — 1080px and above. The container is near its 1200px cap, so open the
+   gutters and give the full-bleed photos more height to stay proportional.
+   ========================================================================== */
+
+@media (min-width: 1080px) {
+  .mag { --gut: 64px; }
+
+  .mag .ph--bleed { height: 420px; }
+  .mag .cover--bleed { height: 420px; }
+  .mag .ph--bleed-col { height: 320px; }
+  .mag .cover--bleed-col { height: 320px; }
+
+  .mag .hero-title { font-size: 52px !important; }
 }
