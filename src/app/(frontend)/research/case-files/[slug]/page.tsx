@@ -76,6 +76,15 @@ export default async function CaseFileDetail({ params }: { params: Promise<{ slu
             </div>
           )}
 
+          {cf.podcastEpisode && typeof cf.podcastEpisode === "object" && (
+            <div className="detail-cta">
+              <a className="btn" href="#podcast">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+                Listen to the episode
+              </a>
+            </div>
+          )}
+
           {cover && (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img className="detail-cover" src={cover} alt="" />

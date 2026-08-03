@@ -6,29 +6,31 @@ const ArrowRight = ({ s = 13 }: { s?: number }) => (
   <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
 );
 
-// The hero's right column: the newest case file and newest publication, so
-// there is fresh work above the fold without scrolling.
-export function HeroLatest({ caseFile, publication }: { caseFile?: any; publication?: any }) {
+// The hero's right column: the most recent work across case files and
+// publications, so fresh content sits above the fold. `items` is a merged,
+// date-sorted list of { kind, doc }; the panel grows as more is published.
+export function HeroLatest({ items = [] }: { items?: any[] }) {
+  if (!items.length) return null;
   return (
-    <div className="hero-latest fade d3">
-      {caseFile && (
-        <Link className="hero-latest-card" href={`/research/case-files/${caseFile.slug}`}>
-          <span className="hero-latest-label">Latest case file<ArrowRight /></span>
-          <span className="hero-latest-title">{caseFile.title}</span>
-          {(caseFile.sector || caseFile.readTime) && (
-            <span className="hero-latest-meta">
-              {[caseFile.sector, caseFile.readTime && `${caseFile.readTime} min`].filter(Boolean).join(" · ")}
-            </span>
-          )}
-        </Link>
-      )}
-      {publication && (
-        <Link className="hero-latest-card" href={publication.assetUrl || `/publications/${publication.slug}`}>
-          <span className="hero-latest-label">Latest publication<ArrowRight /></span>
-          <span className="hero-latest-title">{publication.title}</span>
-          <span className="hero-latest-meta">{TYPE_LABELS[publication.type] || "Publication"}</span>
-        </Link>
-      )}
+    <div className="hero-latest fade d2">
+      <p className="hero-latest-h">The latest</p>
+      {items.map(({ kind, doc }: any, i: number) => {
+        const isCase = kind === "case";
+        const href = isCase
+          ? `/research/case-files/${doc.slug}`
+          : (doc.assetUrl || `/publications/${doc.slug}`);
+        const label = isCase ? "Case file" : (TYPE_LABELS[doc.type] || "Publication");
+        const meta = isCase
+          ? [doc.sector, doc.readTime && `${doc.readTime} min`].filter(Boolean).join(" · ")
+          : pubMeta(doc).slice(0, 2).join(" · ");
+        return (
+          <Link className="hero-latest-card" href={href} key={doc.id ?? i}>
+            <span className="hero-latest-label">{label}<ArrowRight /></span>
+            <span className="hero-latest-title">{doc.title}</span>
+            {meta && <span className="hero-latest-meta">{meta}</span>}
+          </Link>
+        );
+      })}
     </div>
   );
 }

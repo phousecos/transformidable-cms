@@ -50,37 +50,48 @@ export default async function HomePage() {
     fetchCollection(payload, "case-files", 4),
   ]);
 
+  // The hero "latest" panel: newest work across both collections, by date.
+  const latest = [
+    ...caseFiles.map((doc: any) => ({ kind: "case", doc })),
+    ...publications.map((doc: any) => ({ kind: "pub", doc })),
+  ]
+    .filter((x) => x.doc)
+    .sort((a, b) => {
+      const da = a.doc.publishedAt ? new Date(a.doc.publishedAt).getTime() : 0;
+      const db = b.doc.publishedAt ? new Date(b.doc.publishedAt).getTime() : 0;
+      return db - da;
+    })
+    .slice(0, 4);
+
   return (
     <ResearchShell>
         {/* HERO */}
         <section className="hero">
           <div className="wrap hero-in">
-            <div className="hero-tags fade">
-              <span>Governance, leadership &amp; institutional resilience</span>
-              <span className="dot" aria-hidden="true"></span>
-              <span>A research &amp; advisory practice</span>
-            </div>
-
-            <h1 className="hero-head fade d1">
-              Advancing the science and practice of organizational <span className="em">transformation.</span>
-            </h1>
-
             <div className="hero-grid">
-              <div className="fade d2">
-                <p className="lead" style={{ maxWidth: "52ch" }}>
+              <div className="hero-main">
+                <div className="hero-tags fade">
+                  <span>Governance, leadership &amp; institutional resilience</span>
+                  <span className="dot" aria-hidden="true"></span>
+                  <span>A research &amp; advisory practice</span>
+                </div>
+                <h1 className="hero-head fade d1">
+                  Advancing the science and practice of organizational <span className="em">transformation.</span>
+                </h1>
+                <p className="lead fade d2" style={{ maxWidth: "52ch" }}>
                   We research how governance, leadership, and institutional decision-making shape
                   organizational resilience. We publish evidence, advise leaders, develop analytical
                   tools, and provide expert analysis that helps organizations&mdash;and the legal
                   system&mdash;understand why complex transformations succeed or fail.
                 </p>
-                <div className="hero-cta" style={{ marginTop: 26 }}>
+                <div className="hero-cta fade d2" style={{ marginTop: 26 }}>
                   <Link className="btn" href="/research">Read the research agenda <Arrow /></Link>
                   <Link className="link" href="/briefing">Subscribe to the briefing</Link>
                 </div>
               </div>
 
-              {caseFiles[0] || publications[0] ? (
-                <HeroLatest caseFile={caseFiles[0]} publication={publications[0]} />
+              {latest.length > 0 ? (
+                <HeroLatest items={latest} />
               ) : (
                 <aside className="define-card fade d3">
                   <p className="figlabel">The word</p>
