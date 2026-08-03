@@ -9,6 +9,8 @@ import sharp from 'sharp'
 import { Users } from './collections/Users.ts'
 import { Media } from './collections/Media.ts'
 import { Articles } from './collections/Articles.ts'
+import { Publications } from './collections/Publications.ts'
+import { CaseFiles } from './collections/CaseFiles.ts'
 import { Issues } from './collections/Issues.ts'
 import { Verticals } from './collections/Verticals.ts'
 import { Topics } from './collections/Topics.ts'
@@ -88,6 +90,8 @@ export default buildConfig({
     // Active collections
     Users,
     Media,
+    Publications,
+    CaseFiles,
     Articles,
     Issues,
     Verticals,

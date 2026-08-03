@@ -12,7 +12,8 @@
     "lint": "next lint",
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap",
-    "seed": "tsx src/seed.ts"
+    "seed": "tsx src/seed.ts",
+    "seed:research": "tsx src/seed/research.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.14.0",
