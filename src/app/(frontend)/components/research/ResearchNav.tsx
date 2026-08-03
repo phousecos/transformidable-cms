@@ -22,10 +22,10 @@ const NAV = [
   },
   {
     label: "Publications", href: "/publications", children: [
-      { no: "02.1", name: "The Governance Files", desc: "Our flagship long-form series", href: "/publications/governance-files" },
-      { no: "02.2", name: "Articles", desc: "Shorter, argued pieces", href: "/publications/articles" },
-      { no: "02.3", name: "White Papers", desc: "Peer-reviewed depth", href: "/publications/white-papers" },
-      { no: "02.4", name: "Annual Reports", desc: "The state of governance, yearly", href: "/publications/annual-reports" },
+      { no: "02.1", name: "The Governance Files", desc: "Our flagship long-form series", href: "/publications?type=governance-file" },
+      { no: "02.2", name: "Articles", desc: "Shorter, argued pieces", href: "/publications?type=article" },
+      { no: "02.3", name: "White Papers", desc: "Peer-reviewed depth", href: "/publications?type=white-paper" },
+      { no: "02.4", name: "Annual Reports", desc: "The state of governance, yearly", href: "/publications?type=annual-report" },
     ],
   },
   {

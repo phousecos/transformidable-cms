@@ -1,28 +1,10 @@
 // @ts-nocheck
 import Link from "next/link";
+import { TYPE_LABELS, caseNo, pubMeta } from "./format";
 
 const ArrowRight = ({ s = 13 }: { s?: number }) => (
   <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
 );
-
-const TYPE_LABELS: Record<string, string> = {
-  "governance-file": "Governance File",
-  "article": "Article",
-  "white-paper": "White Paper",
-  "annual-report": "Annual Report",
-};
-
-function monthYear(d: any): string {
-  if (!d) return "";
-  const date = new Date(d);
-  if (isNaN(date.getTime())) return "";
-  return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
-}
-
-function caseNo(n: any): string {
-  if (n == null) return "";
-  return `No. ${String(n).padStart(3, "0")}`;
-}
 
 // ── Latest Publications ──────────────────────────────────────────────────
 export function PublicationsList({ publications = [] }: { publications?: any[] }) {
@@ -38,15 +20,7 @@ export function PublicationsList({ publications = [] }: { publications?: any[] }
       ) : (
         publications.map((p) => {
           const label = TYPE_LABELS[p.type] || "Publication";
-          const meta: string[] = [];
-          if (p.type === "governance-file") meta.push("The Governance Files");
-          if (p.seriesLabel) meta.push(p.seriesLabel);
-          if (p.peerReviewed) meta.push("Peer-reviewed");
-          if (p.pageCount) meta.push(`${p.pageCount} pp`);
-          if (p.readTime) meta.push(`${p.readTime} min`);
-          const dateLabel = monthYear(p.publishedAt);
-          if (dateLabel && (p.type === "annual-report" || meta.length === 0)) meta.push(dateLabel);
-
+          const meta = pubMeta(p);
           const href = p.assetUrl || `/publications/${p.slug}`;
           const external = typeof href === "string" && href.startsWith("http");
 

@@ -2,8 +2,7 @@
 import config from "@payload-config";
 import { getPayload } from "payload";
 import Link from "next/link";
-import "./components/research/research.css";
-import { ResearchNav, ResearchSubscribe } from "./components/research/ResearchNav";
+import { ResearchShell } from "./components/research/ResearchShell";
 import { PublicationsList, CaseFilesFeature } from "./components/research/ResearchSections";
 
 export const dynamic = "force-dynamic";
@@ -52,10 +51,7 @@ export default async function HomePage() {
   ]);
 
   return (
-    <div className="tr">
-      <ResearchNav />
-
-      <main id="main-content">
+    <ResearchShell>
         {/* HERO */}
         <section className="hero">
           <div className="wrap hero-in">
@@ -177,7 +173,7 @@ export default async function HomePage() {
                 <p className="kicker">Contents</p>
                 <h2 className="h">The work, in five parts.</h2>
               </div>
-              <p className="figlabel" style={{ alignSelf: "flex-end" }}>Vol. I &middot; Est. 2026</p>
+              <p className="figlabel" style={{ alignSelf: "flex-end" }}>Est. 2026</p>
             </div>
 
             {[
@@ -288,55 +284,6 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
-      </main>
-
-      {/* FOOTER */}
-      <footer className="footer" id="about">
-        <div className="wrap footer-top" id="briefing">
-          <p className="kicker">The Governance Briefing</p>
-          <p className="footer-mission">
-            <em>Transformidable</em>. Capable of sustained transformation through effective
-            governance, leadership, and institutional resilience.
-          </p>
-          <ResearchSubscribe />
-        </div>
-
-        <div className="wrap footer-cols">
-          <div className="fcol brand">
-            <Link className="fw" href="/" aria-label="Transformidable — home">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="brandlogo" src="/logo-new.png" alt="Transformidable" width={240} height={60} />
-            </Link>
-            <p>Independent research and advisory on governance, leadership, and institutional resilience.</p>
-          </div>
-          <div className="fcol">
-            <h5>Research</h5>
-            <Link href="/research/case-files">Case Files</Link>
-            <Link href="/research/notes">Research Notes</Link>
-            <Link href="/research/data">Data</Link>
-            <Link href="/research/methodology">Methodology</Link>
-          </div>
-          <div className="fcol">
-            <h5>Publications</h5>
-            <Link href="/publications/governance-files">The Governance Files</Link>
-            <Link href="/publications/articles">Articles</Link>
-            <Link href="/publications/white-papers">White Papers</Link>
-            <Link href="/publications/annual-reports">Annual Reports</Link>
-          </div>
-          <div className="fcol">
-            <h5>Explore</h5>
-            <Link href="/tools/governance-analytics">Governance Analytics</Link>
-            <Link href="/tools/benchmarks">Benchmarks</Link>
-            <Link href="/events">Events</Link>
-            <Link href="/about">About</Link>
-          </div>
-        </div>
-
-        <div className="wrap footer-legal">
-          <span>&copy; 2026 Transformidable &middot; All rights reserved</span>
-          <span>Set in Source Serif &amp; Archivo</span>
-        </div>
-      </footer>
-    </div>
+    </ResearchShell>
   );
 }
