@@ -133,7 +133,9 @@
 .tr .mobile-menu .mm-sub { font-family: var(--serif); font-size: 13px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--ink-mute); padding: 8px 0 8px 16px; border-bottom: 0; }
 
 /* ---- Hero ------------------------------------------------------------- */
-.tr .hero { border-bottom: 1px solid var(--rule); position: relative; overflow: hidden; }
+/* Hero spacing is controlled by .hero-in; cancel the generic section
+   padding so the two don't stack into a large gap under the masthead. */
+.tr .hero { border-bottom: 1px solid var(--rule); position: relative; overflow: hidden; padding-block: 0; }
 .tr .hero::after { content: ""; position: absolute; right: -140px; top: -140px; width: 460px; height: 460px; background: radial-gradient(circle at center, color-mix(in srgb, var(--wine) 8%, transparent), transparent 68%); pointer-events: none; }
 .tr .hero-in { padding: clamp(26px, 4vw, 44px) 0 clamp(40px, 6vw, 68px); position: relative; z-index: 1; }
 .tr .hero-tags { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
