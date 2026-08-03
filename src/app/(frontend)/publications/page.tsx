@@ -1,0 +1,98 @@
+// @ts-nocheck
+import config from "@payload-config";
+import { getPayload } from "payload";
+import Link from "next/link";
+import { ResearchShell } from "../components/research/ResearchShell";
+import { TYPE_LABELS, TYPE_PLURALS, pubMeta } from "../components/research/format";
+
+export const dynamic = "force-dynamic";
+
+export const metadata = {
+  title: "Publications — Transformidable",
+  description:
+    "The Governance Files, Articles, White Papers, and Annual Reports. The research, argued and on the record.",
+};
+
+const FILTERS = [
+  { value: "", label: "All" },
+  { value: "governance-file", label: "Governance Files" },
+  { value: "article", label: "Articles" },
+  { value: "white-paper", label: "White Papers" },
+  { value: "annual-report", label: "Annual Reports" },
+];
+
+export default async function PublicationsIndex({
+  searchParams,
+}: {
+  searchParams: Promise<{ type?: string }>;
+}) {
+  const { type } = await searchParams;
+  const activeType = TYPE_LABELS[type as string] ? (type as string) : "";
+
+  const payload = await getPayload({ config });
+  let docs: any[] = [];
+  try {
+    const where: any = { status: { equals: "published" } };
+    if (activeType) where.type = { equals: activeType };
+    const res = await payload.find({
+      collection: "publications",
+      where,
+      sort: "-publishedAt",
+      depth: 1,
+      limit: 60,
+    });
+    docs = res.docs || [];
+  } catch {
+    docs = [];
+  }
+
+  const heading = activeType ? TYPE_PLURALS[activeType] : "Publications";
+
+  return (
+    <ResearchShell>
+      <section className="idx-hero">
+        <div className="wrap idx-hero-in">
+          <p className="kicker">Publications</p>
+          <h1 className="idx-title">{heading}</h1>
+          <p className="idx-intro">
+            What the research becomes: argued, edited, and on the record. The Governance Files run
+            long; articles run short; white papers and annual reports carry the depth.
+          </p>
+          <div className="idx-filters">
+            {FILTERS.map((f) => {
+              const href = f.value ? `/publications?type=${f.value}` : "/publications";
+              const isActive = f.value === activeType;
+              return (
+                <Link className={`idx-filter${isActive ? " is-active" : ""}`} href={href} key={f.label}>
+                  {f.label}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <div className="idx-body">
+        <div className="wrap">
+          {docs.length === 0 ? (
+            <p className="empty">No publications in this series yet. New work is on the way.</p>
+          ) : (
+            docs.map((p) => {
+              const meta = pubMeta(p, true);
+              return (
+                <article className="pub" key={p.id}>
+                  <span className="p-type">{TYPE_LABELS[p.type] || "Publication"}</span>
+                  <div>
+                    <Link className="p-link" href={`/publications/${p.slug}`}><h4>{p.title}</h4></Link>
+                    {p.dek && <p className="p-desc">{p.dek}</p>}
+                    {meta.length > 0 && <span className="p-meta">{meta.join(" · ")}</span>}
+                  </div>
+                </article>
+              );
+            })
+          )}
+        </div>
+      </div>
+    </ResearchShell>
+  );
+}
