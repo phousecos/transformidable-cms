@@ -68,7 +68,7 @@ export function CaseFilesFeature({ caseFiles = [] }: { caseFiles?: any[] }) {
     { l: "Reading", v: featured.readTime ? `${featured.readTime} min` : null },
   ].filter((m) => m.v);
 
-  const exhibit = Array.isArray(featured.exhibit) ? featured.exhibit : [];
+  const exhibit = Array.isArray(featured.timeline) ? featured.timeline : [];
   const href = `/research/case-files/${featured.slug}`;
 
   return (
@@ -92,7 +92,7 @@ export function CaseFilesFeature({ caseFiles = [] }: { caseFiles?: any[] }) {
           <figure className="exhibit" style={{ margin: 0 }}>
             <div className="exhibit-head">
               <span className="figlabel">Exhibit A</span>
-              {featured.exhibitLabel && <span className="e-t">{featured.exhibitLabel}</span>}
+              {featured.timelineLabel && <span className="e-t">{featured.timelineLabel}</span>}
             </div>
             <div className="exhibit-body">
               <div className="timeline">
@@ -105,7 +105,7 @@ export function CaseFilesFeature({ caseFiles = [] }: { caseFiles?: any[] }) {
                     </span>
                     <div className="tl-body">
                       <div className="t">{row.title}</div>
-                      {row.detail && <div className="d">{row.detail}</div>}
+                      {row.description && <div className="d">{row.description}</div>}
                     </div>
                   </div>
                 ))}
