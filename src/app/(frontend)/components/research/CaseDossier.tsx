@@ -36,7 +36,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
   const documents = has(cf.documents) ? cf.documents : [];
   const audits = has(cf.auditReports) ? cf.auditReports : [];
   const news = has(cf.newsCoverage) ? cf.newsCoverage : [];
-  const notes = has(cf.researchNotes) ? cf.researchNotes : [];
+  const notes = (Array.isArray(cf.researchNotes) ? cf.researchNotes : []).filter((n: any) => n && typeof n === "object");
   const mechanisms = has(cf.governanceMechanisms) ? cf.governanceMechanisms : [];
   const lessons = has(cf.lessonsLearned) ? cf.lessonsLearned : [];
   const related = (Array.isArray(cf.relatedCases) ? cf.relatedCases : []).filter((r: any) => r && typeof r === "object");
@@ -185,17 +185,18 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
 
         {notes.length > 0 && (
           <Section id="research-notes" label="Research Notes">
-            <div className="case-notes">
-              {notes.map((nt: any, i: number) => (
-                <div className="case-note" key={i}>
-                  {(nt.title || nt.date) && (
-                    <div className="case-note-head">
-                      {nt.title && <span className="case-note-title">{nt.title}</span>}
-                      {nt.date && <span className="case-row-meta">{fullDate(nt.date)}</span>}
-                    </div>
-                  )}
-                  {nt.note && <p className="case-note-body">{nt.note}</p>}
-                </div>
+            <div className="case-rows">
+              {notes.map((nt: any) => (
+                <Link className="case-row" href={`/research/notes/${nt.slug}`} key={nt.id}>
+                  <div className="case-row-main">
+                    <div className="case-row-title">{nt.title}</div>
+                    {nt.dek && <p className="case-row-desc">{nt.dek}</p>}
+                    {nt.publishedAt && <span className="case-row-meta">{fullDate(nt.publishedAt)}</span>}
+                  </div>
+                  <span className="link" aria-hidden="true">Read
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                  </span>
+                </Link>
               ))}
             </div>
           </Section>
