@@ -155,6 +155,34 @@ try {
     }
   }
 
+  // Step 5: Drop tables/columns that were renamed or removed in code. Without
+  // this, drizzle-kit push sees an add+drop pair and stops to ask "Is X
+  // created or renamed from Y?" — an interactive prompt that hangs a
+  // non-interactive CI build. Pre-dropping the old objects makes the change a
+  // set of unambiguous CREATEs/ADDs, which push applies without prompting.
+  // All statements are IF EXISTS, so they are no-ops on a fresh database.
+  const staleTables = ['case_files_exhibit', 'case_files_research_notes']
+  for (const t of staleTables) {
+    try {
+      await client.query(`DROP TABLE IF EXISTS "${t}" CASCADE`)
+      console.log(`  Dropped stale table ${t} (renamed/removed in code)`)
+    } catch (e: any) {
+      console.log(`  Could not drop ${t}: ${e.message}`)
+    }
+  }
+  const staleColumns: { table: string; column: string }[] = [
+    { table: 'case_files', column: 'body' },
+    { table: 'case_files', column: 'exhibit_label' },
+  ]
+  for (const { table, column } of staleColumns) {
+    try {
+      await client.query(`ALTER TABLE IF EXISTS "${table}" DROP COLUMN IF EXISTS "${column}"`)
+      console.log(`  Dropped stale column ${table}.${column} (renamed/removed in code)`)
+    } catch (e: any) {
+      console.log(`  Could not drop ${table}.${column}: ${e.message}`)
+    }
+  }
+
   console.log('[migrate] Phase 1 complete — enums dropped and data cleaned.')
 } catch (e: any) {
   console.error('[migrate] Phase 1 error:', e.message)
