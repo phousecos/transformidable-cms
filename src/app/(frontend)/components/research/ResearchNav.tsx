@@ -29,9 +29,9 @@ const NAV = [
     ],
   },
   {
-    label: "Tools", href: "/tools", children: [
-      { no: "03.1", name: "Governance Analytics", desc: "Score your own governance", href: "/tools/governance-analytics" },
-      { no: "03.2", name: "Benchmarks", desc: "How your sector compares", href: "/tools/benchmarks" },
+    label: "Tools", href: "/#tools", children: [
+      { no: "03.1", name: "Governance Analytics", desc: "Coming soon", href: "/#tools" },
+      { no: "03.2", name: "Benchmarks", desc: "Coming soon", href: "/#tools" },
     ],
   },
   { label: "Events", href: "/events" },
@@ -49,7 +49,7 @@ export function ResearchNav() {
           <span className="u-brand">Transformidable</span>
           <div className="u-links">
             <Link className="u-brief" href="/briefing">The Governance Briefing</Link>
-            <Link href="/tools/governance-analytics">
+            <Link href="/#tools">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M3 3v18h18" /><path d="M7 14l3-4 3 3 4-6" /></svg>
               Governance Analytics
             </Link>

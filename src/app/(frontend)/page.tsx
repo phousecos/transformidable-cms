@@ -217,13 +217,14 @@ export default async function HomePage() {
           <CaseFilesFeature caseFiles={caseFiles} />
         </section>
 
-        {/* BENCHMARKS / ANALYTICS (static) */}
-        <section id="tools" className="rule-band">
+        {/* BENCHMARKS / ANALYTICS — not built yet: shown as Coming Soon */}
+        <section id="tools" className="rule-band is-coming-soon">
           <div className="wrap">
             <div className="sec-head">
               <div>
                 <p className="kicker">Tools &middot; Governance Analytics</p>
                 <h2 className="h">Turn the research into a number you can track.</h2>
+                <span className="soon-badge">Coming soon</span>
               </div>
             </div>
             <div className="bench-grid">
@@ -234,9 +235,10 @@ export default async function HomePage() {
                   governance is set up to carry transformation without breaking. Run it on your own
                   organization, then see where you sit against your peers.
                 </p>
-                <Link className="btn" href="/tools/governance-analytics">Open Governance Analytics <Arrow /></Link>
+                <span className="btn btn--disabled" aria-disabled="true">Coming soon</span>
               </div>
-              <div>
+              <div className="stamp-wrap">
+                <span className="stamp" aria-hidden="true">Coming Soon</span>
                 <div className="chart-card">
                   <div className="cc-head">
                     <div>
