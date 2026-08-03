@@ -1,95 +1,106 @@
 // @ts-nocheck
-import SiteNav from "../components/SiteNav";
-import Footer from "../components/Footer";
+import Link from "next/link";
+import { ResearchShell } from "../components/research/ResearchShell";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "About — Transformidable",
-  description: "Ideas worth leading with. Transformidable Media.",
+  description:
+    "A research and advisory practice studying how governance, leadership, and institutional decision-making shape organizational resilience.",
 };
 
-const brands = [
-  {
-    name: "Transformidable Media",
-    url: "https://transformidable.media",
-    domain: "transformidable.media",
-    description: "C-suite strategy, transformational leadership philosophy, and the art of leading through change.",
-  },
-  {
-    name: "Lumynr",
-    url: "https://lumynr.com",
-    domain: "lumynr.com",
-    description: "A vibrant and growing community for Black women in the technology profession.",
-  },
-  {
-    name: "Vetters Group",
-    url: "https://vettersgroup.com",
-    domain: "vettersgroup.com",
-    description: "Background checks, HR process improvement, and staffing verification.",
-  },
+const AGENDA = [
+  ["Governance", "How do governance decisions influence organizational outcomes?"],
+  ["Leadership", "What leadership behaviors enable successful transformation?"],
+  ["Institutions", "Why do some organizations become resilient while others fail?"],
+  ["Technology", "How should organizations govern emerging technologies?"],
+  ["Evidence", "What can public failures teach us about better governance?"],
 ];
-
-function BrandCard({ brand }: { brand: { name: string; url: string; domain: string; description: string } }) {
-  return (
-    <a
-      href={brand.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={`${brand.name} — ${brand.domain} (opens in new window)`}
-      className="flex h-full flex-col rounded-lg border border-obsidian/15 bg-white/40 p-7 transition-all hover:border-oxblood/40 hover:shadow-sm focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-oxblood md:p-8"
-    >
-      <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-gold md:text-xs">
-        {brand.domain}
-      </p>
-      <h3 className="mt-3 font-serif text-xl font-bold text-obsidian md:text-2xl">{brand.name}</h3>
-      <div className="mt-4 h-[2px] w-10 bg-oxblood" />
-      <p className="mt-5 text-sm leading-relaxed text-obsidian/75 md:text-base">{brand.description}</p>
-    </a>
-  );
-}
 
 export default function AboutPage() {
   return (
-    <>
-      <SiteNav />
-      <main id="main-content">
-        {/* Dark hero */}
-        <section className="bg-obsidian">
-          <div className="mx-auto max-w-5xl px-6 pb-16 pt-12 md:pb-20 md:pt-16">
-            <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-gold md:text-xs">
-              About
+    <ResearchShell>
+      <section className="idx-hero">
+        <div className="wrap idx-hero-in">
+          <p className="kicker">About</p>
+          <h1 className="idx-title">Governance decides whether transformation holds.</h1>
+          <p className="idx-intro">
+            Transformidable is a research and advisory practice. We study how governance, leadership,
+            and institutional decision-making shape the success, resilience, and public trust of
+            organizations navigating complex change.
+          </p>
+        </div>
+      </section>
+
+      <article className="detail">
+        <div className="detail-wrap">
+          <div className="prose" style={{ marginTop: 0 }}>
+            <p>
+              Most transformations do not fail for lack of technology or talent. They fail, or quietly
+              revert, because of decisions made upstream: in the rooms where oversight, accountability,
+              and authority are set. Those are governance decisions, and they are usually made long
+              before the stress event that finally exposes them.
             </p>
-            <h1 className="mt-6 font-serif text-4xl font-bold italic text-parchment md:text-6xl lg:text-7xl">
-              Ideas worth leading with.
-            </h1>
-            <div className="mt-8 max-w-3xl space-y-6 text-base leading-relaxed text-parchment/70 md:text-lg">
-              <p>
-                <strong className="font-semibold text-parchment">Transformidable Media</strong> is a publication of{" "}
-                <span className="font-semibold text-parchment">Transformidable LLC</span>
-                , bringing together the brands and perspectives of Jerri Bland, Ed.D., and Vetters Group — along with those of our partners at Kade Advisory.
-              </p>
-              <p>
-                Together, these properties cover the full spectrum of technology leadership — from enterprise strategy and project execution to talent development, executive coaching, and community building for women in tech.
-              </p>
-            </div>
+            <p>
+              Transformidable exists to study those decisions in the open. We trace, case by case, how
+              governance and leadership shape whether an organization can carry change without breaking,
+              and we turn what we learn into evidence that leaders and institutions&mdash;and, when a
+              transformation is contested, the legal system&mdash;can actually use.
+            </p>
+            <p>
+              The work is deliberately independent. It is not opinion, and it is not a sales pitch for a
+              methodology. It is a standing body of evidence about the decisions that decide whether
+              transformation holds.
+            </p>
           </div>
-        </section>
 
-        {/* Our Brands */}
-        <section className="bg-parchment">
-          <div className="mx-auto max-w-5xl px-6 py-16 md:py-20">
-            <h2 className="font-serif text-3xl font-bold text-obsidian md:text-4xl">
-              Our Brands
-            </h2>
-
-            <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
-              {brands.map((brand) => (
-                <BrandCard key={brand.domain} brand={brand} />
+          <section className="case-section" id="agenda">
+            <h2 className="case-h">The research agenda</h2>
+            <p className="body" style={{ marginBottom: 20 }}>
+              Five questions organize the work. Each is pursued through primary case research, then
+              published as case files, articles, and reports.
+            </p>
+            <div className="prose" style={{ marginTop: 0 }}>
+              {AGENDA.map(([term, q]) => (
+                <p key={term}><strong>{term}.</strong> {q}</p>
               ))}
             </div>
+          </section>
+
+          <section className="case-section" id="who">
+            <h2 className="case-h">Who does the work</h2>
+            <div className="prose" style={{ marginTop: 0 }}>
+              <p>
+                Transformidable is led by <strong>Jerri Bland, Ed.D.</strong> Her work sits at the
+                intersection of governance, leadership, and organizational change, with particular
+                attention to mission-driven institutions carrying high-stakes, systemwide transformations.
+              </p>
+              <p>
+                She brings the discipline of a researcher and the vantage point of someone who has watched,
+                up close, how decisions made in board and committee rooms decide whether change takes hold
+                or unwinds. That vantage point&mdash;treating governance as the place where transformation
+                is really won or lost&mdash;is the lens this research is built on.
+              </p>
+              <p>
+                It is also what the work adds to the conversation. Transformation is usually discussed in
+                the language of strategy, technology, or change management. Transformidable insists on the
+                prior question: were the governance and leadership decisions sound enough to carry it? That
+                question is often the difference between a transformation that endures and one that is
+                studied, later, as a failure.
+              </p>
+            </div>
+          </section>
+
+          <div className="detail-foot" style={{ display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap" }}>
+            <Link className="btn" href="/#briefing">
+              Subscribe to the briefing
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </Link>
+            <Link className="link" href="/research/case-files">Read the case files</Link>
           </div>
-        </section>
-      </main>
-      <Footer />
-    </>
+        </div>
+      </article>
+    </ResearchShell>
   );
 }

@@ -13,11 +13,9 @@ const ArrowRight = ({ s = 13 }: { s?: number }) => (
 // Nav model mirrors the site information architecture.
 const NAV = [
   {
-    label: "Research", href: "/research", children: [
+    label: "Research", href: "/research/case-files", children: [
       { no: "01.1", name: "Case Files", desc: "Anatomies of real governance decisions", href: "/research/case-files" },
       { no: "01.2", name: "Research Notes", desc: "Working findings, in progress", href: "/research/notes" },
-      { no: "01.3", name: "Data", desc: "Datasets behind the research", href: "/research/data" },
-      { no: "01.4", name: "Methodology", desc: "How we study governance", href: "/research/methodology" },
     ],
   },
   {
@@ -28,13 +26,7 @@ const NAV = [
       { no: "02.4", name: "Annual Reports", desc: "The state of governance, yearly", href: "/publications?type=annual-report" },
     ],
   },
-  {
-    label: "Tools", href: "/#tools", children: [
-      { no: "03.1", name: "Governance Analytics", desc: "Coming soon", href: "/#tools" },
-      { no: "03.2", name: "Benchmarks", desc: "Coming soon", href: "/#tools" },
-    ],
-  },
-  { label: "Events", href: "/events" },
+  { label: "Events", href: "/#events" },
   { label: "About", href: "/about" },
 ];
 
@@ -48,11 +40,7 @@ export function ResearchNav() {
         <div className="wrap utility-in">
           <span className="u-brand">Transformidable</span>
           <div className="u-links">
-            <Link className="u-brief" href="/briefing">The Governance Briefing</Link>
-            <Link href="/#tools">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M3 3v18h18" /><path d="M7 14l3-4 3 3 4-6" /></svg>
-              Governance Analytics
-            </Link>
+            <Link className="u-brief" href="/#briefing">The Governance Briefing</Link>
           </div>
         </div>
       </div>

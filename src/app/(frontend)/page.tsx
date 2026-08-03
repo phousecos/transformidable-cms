@@ -85,8 +85,8 @@ export default async function HomePage() {
                   system&mdash;understand why complex transformations succeed or fail.
                 </p>
                 <div className="hero-cta fade d2" style={{ marginTop: 26 }}>
-                  <Link className="btn" href="/research">Read the research agenda <Arrow /></Link>
-                  <Link className="link" href="/briefing">Subscribe to the briefing</Link>
+                  <Link className="btn" href="/#research">Read the research agenda <Arrow /></Link>
+                  <Link className="link" href="/#briefing">Subscribe to the briefing</Link>
                 </div>
               </div>
 
@@ -144,7 +144,7 @@ export default async function HomePage() {
                 <p className="kicker">The agenda</p>
                 <h2 className="h">Five questions the research sets out to answer.</h2>
               </div>
-              <Link className="link" href="/research">All research <Arrow s={13} /></Link>
+              <Link className="link" href="/research/case-files">All research <Arrow s={13} /></Link>
             </div>
             <div className="inquiries">
               <div className="inquiry">
@@ -172,7 +172,7 @@ export default async function HomePage() {
                 <h3>What can public failures teach us about better governance?</h3>
                 <p>Reading the public record of breakdowns for lessons that transfer.</p>
               </div>
-              <Link className="inquiry call" href="/research">
+              <Link className="inquiry call" href="/research/case-files">
                 <p className="ck">The research agenda, in full. Five threads, one body of evidence.</p>
                 <span className="link" style={{ color: "var(--wine)" }}>Explore the agenda <Arrow s={13} /></span>
               </Link>
@@ -192,10 +192,10 @@ export default async function HomePage() {
             </div>
 
             {[
-              { no: "01", name: "Research", href: "/research", desc: "The evidence base. Primary study of governance in the field.", kids: ["Case Files", "Research Notes", "Data", "Methodology"] },
+              { no: "01", name: "Research", href: "/research/case-files", desc: "The evidence base. Primary study of governance in the field.", kids: ["Case Files", "Research Notes"] },
               { no: "02", name: "Publications", href: "/publications", desc: "What the research becomes. Argued, edited, and on the record.", kids: ["The Governance Files", "Articles", "White Papers", "Annual Reports"] },
-              { no: "03", name: "Tools", href: "/tools", desc: "The research, turned outward. Instruments you can run on yourself.", kids: ["Governance Analytics", "Benchmarks"] },
-              { no: "04", name: "Events", href: "/events", desc: "Where the findings are argued in the room. Roundtables and briefings.", kids: ["Roundtables", "Briefings"] },
+              { no: "03", name: "Tools", href: "/#tools", desc: "The research, turned outward. Instruments you can run on yourself.", kids: ["Governance Analytics", "Benchmarks"] },
+              { no: "04", name: "Events", href: "/#events", desc: "Where the findings are argued in the room. Roundtables and briefings.", kids: ["Roundtables", "Briefings"] },
               { no: "05", name: "About", href: "/about", desc: "Who does the work, how it is funded, and the standards it is held to.", kids: ["Mission", "People", "Standards"] },
             ].map((row) => (
               <Link className="contents-row" href={row.href} key={row.no}>
@@ -289,13 +289,13 @@ export default async function HomePage() {
                   <div className="e-date"><span className="m">Oct 16, 2026</span><span className="tag">Roundtable</span></div>
                   <h4>Governance &amp; the Digital Board</h4>
                   <p>A working session on how boards oversee transformation they cannot personally see.</p>
-                  <Link className="link" href="/events">Request a seat <Arrow s={13} /></Link>
+                  <Link className="link" href="/#briefing">Request a seat <Arrow s={13} /></Link>
                 </div>
                 <div className="event">
                   <div className="e-date"><span className="m">Nov 2026</span><span className="tag">Briefing</span></div>
                   <h4>Reading the Resilience Index</h4>
                   <p>A live walkthrough of the Q3 benchmark and what moved. Online.</p>
-                  <Link className="link" href="/events">Get notified <Arrow s={13} /></Link>
+                  <Link className="link" href="/#briefing">Get notified <Arrow s={13} /></Link>
                 </div>
               </aside>
             </div>
