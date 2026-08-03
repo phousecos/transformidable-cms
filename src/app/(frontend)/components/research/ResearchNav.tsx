@@ -1,6 +1,6 @@
 // @ts-nocheck
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 const Chevron = () => (
@@ -41,27 +41,6 @@ const NAV = [
 export function ResearchNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const toggleTheme = () => {
-    const root = document.documentElement;
-    let current = root.getAttribute("data-theme");
-    if (!current) {
-      current = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    }
-    const next = current === "dark" ? "light" : "dark";
-    root.setAttribute("data-theme", next);
-    try { window.localStorage.setItem("tr-theme", next); } catch {}
-  };
-
-  // Apply a saved preference on mount (no-op if none saved).
-  useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem("tr-theme");
-      if (saved === "dark" || saved === "light") {
-        document.documentElement.setAttribute("data-theme", saved);
-      }
-    } catch {}
-  }, []);
-
   return (
     <>
       {/* Utility bar */}
@@ -74,9 +53,6 @@ export function ResearchNav() {
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M3 3v18h18" /><path d="M7 14l3-4 3 3 4-6" /></svg>
               Governance Analytics
             </Link>
-            <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle light and dark theme">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
-            </button>
           </div>
         </div>
       </div>

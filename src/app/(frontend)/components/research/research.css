@@ -1,9 +1,9 @@
 /* ==========================================================================
    TRANSFORMIDABLE — Governance Research homepage
    Scoped under .tr so nothing leaks into the magazine (.mag) or admin themes.
-   Light + dark, driven by html[data-theme] with a prefers-color-scheme
-   fallback. Brand rule carried forward: GOLD means "act here"; WINE is the
-   structural color; wine is a surface only in the utility bar and footer.
+   Single light theme (cream + true oxblood). Brand rule carried forward:
+   GOLD means "act here"; WINE is the structural color; wine is a surface only
+   in the utility bar and footer.
    ========================================================================== */
 
 .tr {
@@ -43,46 +43,9 @@
   line-height: 1.5;
 }
 
-@media (prefers-color-scheme: dark) {
-  .tr {
-    --wine: #d98fa4;
-    --wine-deep: #14090c;
-    --wine-mid: #b0526e;
-    --gold: #d8b53f;
-    --gold-deep: #c9a227;
-    --paper: #1b1113;
-    --paper-2: #221618;
-    --paper-3: #2a1b1e;
-    --rule: #3a262b;
-    --rule-strong: #4a3238;
-    --ink: #f4ece1;
-    --ink-body: #d3c4c7;
-    --ink-mute: #a08e92;
-    --ink-faint: #6f5c60;
-    --on-wine: #f0dce2;
-    --on-wine-mute: #cf9fac;
-    --wine-rule: #4a2531;
-    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 34px -12px rgba(0, 0, 0, .6);
-  }
-}
-:root[data-theme="dark"] .tr {
-  --wine: #d98fa4; --wine-deep: #14090c; --wine-mid: #b0526e;
-  --gold: #d8b53f; --gold-deep: #c9a227;
-  --paper: #1b1113; --paper-2: #221618; --paper-3: #2a1b1e;
-  --rule: #3a262b; --rule-strong: #4a3238;
-  --ink: #f4ece1; --ink-body: #d3c4c7; --ink-mute: #a08e92; --ink-faint: #6f5c60;
-  --on-wine: #f0dce2; --on-wine-mute: #cf9fac; --wine-rule: #4a2531;
-  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 34px -12px rgba(0, 0, 0, .6);
-}
-:root[data-theme="light"] .tr {
-  --wine: #750427; --wine-deep: #4a0518; --wine-mid: #5f0620;
-  --gold: #c9a227; --gold-deep: #a9861a;
-  --paper: #f7f3ea; --paper-2: #efe9dc; --paper-3: #e7dfce;
-  --rule: #ddd3c4; --rule-strong: #cbbfaa;
-  --ink: #1a1210; --ink-body: #453a3c; --ink-mute: #7c6c70; --ink-faint: #a99a9d;
-  --on-wine: #f0dce2; --on-wine-mute: #d9a9b6; --wine-rule: #8f3050;
-  --shadow: 0 1px 2px rgba(74, 5, 24, .05), 0 8px 30px -12px rgba(74, 5, 24, .14);
-}
+/* Single light theme by design: the cream + true-oxblood identity. Dark mode
+   is intentionally not used (lightening oxblood enough to be legible on a dark
+   ground pushed the accent toward pink). */
 
 .tr *, .tr *::before, .tr *::after { box-sizing: border-box; }
 .tr a { color: inherit; text-decoration: none; }
@@ -115,9 +78,7 @@
 /* ---- Brand logo ------------------------------------------------------- */
 .tr .brandlogo { display: block; height: 40px; width: auto; }
 @media (min-width: 940px) { .tr .brandlogo { height: 44px; } }
-@media (prefers-color-scheme: dark) { .tr .masthead .brandlogo { filter: brightness(0) invert(1); } }
-:root[data-theme="dark"] .tr .masthead .brandlogo { filter: brightness(0) invert(1); }
-:root[data-theme="light"] .tr .masthead .brandlogo { filter: none; }
+/* Footer sits on the deep-wine surface, so the logo is shown in white there. */
 .tr .footer .brandlogo { height: 30px; filter: brightness(0) invert(1); }
 
 /* ---- Utility bar (wine surface #1) ------------------------------------ */
@@ -129,9 +90,6 @@
 .tr .utility .u-links a:hover { color: #fff; }
 .tr .u-brief { display: none; }
 @media (min-width: 620px) { .tr .u-brief { display: inline-flex; } }
-.tr .theme-toggle { background: none; border: 1px solid var(--wine-rule); color: var(--on-wine); border-radius: 999px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
-.tr .theme-toggle:hover { border-color: var(--on-wine); }
-.tr .theme-toggle svg { width: 13px; height: 13px; }
 
 /* ---- Masthead --------------------------------------------------------- */
 .tr .masthead { background: var(--paper); border-bottom: 1px solid var(--rule); position: sticky; top: 0; z-index: 40; }
