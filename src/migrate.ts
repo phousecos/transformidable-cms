@@ -241,6 +241,22 @@ try {
   console.error('[migrate] Unlimited Powerhouse retirement error:', e.message)
 }
 
+// ── Phase 2.7: Sample research content (non-production only) ──────────────
+// Populate Case Files, Publications, and Research Notes so the homepage and
+// dossier render with data. Gated to preview deploys (or an explicit opt-in)
+// so production is never seeded with sample content. Idempotent by slug.
+if (process.env.VERCEL_ENV === 'preview' || process.env.SEED_SAMPLE_DATA === 'true') {
+  try {
+    const { seedResearchSamples } = await import('./seed/research-samples.ts')
+    await seedResearchSamples(payload)
+    console.log('[migrate] Sample research content seeded (preview).')
+  } catch (e: any) {
+    console.error('[migrate] Sample research seed error:', e.message)
+  }
+} else {
+  console.log('[migrate] Skipping sample research content (not a preview deploy).')
+}
+
 // ── Phase 3: Enable Row Level Security on all public tables ──────────────
 // Supabase exposes the public schema through PostgREST. Without RLS, the
 // anon/authenticated API roles can read every row. Payload connects as the
