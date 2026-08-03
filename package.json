@@ -14,7 +14,8 @@
     "generate:importmap": "payload generate:importmap",
     "seed": "tsx src/seed.ts",
     "seed:research": "tsx src/seed/research.ts",
-    "seed:articles": "tsx src/seed/articles-to-publications.ts"
+    "seed:articles": "tsx src/seed/articles-to-publications.ts",
+    "seed:ucpath": "tsx src/seed/ucpath.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.14.0",

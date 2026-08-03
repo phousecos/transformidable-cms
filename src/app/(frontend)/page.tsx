@@ -3,7 +3,7 @@ import config from "@payload-config";
 import { getPayload } from "payload";
 import Link from "next/link";
 import { ResearchShell } from "./components/research/ResearchShell";
-import { PublicationsList, CaseFilesFeature } from "./components/research/ResearchSections";
+import { PublicationsList, CaseFilesFeature, HeroLatest } from "./components/research/ResearchSections";
 
 export const dynamic = "force-dynamic";
 
@@ -79,18 +79,22 @@ export default async function HomePage() {
                 </div>
               </div>
 
-              <aside className="define-card fade d3">
-                <p className="figlabel">The word</p>
-                <div className="pron2">
-                  <span className="word2">Transformidable</span>
-                  <span className="pos2">adjective</span>
-                  <span className="phon2">/trans&bull;form&bull;i&bull;da&bull;ble/</span>
-                </div>
-                <p className="meaning2">
-                  <span className="q">&ldquo;</span>Capable of sustained transformation through effective
-                  governance, leadership, and institutional resilience.<span className="q">&rdquo;</span>
-                </p>
-              </aside>
+              {caseFiles[0] || publications[0] ? (
+                <HeroLatest caseFile={caseFiles[0]} publication={publications[0]} />
+              ) : (
+                <aside className="define-card fade d3">
+                  <p className="figlabel">The word</p>
+                  <div className="pron2">
+                    <span className="word2">Transformidable</span>
+                    <span className="pos2">adjective</span>
+                    <span className="phon2">/trans&bull;form&bull;i&bull;da&bull;ble/</span>
+                  </div>
+                  <p className="meaning2">
+                    <span className="q">&ldquo;</span>Capable of sustained transformation through effective
+                    governance, leadership, and institutional resilience.<span className="q">&rdquo;</span>
+                  </p>
+                </aside>
+              )}
             </div>
           </div>
         </section>

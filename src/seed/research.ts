@@ -17,8 +17,8 @@ type CaseSeed = {
   dek: string
   featured?: boolean
   publishedAt: string
-  exhibitLabel?: string
-  exhibit?: { time: string; title: string; detail?: string; keyMoment?: boolean }[]
+  timelineLabel?: string
+  timeline?: { time: string; title: string; description?: string; keyMoment?: boolean }[]
 }
 
 type PubSeed = {
@@ -45,12 +45,12 @@ const CASE_FILES: CaseSeed[] = [
     featured: true,
     publishedAt: '2026-07-20T12:00:00.000Z',
     dek: 'A $400M credit union replaced the system its entire organization runs on, and against the base rate, it worked. The difference was not the vendor or the timeline. It was eleven governance decisions made in the year before go-live.',
-    exhibitLabel: 'The eleven-month decision window',
-    exhibit: [
-      { time: '-11 mo', title: 'Board reframes the project as governance, not IT', detail: 'Ownership moves to a standing committee', keyMoment: true },
-      { time: '-8 mo', title: 'Reversibility written into the contract', detail: 'A funded path back, not just forward' },
-      { time: '-4 mo', title: 'Members briefed before the switch, not after', detail: 'Trust treated as a deliverable', keyMoment: true },
-      { time: 'Go-live', title: 'Conversion holds; no reversion at 18 months', detail: 'The outcome the earlier decisions bought' },
+    timelineLabel: 'The eleven-month decision window',
+    timeline: [
+      { time: '-11 mo', title: 'Board reframes the project as governance, not IT', description: 'Ownership moves to a standing committee', keyMoment: true },
+      { time: '-8 mo', title: 'Reversibility written into the contract', description: 'A funded path back, not just forward' },
+      { time: '-4 mo', title: 'Members briefed before the switch, not after', description: 'Trust treated as a deliverable', keyMoment: true },
+      { time: 'Go-live', title: 'Conversion holds; no reversion at 18 months', description: 'The outcome the earlier decisions bought' },
     ],
   },
   {

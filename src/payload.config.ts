@@ -11,6 +11,7 @@ import { Media } from './collections/Media.ts'
 import { Articles } from './collections/Articles.ts'
 import { Publications } from './collections/Publications.ts'
 import { CaseFiles } from './collections/CaseFiles.ts'
+import { ResearchNotes } from './collections/ResearchNotes.ts'
 import { Issues } from './collections/Issues.ts'
 import { Verticals } from './collections/Verticals.ts'
 import { Topics } from './collections/Topics.ts'
@@ -92,6 +93,7 @@ export default buildConfig({
     Media,
     Publications,
     CaseFiles,
+    ResearchNotes,
     Articles,
     Issues,
     Verticals,

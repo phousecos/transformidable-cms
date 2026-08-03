@@ -6,6 +6,33 @@ const ArrowRight = ({ s = 13 }: { s?: number }) => (
   <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
 );
 
+// The hero's right column: the newest case file and newest publication, so
+// there is fresh work above the fold without scrolling.
+export function HeroLatest({ caseFile, publication }: { caseFile?: any; publication?: any }) {
+  return (
+    <div className="hero-latest fade d3">
+      {caseFile && (
+        <Link className="hero-latest-card" href={`/research/case-files/${caseFile.slug}`}>
+          <span className="hero-latest-label">Latest case file<ArrowRight /></span>
+          <span className="hero-latest-title">{caseFile.title}</span>
+          {(caseFile.sector || caseFile.readTime) && (
+            <span className="hero-latest-meta">
+              {[caseFile.sector, caseFile.readTime && `${caseFile.readTime} min`].filter(Boolean).join(" · ")}
+            </span>
+          )}
+        </Link>
+      )}
+      {publication && (
+        <Link className="hero-latest-card" href={publication.assetUrl || `/publications/${publication.slug}`}>
+          <span className="hero-latest-label">Latest publication<ArrowRight /></span>
+          <span className="hero-latest-title">{publication.title}</span>
+          <span className="hero-latest-meta">{TYPE_LABELS[publication.type] || "Publication"}</span>
+        </Link>
+      )}
+    </div>
+  );
+}
+
 // ── Latest Publications ──────────────────────────────────────────────────
 export function PublicationsList({ publications = [] }: { publications?: any[] }) {
   return (
@@ -68,7 +95,7 @@ export function CaseFilesFeature({ caseFiles = [] }: { caseFiles?: any[] }) {
     { l: "Reading", v: featured.readTime ? `${featured.readTime} min` : null },
   ].filter((m) => m.v);
 
-  const exhibit = Array.isArray(featured.exhibit) ? featured.exhibit : [];
+  const exhibit = Array.isArray(featured.timeline) ? featured.timeline : [];
   const href = `/research/case-files/${featured.slug}`;
 
   return (
@@ -92,7 +119,7 @@ export function CaseFilesFeature({ caseFiles = [] }: { caseFiles?: any[] }) {
           <figure className="exhibit" style={{ margin: 0 }}>
             <div className="exhibit-head">
               <span className="figlabel">Exhibit A</span>
-              {featured.exhibitLabel && <span className="e-t">{featured.exhibitLabel}</span>}
+              {featured.timelineLabel && <span className="e-t">{featured.timelineLabel}</span>}
             </div>
             <div className="exhibit-body">
               <div className="timeline">
@@ -105,7 +132,7 @@ export function CaseFilesFeature({ caseFiles = [] }: { caseFiles?: any[] }) {
                     </span>
                     <div className="tl-body">
                       <div className="t">{row.title}</div>
-                      {row.detail && <div className="d">{row.detail}</div>}
+                      {row.description && <div className="d">{row.description}</div>}
                     </div>
                   </div>
                 ))}

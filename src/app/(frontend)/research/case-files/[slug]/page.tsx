@@ -5,9 +5,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ResearchShell } from "../../../components/research/ResearchShell";
 import { caseNo, fullDate } from "../../../components/research/format";
-import { renderLexical } from "../../../components/research/lexical";
+import { CaseDossier } from "../../../components/research/CaseDossier";
 
 export const dynamic = "force-dynamic";
+
+const CASE_STATUS: Record<string, string> = {
+  "ongoing": "Ongoing",
+  "under-review": "Under review",
+  "in-litigation": "In litigation",
+  "resolved": "Resolved",
+};
 
 async function getCaseFile(slug: string) {
   const payload = await getPayload({ config });
@@ -15,7 +22,7 @@ async function getCaseFile(slug: string) {
     const res = await payload.find({
       collection: "case-files",
       where: { slug: { equals: slug }, status: { equals: "published" } },
-      depth: 1,
+      depth: 2,
       limit: 1,
     });
     return res.docs?.[0] || null;
@@ -32,10 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const cf = await getCaseFile(slug);
   if (!cf) return { title: "Case file not found — Transformidable" };
-  return {
-    title: `${cf.title} — Transformidable`,
-    description: cf.dek || undefined,
-  };
+  return { title: `${cf.title} — Transformidable`, description: cf.dek || undefined };
 }
 
 export default async function CaseFileDetail({ params }: { params: Promise<{ slug: string }> }) {
@@ -44,11 +48,10 @@ export default async function CaseFileDetail({ params }: { params: Promise<{ slu
   if (!cf) notFound();
 
   const cover = mediaUrl(cf.featuredImage);
-  const bodyHtml = renderLexical(cf.body);
-  const exhibit = Array.isArray(cf.exhibit) ? cf.exhibit : [];
-
   const meta = [
     cf.sector && { l: "Sector", v: cf.sector },
+    cf.jurisdiction && { l: "Jurisdiction", v: cf.jurisdiction },
+    cf.caseStatus && CASE_STATUS[cf.caseStatus] && { l: "Status", v: CASE_STATUS[cf.caseStatus] },
     cf.method && { l: "Method", v: cf.method },
     cf.readTime && { l: "Reading", v: `${cf.readTime} min` },
     cf.publishedAt && { l: "Published", v: fullDate(cf.publishedAt) },
@@ -69,9 +72,7 @@ export default async function CaseFileDetail({ params }: { params: Promise<{ slu
 
           {meta.length > 0 && (
             <div className="detail-meta">
-              {meta.map((m: any) => (
-                <span className="dm" key={m.l}>{m.l}: <b>{m.v}</b></span>
-              ))}
+              {meta.map((m: any) => <span className="dm" key={m.l}>{m.l}: <b>{m.v}</b></span>)}
             </div>
           )}
 
@@ -79,39 +80,11 @@ export default async function CaseFileDetail({ params }: { params: Promise<{ slu
             /* eslint-disable-next-line @next/next/no-img-element */
             <img className="detail-cover" src={cover} alt="" />
           )}
+        </div>
 
-          {exhibit.length > 0 && (
-            <figure className="exhibit detail-exhibit" style={{ margin: "34px 0 0" }}>
-              <div className="exhibit-head">
-                <span className="figlabel">Exhibit A</span>
-                {cf.exhibitLabel && <span className="e-t">{cf.exhibitLabel}</span>}
-              </div>
-              <div className="exhibit-body">
-                <div className="timeline">
-                  {exhibit.map((row: any, i: number) => (
-                    <div className="tl-row" key={i}>
-                      <span className="tl-time">{row.time}</span>
-                      <span className="tl-mark">
-                        <span className={`tl-dot${row.keyMoment ? " key" : ""}`} />
-                        <span className="tl-line" />
-                      </span>
-                      <div className="tl-body">
-                        <div className="t">{row.title}</div>
-                        {row.detail && <div className="d">{row.detail}</div>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </figure>
-          )}
+        <CaseDossier caseFile={cf} />
 
-          {bodyHtml ? (
-            <div className="prose" dangerouslySetInnerHTML={{ __html: bodyHtml }} />
-          ) : (
-            <p className="detail-note">The full case file is being prepared for publication.</p>
-          )}
-
+        <div className="detail-wrap">
           <div className="detail-foot">
             <Link className="link" href="/research/case-files">More case files
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
