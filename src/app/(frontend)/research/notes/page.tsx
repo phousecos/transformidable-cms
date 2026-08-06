@@ -32,7 +32,7 @@ export default async function ResearchNotesIndex() {
   return (
     <ResearchShell>
       <section className="idx-hero tr-onsky">
-        <Sky variant="research" />
+        <Sky variant="notes" />
         <div className="wrap idx-hero-in">
           <p className="kicker">Research &middot; Research Notes</p>
           <h1 className="idx-title">Research Notes</h1>

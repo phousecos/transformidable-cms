@@ -16,18 +16,30 @@ import { Constellation } from "./Constellation";
  * via z-index.
  */
 
-// Per-page star fields. Distinct seed + density + a signature anchor star so
-// each page reads as its own constellation. `variant` also selects the ombré
-// via a CSS class (.tr-sky--<variant>) defined in research.css.
+// Eight distinct star fields — one per main page. Each varies by *region*
+// (spread), density (count), seed, and the position of its signature anchor
+// star, so no two read as the same constellation. `variant` also selects the
+// ombré via a CSS class (.tr-sky--<variant>) defined in research.css.
+// Each field lives in a distinct region (right of the copy), with its own
+// density, seed, and anchor-star position — so no two read alike.
 export const SKY_VARIANTS = {
-  research: { seed: 7, count: 34, focal: { x: 74, y: 30 } },
-  publications: { seed: 13, count: 30, focal: { x: 82, y: 44 } },
-  podcast: { seed: 29, count: 32, focal: { x: 68, y: 26 } },
-  "case-files": { seed: 41, count: 36, focal: { x: 86, y: 34 } },
-  events: { seed: 53, count: 28, focal: { x: 71, y: 40 } },
-  about: { seed: 67, count: 30, focal: { x: 80, y: 28 } },
-  tools: { seed: 83, count: 33, focal: { x: 77, y: 36 } },
-  default: { seed: 7, count: 34, focal: { x: 74, y: 30 } },
+  // Home — broad right field, full height, dense.
+  research:     { seed: 7,  count: 34, region: { x0: 0.38, x1: 1, y0: 0,    y1: 1    }, focal: { x: 74, y: 30 } },
+  // Publications (also Governance Files / podcast cover) — right, upper band.
+  publications: { seed: 13, count: 28, region: { x0: 0.46, x1: 1, y0: 0,    y1: 0.66 }, focal: { x: 66, y: 22 } },
+  // Case Files — far right, full height, dense.
+  "case-files": { seed: 41, count: 34, region: { x0: 0.56, x1: 1, y0: 0,    y1: 1    }, focal: { x: 88, y: 34 } },
+  // Research Notes — right, lower band, sparse.
+  notes:        { seed: 23, count: 22, region: { x0: 0.42, x1: 1, y0: 0.34, y1: 1    }, focal: { x: 60, y: 78 } },
+  // About — far right corner, upper, airy.
+  about:        { seed: 67, count: 16, region: { x0: 0.6,  x1: 1, y0: 0,    y1: 0.58 }, focal: { x: 86, y: 20 } },
+  // Podcast — right, full, medium.
+  podcast:      { seed: 29, count: 30, region: { x0: 0.44, x1: 1, y0: 0,    y1: 1    }, focal: { x: 58, y: 26 } },
+  // Events — right, lower-mid, sparse-wide.
+  events:       { seed: 53, count: 20, region: { x0: 0.4,  x1: 1, y0: 0.28, y1: 1    }, focal: { x: 72, y: 62 } },
+  // Tools — far right, upper-full, dense.
+  tools:        { seed: 83, count: 30, region: { x0: 0.54, x1: 1, y0: 0,    y1: 0.82 }, focal: { x: 78, y: 40 } },
+  default:      { seed: 7,  count: 34, region: { x0: 0.38, x1: 1, y0: 0,    y1: 1    }, focal: { x: 74, y: 30 } },
 };
 
 export function Sky({ variant = "research", className = "" }) {
@@ -35,7 +47,7 @@ export function Sky({ variant = "research", className = "" }) {
   return (
     <div className={`tr-sky tr-sky--${variant} ${className}`} aria-hidden="true">
       <span className="tr-sky-glow" />
-      <Constellation seed={cfg.seed} count={cfg.count} focal={cfg.focal} className="tr-sky-stars" />
+      <Constellation seed={cfg.seed} count={cfg.count} region={cfg.region} focal={cfg.focal} className="tr-sky-stars" />
     </div>
   );
 }

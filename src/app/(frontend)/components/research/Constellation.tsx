@@ -29,15 +29,20 @@ const H = 520;
 
 type Pt = { x: number; y: number; r: number; ring: boolean; gold: boolean; delay: number };
 
-function buildField(seed: number, count: number, biasRight: boolean) {
+// The scatter is confined to a normalized region [x0,x1] × [y0,y1]. Varying the
+// region (plus density and seed) is what makes two fields read as *different
+// constellations* rather than reshuffled dots — while keeping every field to
+// the right of the left-aligned hero copy so text stays legible.
+const DEFAULT_REGION = { x0: 0.36, x1: 1, y0: 0, y1: 1 };
+
+function buildField(seed: number, count: number, region: any) {
+  const r = { ...DEFAULT_REGION, ...(region || {}) };
   const rng = makeRng(seed);
   const pts: Pt[] = [];
   let guard = 0;
   while (pts.length < count && guard++ < count * 40) {
-    // Bias the scatter toward the right so copy on the left stays clean.
-    const bx = biasRight ? 0.32 + rng() * 0.68 : rng();
-    const x = bx * W;
-    const y = rng() * H;
+    const x = (r.x0 + rng() * (r.x1 - r.x0)) * W;
+    const y = (r.y0 + rng() * (r.y1 - r.y0)) * H;
     // Keep nodes from clumping: reject anything too close to an existing one.
     if (pts.some((p) => (p.x - x) ** 2 + (p.y - y) ** 2 < 74 ** 2)) continue;
     const roll = rng();
@@ -73,19 +78,20 @@ function buildField(seed: number, count: number, biasRight: boolean) {
 export function Constellation({
   seed = 7,
   count = 34,
-  biasRight = true,
+  region = null,
   focal = null,
   className = "",
 }: {
   seed?: number;
   count?: number;
-  biasRight?: boolean;
+  // Normalized bounding box {x0,x1,y0,y1} the scatter is confined to.
+  region?: { x0?: number; x1?: number; y0?: number; y1?: number } | null;
   // Normalized 0..100 position(s) of a signature "anchor" star — a brighter,
   // haloed gold node that gives each page a recognizable element of its own.
   focal?: { x: number; y: number } | { x: number; y: number }[] | null;
   className?: string;
 }) {
-  const { pts, edges } = buildField(seed, count, biasRight);
+  const { pts, edges } = buildField(seed, count, region);
   const focals = focal ? (Array.isArray(focal) ? focal : [focal]) : [];
   return (
     <svg

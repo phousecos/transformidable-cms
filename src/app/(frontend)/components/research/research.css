@@ -534,6 +534,10 @@
   radial-gradient(92% 132% at 4% 62%, rgba(201,120,39,.15), transparent 62%),
   linear-gradient(90deg, #440d17 0%, #3c0b14 30%, #290a12 58%, #150809 80%, #0b0807 100%); }
 
+.tr .tr-sky--notes .tr-sky-glow { background:
+  radial-gradient(92% 132% at 4% 62%, rgba(150,90,150,.12), transparent 62%),
+  linear-gradient(90deg, #34122a 0%, #2c0f22 30%, #200a18 58%, #140a0f 80%, #0b080a 100%); }
+
 .tr .tr-sky--events .tr-sky-glow { background:
   radial-gradient(96% 134% at 4% 60%, rgba(216,150,60,.17), transparent 62%),
   linear-gradient(90deg, #521a12 0%, #47160f 30%, #300d11 58%, #160a0b 80%, #0c0809 100%); }
