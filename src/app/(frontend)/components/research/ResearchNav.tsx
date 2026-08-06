@@ -19,11 +19,19 @@ const NAV = [
     ],
   },
   {
+    // Publications is the written work; the episodic media series live under
+    // Briefings below.
     label: "Publications", href: "/publications", children: [
-      { no: "02.1", name: "The Governance Files", desc: "Our flagship long-form series", href: "/publications?type=governance-file" },
-      { no: "02.2", name: "Articles", desc: "Shorter, argued pieces", href: "/publications?type=article" },
-      { no: "02.3", name: "White Papers", desc: "Peer-reviewed depth", href: "/publications?type=white-paper" },
-      { no: "02.4", name: "Annual Reports", desc: "The state of governance, yearly", href: "/publications?type=annual-report" },
+      { no: "02.1", name: "Articles", desc: "Shorter, argued pieces", href: "/publications?type=article" },
+      { no: "02.2", name: "White Papers", desc: "Peer-reviewed depth", href: "/publications?type=white-paper" },
+      { no: "02.3", name: "Annual Reports", desc: "The state of governance, yearly", href: "/publications?type=annual-report" },
+    ],
+  },
+  {
+    // Episodic media you watch or listen to.
+    label: "Briefings", href: "/podcast", children: [
+      { no: "03.1", name: "The Governance Files", desc: "The podcast — governance decisions on the record", href: "/podcast" },
+      { no: "03.2", name: "The Transformidable Brief", desc: "Mixed-media briefings — video & articles", href: "/publications?type=transformidable-brief" },
     ],
   },
   // Tools (Governance Analytics / Benchmarks) is not built yet — hidden from

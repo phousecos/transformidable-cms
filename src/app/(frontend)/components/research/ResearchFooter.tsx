@@ -29,15 +29,18 @@ export function ResearchFooter() {
         </div>
         <div className="fcol">
           <h5>Publications</h5>
-          <Link href="/publications?type=governance-file">The Governance Files</Link>
           <Link href="/publications?type=article">Articles</Link>
           <Link href="/publications?type=white-paper">White Papers</Link>
           <Link href="/publications?type=annual-report">Annual Reports</Link>
         </div>
         <div className="fcol">
+          <h5>Briefings</h5>
+          <Link href="/podcast">The Governance Files</Link>
+          <Link href="/publications?type=transformidable-brief">The Transformidable Brief</Link>
+        </div>
+        <div className="fcol">
           <h5>Explore</h5>
           <Link href="/#events">Events</Link>
-          <Link href="/publications?type=transformidable-brief">The Transformidable Brief</Link>
           <Link href="/about">About</Link>
         </div>
       </div>
