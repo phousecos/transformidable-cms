@@ -201,7 +201,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
           <Section id="research-notes" label="Research Notes">
             <div className="case-rows">
               {notes.map((nt: any) => (
-                <Link className="case-row" href={`/research/notes/${nt.slug}`} key={nt.id}>
+                <Link className="case-row" href={`/publications/research-notes/${nt.slug}`} key={nt.id}>
                   <div className="case-row-main">
                     <div className="case-row-title">{nt.title}</div>
                     {nt.dek && <p className="case-row-desc">{nt.dek}</p>}
@@ -273,7 +273,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
           <Section id="related" label="Related Cases">
             <div className="case-related">
               {related.map((r: any) => (
-                <Link className="case-related-card" href={`/research/case-files/${r.slug}`} key={r.id}>
+                <Link className="case-related-card" href={`/publications/case-files/${r.slug}`} key={r.id}>
                   <span className="cn">Case File {caseNo(r.caseNumber)}</span>
                   <span className="case-related-t">{r.title}</span>
                 </Link>

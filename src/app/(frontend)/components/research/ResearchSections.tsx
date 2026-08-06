@@ -12,7 +12,7 @@ export function HeroLatest({ caseFile, publication }: { caseFile?: any; publicat
   return (
     <div className="hero-latest fade d3">
       {caseFile && (
-        <Link className="hero-latest-card" href={`/research/case-files/${caseFile.slug}`}>
+        <Link className="hero-latest-card" href={`/publications/case-files/${caseFile.slug}`}>
           <span className="hero-latest-label">Latest case file<ArrowRight /></span>
           <span className="hero-latest-title">{caseFile.title}</span>
           {(caseFile.sector || caseFile.readTime) && (
@@ -96,7 +96,7 @@ export function CaseFilesFeature({ caseFiles = [] }: { caseFiles?: any[] }) {
   ].filter((m) => m.v);
 
   const exhibit = Array.isArray(featured.timeline) ? featured.timeline : [];
-  const href = `/research/case-files/${featured.slug}`;
+  const href = `/publications/case-files/${featured.slug}`;
 
   return (
     <div className="wrap">
@@ -145,7 +145,7 @@ export function CaseFilesFeature({ caseFiles = [] }: { caseFiles?: any[] }) {
       {rest.length > 0 && (
         <div className="cf-list">
           {rest.map((cf) => (
-            <Link className="cf-list-item" href={`/research/case-files/${cf.slug}`} key={cf.id}>
+            <Link className="cf-list-item" href={`/publications/case-files/${cf.slug}`} key={cf.id}>
               <span className="n">{caseNo(cf.caseNumber)}</span>
               <span className="t">{cf.title}{cf.dek && <span className="d">{cf.dek}</span>}</span>
               <span className="m">{cf.sector || (cf.readTime ? `${cf.readTime} min` : "")}</span>

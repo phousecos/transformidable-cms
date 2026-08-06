@@ -51,7 +51,7 @@ export default async function CaseFilesIndex() {
           ) : (
             <div className="cf-cards">
               {docs.map((cf) => (
-                <Link className="cf-card" href={`/research/case-files/${cf.slug}`} key={cf.id}>
+                <Link className="cf-card" href={`/publications/case-files/${cf.slug}`} key={cf.id}>
                   <span className="cn">Case File {caseNo(cf.caseNumber)}</span>
                   <h3>{cf.title}</h3>
                   {cf.dek && <p>{cf.dek}</p>}

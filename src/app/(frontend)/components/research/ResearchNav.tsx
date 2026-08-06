@@ -13,29 +13,42 @@ const ArrowRight = ({ s = 13 }: { s?: number }) => (
 // Nav model mirrors the site information architecture.
 const NAV = [
   {
-    label: "Research", href: "/research/case-files", children: [
-      { no: "01.1", name: "Case Files", desc: "Anatomies of real governance decisions", href: "/research/case-files" },
-      { no: "01.2", name: "Research Notes", desc: "Working findings, in progress", href: "/research/notes" },
+    label: "Research", href: "/research/agenda", children: [
+      { no: "01.1", name: "Research Agenda", desc: "The questions we set out to answer", href: "/research/agenda" },
+      { no: "01.2", name: "Methodology", desc: "How we study governance", href: "/research/methodology" },
+      { no: "01.3", name: "Governance Mechanisms", desc: "The mechanisms that make governance hold", href: "/research/governance-mechanisms" },
+      { no: "01.4", name: "Datasets", desc: "The data behind the research", href: "/research/datasets" },
+      { no: "01.5", name: "Research Projects", desc: "Active lines of inquiry", href: "/research/projects" },
     ],
   },
   {
-    // Publications is the written work; the episodic media series live under
-    // Briefings below.
     label: "Publications", href: "/publications", children: [
-      { no: "02.1", name: "Articles", desc: "Shorter, argued pieces", href: "/publications?type=article" },
-      { no: "02.2", name: "White Papers", desc: "Peer-reviewed depth", href: "/publications?type=white-paper" },
-      { no: "02.3", name: "Annual Reports", desc: "The state of governance, yearly", href: "/publications?type=annual-report" },
+      { no: "02.1", name: "Case Files", desc: "Anatomies of real governance decisions", href: "/publications/case-files" },
+      { no: "02.2", name: "Articles", desc: "Shorter, argued pieces", href: "/publications?type=article" },
+      { no: "02.3", name: "White Papers", desc: "Peer-reviewed depth", href: "/publications?type=white-paper" },
+      { no: "02.4", name: "Research Notes", desc: "Working findings, in progress", href: "/publications/research-notes" },
+      { no: "02.5", name: "Annual Reports", desc: "The state of governance, yearly", href: "/publications?type=annual-report" },
     ],
   },
   {
     // Episodic media you watch or listen to.
     label: "Briefings", href: "/podcast", children: [
       { no: "03.1", name: "The Governance Files", desc: "The podcast — governance decisions on the record", href: "/podcast" },
-      { no: "03.2", name: "The Transformidable Brief", desc: "Mixed-media briefings — video & articles", href: "/publications?type=transformidable-brief" },
+      { no: "03.2", name: "Transformidable Briefing", desc: "Mixed-media briefings — video & articles", href: "/publications?type=transformidable-brief" },
+      { no: "03.3", name: "Webinar Archive", desc: "Past webinars and recordings", href: "/briefings/webinars" },
+      { no: "03.4", name: "Live Sessions", desc: "Upcoming and live briefings", href: "/briefings/live" },
     ],
   },
-  // Tools (Governance Analytics / Benchmarks) is not built yet — hidden from
-  // the nav until it ships. The homepage still shows it as "Coming Soon".
+  {
+    label: "Tools", href: "/tools/governance-codebook", children: [
+      { no: "04.1", name: "Governance Codebook", desc: "A structured governance reference", href: "/tools/governance-codebook" },
+      { no: "04.2", name: "Mechanism Explorer", desc: "Explore mechanisms and how they interact", href: "/tools/mechanism-explorer" },
+      { no: "04.3", name: "Governance Watch", desc: "Monitoring governance signals", href: "/tools/governance-watch" },
+      { no: "04.4", name: "Assessment Tools", desc: "Assess your own governance", href: "/tools/assessments" },
+      { no: "04.5", name: "Benchmarks", desc: "How your sector compares", href: "/tools/benchmarks" },
+      { no: "04.6", name: "Risk Models", desc: "Anticipate governance risk", href: "/tools/risk-models" },
+    ],
+  },
   { label: "Events", href: "/#events" },
   { label: "About", href: "/about" },
 ];

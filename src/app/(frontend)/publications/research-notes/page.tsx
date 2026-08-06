@@ -52,7 +52,7 @@ export default async function ResearchNotesIndex() {
               <article className="pub" key={n.id}>
                 <span className="p-type">Note</span>
                 <div>
-                  <Link className="p-link" href={`/research/notes/${n.slug}`}><h4>{n.title}</h4></Link>
+                  <Link className="p-link" href={`/publications/research-notes/${n.slug}`}><h4>{n.title}</h4></Link>
                   {n.dek && <p className="p-desc">{n.dek}</p>}
                   {(n.publishedAt || n.readTime) && (
                     <span className="p-meta">

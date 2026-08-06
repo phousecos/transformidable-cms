@@ -344,6 +344,8 @@
 .tr .event p { font-size: 12.5px; line-height: 1.5; color: var(--ink-mute); margin: 0 0 10px; }
 
 .tr .empty { font-family: var(--serif); font-style: italic; color: var(--ink-mute); font-size: 1rem; padding: 8px 0; }
+.tr .coming-soon { text-align: center; padding: 40px 0 8px; }
+.tr .coming-soon .lead { margin: 16px auto 0; max-width: 46ch; }
 
 /* ---- Footer (wine surface #2) ----------------------------------------- */
 .tr .footer { background: var(--wine-deep); color: var(--on-wine); }
@@ -363,6 +365,9 @@
 .tr .fcol.brand p { font-family: var(--serif); font-size: 13px; line-height: 1.6; color: var(--on-wine-mute); margin: 0; max-width: 30ch; }
 .tr .footer-legal { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-block: 22px; border-top: 1px solid var(--wine-rule); }
 .tr .footer-legal span { font-size: 11px; letter-spacing: .04em; color: var(--on-wine-mute); }
+.tr .footer-legal-links { display: inline-flex; gap: 18px; }
+.tr .footer-legal-links a { color: var(--on-wine-mute); }
+.tr .footer-legal-links a:hover { color: #fff; }
 
 /* ---- Detail pages ----------------------------------------------------- */
 .tr .detail { padding-block: clamp(40px, 6vw, 72px); }
