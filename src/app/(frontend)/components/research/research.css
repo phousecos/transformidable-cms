@@ -450,6 +450,145 @@
 .tr .case-related-t { display: block; font-family: var(--serif); font-size: 1.1rem; color: var(--ink); line-height: 1.25; margin-top: 8px; }
 .tr .case-related-card:hover .case-related-t { color: var(--wine); }
 
+/* ---- Constellation (decorative node field) ---------------------------- */
+.tr .tr-constellation {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  color: var(--wine);
+}
+.tr .tr-const-lines line {
+  stroke: currentColor;
+  stroke-width: 1;
+  opacity: .12;
+}
+.tr .tr-const-dot { fill: currentColor; opacity: .32; }
+.tr .tr-const-dot.gold { fill: var(--gold); opacity: .8; }
+.tr .tr-const-ring { fill: none; stroke: currentColor; stroke-width: 1; opacity: .3; }
+.tr .tr-const-ring.gold { stroke: var(--gold); opacity: .7; }
+.tr .tr-const-node { animation: tr-twinkle 5.5s ease-in-out infinite; animation-delay: var(--d, 0s); transform-origin: center; }
+@keyframes tr-twinkle { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+/* Keep hero copy comfortably above the field. */
+.tr .hero .hero-in, .tr .idx-hero .idx-hero-in { position: relative; z-index: 1; }
+
+/* Signature anchor star — the "element" that differs per page. */
+.tr .tr-focal-halo { fill: var(--gold); opacity: .12; }
+.tr .tr-focal-ring { fill: none; stroke: var(--gold); stroke-width: 1.2; opacity: .8; }
+.tr .tr-focal-dot { fill: var(--gold); }
+.tr .tr-const-focal { animation: tr-focal-pulse 4.5s ease-in-out infinite; transform-origin: center; }
+@keyframes tr-focal-pulse { 0%, 100% { opacity: .82; } 50% { opacity: 1; } }
+
+/* ---- Sky (ombré hero backdrop) ---------------------------------------- */
+/* The sky is intentionally ALWAYS-DARK: its colors are fixed, not theme
+   tokens, so oxblood never flips to pink and every page keeps a stable,
+   banner-like hero. Hero copy over it uses .tr-onsky (below). */
+.tr .tr-sky { position: absolute; inset: 0; z-index: 0; overflow: hidden; background: #12090c; }
+.tr .tr-sky .tr-sky-glow { position: absolute; inset: 0; pointer-events: none; }
+.tr .tr-sky .tr-constellation { color: #f4edd8; }
+.tr .tr-sky .tr-const-lines line { opacity: .1; }
+.tr .tr-sky .tr-const-dot { fill: #f4edd8; opacity: .5; }
+.tr .tr-sky .tr-const-dot.gold { fill: #e8c451; opacity: .95; }
+.tr .tr-sky .tr-const-ring { stroke: #f4edd8; opacity: .28; }
+.tr .tr-sky .tr-const-ring.gold { stroke: #e8c451; opacity: .8; }
+.tr .tr-sky .tr-focal-halo { fill: #e8c451; opacity: .16; }
+.tr .tr-sky .tr-focal-ring { stroke: #e8c451; }
+.tr .tr-sky .tr-focal-dot { fill: #f6e08a; }
+
+/* Per-page ombré: a left-to-right wash — oxblood anchoring the wordmark side,
+   fading to obsidian under the constellation (matching the brand banners) — plus
+   a low horizon glow. Each variant shifts the hue family while staying anchored
+   in oxblood/gold/obsidian. The wine occupies roughly the left 40%. */
+.tr .tr-sky--research .tr-sky-glow,
+.tr .tr-sky--default .tr-sky-glow { background:
+  radial-gradient(92% 132% at 4% 62%, rgba(201,162,39,.14), transparent 62%),
+  linear-gradient(90deg, #3a0716 0%, #300612 30%, #240a12 58%, #150a0d 80%, #0b0809 100%); }
+
+.tr .tr-sky--publications .tr-sky-glow { background:
+  radial-gradient(92% 132% at 4% 60%, rgba(180,82,110,.15), transparent 62%),
+  linear-gradient(90deg, #35102e 0%, #2e0a28 30%, #200a20 58%, #130912 80%, #0a0810 100%); }
+
+.tr .tr-sky--podcast .tr-sky-glow { background:
+  radial-gradient(96% 134% at 4% 60%, rgba(120,124,214,.14), transparent 62%),
+  linear-gradient(90deg, #310c20 0%, #2a0a1a 30%, #1a0a1a 58%, #0f0a14 80%, #06070d 100%); }
+
+.tr .tr-sky--case-files .tr-sky-glow { background:
+  radial-gradient(92% 132% at 4% 62%, rgba(201,120,39,.15), transparent 62%),
+  linear-gradient(90deg, #440d17 0%, #3c0b14 30%, #290a12 58%, #150809 80%, #0b0807 100%); }
+
+.tr .tr-sky--events .tr-sky-glow { background:
+  radial-gradient(96% 134% at 4% 60%, rgba(216,150,60,.17), transparent 62%),
+  linear-gradient(90deg, #521a12 0%, #47160f 30%, #300d11 58%, #160a0b 80%, #0c0809 100%); }
+
+.tr .tr-sky--about .tr-sky-glow { background:
+  radial-gradient(92% 132% at 4% 62%, rgba(201,162,39,.16), transparent 62%),
+  linear-gradient(90deg, #47091d 0%, #3e0718 30%, #2b0f15 58%, #160b0c 80%, #0d0908 100%); }
+
+.tr .tr-sky--tools .tr-sky-glow { background:
+  radial-gradient(92% 132% at 4% 60%, rgba(150,120,190,.13), transparent 62%),
+  linear-gradient(90deg, #380d20 0%, #300b1a 30%, #200c1a 58%, #110a11 80%, #08090b 100%); }
+
+/* ---- Hero copy laid over a sky ---------------------------------------- */
+/* Opt-in class on the .hero/.idx-hero element. Forces the light-on-dark
+   palette regardless of the page theme, since the sky is always dark. */
+.tr .hero.tr-onsky, .tr .idx-hero.tr-onsky { border-bottom: 0; }
+.tr .tr-onsky .hero-tags span, .tr .tr-onsky .kicker { color: #e8c451; }
+.tr .tr-onsky .hero-tags .dot { background: #e8c451; }
+.tr .tr-onsky .hero-head, .tr .tr-onsky .idx-title { color: #f7f2e6; }
+.tr .tr-onsky .hero-head .em { color: #e8b7c4; }
+.tr .tr-onsky .lead, .tr .tr-onsky .idx-intro { color: #e4d5cf; }
+.tr .tr-onsky .define-card,
+.tr .tr-onsky .hero-latest-card { background: rgba(255,255,255,.05); border-color: rgba(244,237,216,.16); border-left-color: #e8c451; -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+.tr .tr-onsky .hero-latest-label { color: #e8c451; }
+.tr .tr-onsky .hero-latest-title, .tr .tr-onsky .define-card .word2, .tr .tr-onsky .define-card .meaning2 { color: #f7f2e6; }
+.tr .tr-onsky .hero-latest-meta, .tr .tr-onsky .define-card .phon2 { color: #cbb8bd; }
+.tr .tr-onsky .define-card .pos2 { color: #e8b7c4; }
+.tr .tr-onsky .define-card .figlabel { color: #e8c451; }
+.tr .tr-onsky .define-card .meaning2 .q { color: #e8c451; }
+/* The wine "act" button stays gold; the wine link becomes gold on dark. */
+.tr .tr-onsky .link { color: #e8c451; }
+.tr .tr-onsky .link:hover { border-color: #e8c451; }
+/* The homepage hero's ::after wine glow is redundant over a sky. */
+.tr .hero.tr-onsky::after, .tr .idx-hero.tr-onsky::after { display: none; }
+
+/* ---- Governance map (semantic node-link diagram) ---------------------- */
+.tr .gm { margin: 0; }
+.tr .gm-canvas { overflow-x: auto; border: 1px solid var(--rule); background: var(--paper); box-shadow: var(--shadow); }
+.tr .gm-svg { display: block; width: 100%; min-width: 520px; height: auto; }
+
+.tr .gm-node-dot { stroke: var(--paper); stroke-width: 2; }
+.tr .gm-node--body .gm-node-dot { fill: var(--wine); }
+.tr .gm-node--entity .gm-node-dot { fill: var(--ink-mute); }
+.tr .gm-node--external .gm-node-dot { fill: var(--gold); }
+.tr .gm-node-label { font-family: var(--sans); font-size: 12px; font-weight: 600; fill: var(--ink); paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; }
+.tr .gm-node--body .gm-node-label { font-size: 13px; font-weight: 700; }
+
+.tr .gm-edge { fill: none; }
+.tr .gm-edge--strong { stroke: var(--wine); stroke-width: 2.4; }
+.tr .gm-edge--weak { stroke: var(--wine); stroke-width: 1.6; stroke-dasharray: 7 5; opacity: .7; }
+.tr .gm-edge--broken { stroke: var(--ink-mute); stroke-width: 1.4; stroke-dasharray: 2 6; opacity: .6; }
+.tr .gm-edge--info { stroke: var(--gold-deep); stroke-width: 1.6; }
+.tr .gm-edge--decision { stroke: var(--gold); stroke-width: 2.4; }
+.tr .gm-edge--escalation { stroke: var(--gold-deep); stroke-width: 1.8; stroke-dasharray: 6 4; }
+.tr .gm-arrowhead { fill: var(--gold-deep); }
+
+.tr .gm-legend { display: flex; flex-wrap: wrap; gap: 12px 20px; padding: 16px 4px 2px; }
+.tr .gm-leg { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: .02em; color: var(--ink-mute); }
+.tr .gm-leg-dot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+.tr .gm-leg-dot.gm-node--body { background: var(--wine); }
+.tr .gm-leg-dot.gm-node--entity { background: var(--ink-mute); }
+.tr .gm-leg-dot.gm-node--external { background: var(--gold); }
+.tr .gm-leg-line { width: 22px; height: 0; flex: none; }
+.tr .gm-leg-line.gm-edge--strong { border-top: 2.4px solid var(--wine); }
+.tr .gm-leg-line.gm-edge--weak { border-top: 1.6px dashed var(--wine); }
+.tr .gm-leg-line.gm-edge--broken { border-top: 1.6px dotted var(--ink-mute); }
+.tr .gm-leg-line.gm-edge--info { border-top: 1.6px solid var(--gold-deep); }
+.tr .gm-leg-line.gm-edge--decision { border-top: 2.4px solid var(--gold); }
+.tr .gm-leg-line.gm-edge--escalation { border-top: 1.8px dashed var(--gold-deep); }
+.tr .gm-cap { font-family: var(--serif); font-style: italic; color: var(--ink-mute); font-size: 14px; margin: 12px 0 0; }
+
 /* ---- Motion ----------------------------------------------------------- */
 .tr .fade { opacity: 0; transform: translateY(14px); animation: tr-rise .7s cubic-bezier(.2, .7, .2, 1) forwards; }
 .tr .fade.d1 { animation-delay: .06s; } .tr .fade.d2 { animation-delay: .14s; } .tr .fade.d3 { animation-delay: .22s; }

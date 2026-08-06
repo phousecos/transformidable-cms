@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { fullDate, caseNo } from "./format";
 import { renderLexical } from "./lexical";
+import { GovernanceMap, deriveGraphFromCase } from "./GovernanceMap";
 
 const ASSESSMENT: Record<string, string> = { strength: "Strength", weakness: "Weakness", observation: "Observation" };
 const DOC_TYPES: Record<string, string> = {
@@ -33,6 +34,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
   const overviewHtml = renderLexical(cf.overview);
   const timeline = has(cf.timeline) ? cf.timeline : [];
   const orgs = has(cf.organizations) ? cf.organizations : [];
+  const graph = deriveGraphFromCase(cf);
   const documents = has(cf.documents) ? cf.documents : [];
   const audits = has(cf.auditReports) ? cf.auditReports : [];
   const news = has(cf.newsCoverage) ? cf.newsCoverage : [];
@@ -48,6 +50,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
   if (overviewHtml) toc.push({ id: "overview", label: "Overview" });
   if (timeline.length) toc.push({ id: "timeline", label: "Timeline" });
   if (orgs.length) toc.push({ id: "organizations", label: "Organizations" });
+  if (graph) toc.push({ id: "governance-map", label: "Governance Map" });
   if (documents.length) toc.push({ id: "documents", label: "Documents" });
   if (audits.length) toc.push({ id: "audit-reports", label: "Audit Reports" });
   if (news.length) toc.push({ id: "news-coverage", label: "News Coverage" });
@@ -117,6 +120,17 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
                 </div>
               ))}
             </div>
+          </Section>
+        )}
+
+        {graph && (
+          <Section id="governance-map" label="Governance Map">
+            <GovernanceMap
+              title={`Governance map — ${cf.title || "case"}`}
+              caption="Each party wired to the governing body by role. Typed relationships are illustrative, pending case-specific mapping."
+              nodes={graph.nodes}
+              edges={graph.edges}
+            />
           </Section>
         )}
 
