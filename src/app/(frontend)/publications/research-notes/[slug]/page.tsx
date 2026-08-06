@@ -46,7 +46,7 @@ export default async function ResearchNoteDetail({ params }: { params: Promise<{
     <ResearchShell>
       <article className="detail">
         <div className="detail-wrap">
-          <Link className="backlink" href="/research/notes">
+          <Link className="backlink" href="/publications/research-notes">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6" /></svg>
             All research notes
           </Link>
@@ -67,7 +67,7 @@ export default async function ResearchNoteDetail({ params }: { params: Promise<{
           )}
 
           <div className="detail-foot">
-            <Link className="link" href="/research/notes">More research notes
+            <Link className="link" href="/publications/research-notes">More research notes
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
             </Link>
           </div>

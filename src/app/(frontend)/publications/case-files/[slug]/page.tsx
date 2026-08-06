@@ -61,7 +61,7 @@ export default async function CaseFileDetail({ params }: { params: Promise<{ slu
     <ResearchShell>
       <article className="detail">
         <div className="detail-wrap">
-          <Link className="backlink" href="/research/case-files">
+          <Link className="backlink" href="/publications/case-files">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6" /></svg>
             All case files
           </Link>
@@ -86,7 +86,7 @@ export default async function CaseFileDetail({ params }: { params: Promise<{ slu
 
         <div className="detail-wrap">
           <div className="detail-foot">
-            <Link className="link" href="/research/case-files">More case files
+            <Link className="link" href="/publications/case-files">More case files
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
             </Link>
           </div>
