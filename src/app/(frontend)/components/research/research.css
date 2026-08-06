@@ -568,6 +568,10 @@
 .tr .tr-onsky .link:hover { border-color: #e8c451; }
 /* The homepage hero's ::after wine glow is redundant over a sky. */
 .tr .hero.tr-onsky::after, .tr .idx-hero.tr-onsky::after { display: none; }
+/* Index-page filter chips laid over a sky (e.g. Publications). */
+.tr .tr-onsky .idx-filter { color: #e4d5cf; border-color: rgba(244, 237, 216, .28); }
+.tr .tr-onsky .idx-filter:hover { color: #f7f2e6; border-color: #e8c451; }
+.tr .tr-onsky .idx-filter.is-active { background: #e8c451; color: #1a1210; border-color: #e8c451; }
 
 /* ---- Governance map (semantic node-link diagram) ---------------------- */
 .tr .gm { margin: 0; }

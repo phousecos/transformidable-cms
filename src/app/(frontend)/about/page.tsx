@@ -1,6 +1,7 @@
 // @ts-nocheck
 import Link from "next/link";
 import { ResearchShell } from "../components/research/ResearchShell";
+import { Sky } from "../components/research/Sky";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,8 @@ const AGENDA = [
 export default function AboutPage() {
   return (
     <ResearchShell>
-      <section className="idx-hero">
+      <section className="idx-hero tr-onsky">
+        <Sky variant="about" />
         <div className="wrap idx-hero-in">
           <p className="kicker">About</p>
           <h1 className="idx-title">Governance decides whether transformation holds.</h1>
