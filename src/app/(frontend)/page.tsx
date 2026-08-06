@@ -4,6 +4,7 @@ import { getPayload } from "payload";
 import Link from "next/link";
 import { ResearchShell } from "./components/research/ResearchShell";
 import { PublicationsList, CaseFilesFeature, HeroLatest } from "./components/research/ResearchSections";
+import { Constellation } from "./components/research/Constellation";
 
 export const dynamic = "force-dynamic";
 
@@ -54,6 +55,7 @@ export default async function HomePage() {
     <ResearchShell>
         {/* HERO */}
         <section className="hero">
+          <Constellation />
           <div className="wrap hero-in">
             <div className="hero-tags fade">
               <span>Governance, leadership &amp; institutional resilience</span>

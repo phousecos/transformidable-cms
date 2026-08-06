@@ -450,6 +450,66 @@
 .tr .case-related-t { display: block; font-family: var(--serif); font-size: 1.1rem; color: var(--ink); line-height: 1.25; margin-top: 8px; }
 .tr .case-related-card:hover .case-related-t { color: var(--wine); }
 
+/* ---- Constellation (decorative node field) ---------------------------- */
+.tr .tr-constellation {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  color: var(--wine);
+}
+.tr .tr-const-lines line {
+  stroke: currentColor;
+  stroke-width: 1;
+  opacity: .12;
+}
+.tr .tr-const-dot { fill: currentColor; opacity: .32; }
+.tr .tr-const-dot.gold { fill: var(--gold); opacity: .8; }
+.tr .tr-const-ring { fill: none; stroke: currentColor; stroke-width: 1; opacity: .3; }
+.tr .tr-const-ring.gold { stroke: var(--gold); opacity: .7; }
+.tr .tr-const-node { animation: tr-twinkle 5.5s ease-in-out infinite; animation-delay: var(--d, 0s); transform-origin: center; }
+@keyframes tr-twinkle { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+/* Keep hero copy comfortably above the field. */
+.tr .hero .hero-in, .tr .idx-hero .idx-hero-in { position: relative; z-index: 1; }
+
+/* ---- Governance map (semantic node-link diagram) ---------------------- */
+.tr .gm { margin: 0; }
+.tr .gm-canvas { overflow-x: auto; border: 1px solid var(--rule); background: var(--paper); box-shadow: var(--shadow); }
+.tr .gm-svg { display: block; width: 100%; min-width: 520px; height: auto; }
+
+.tr .gm-node-dot { stroke: var(--paper); stroke-width: 2; }
+.tr .gm-node--body .gm-node-dot { fill: var(--wine); }
+.tr .gm-node--entity .gm-node-dot { fill: var(--ink-mute); }
+.tr .gm-node--external .gm-node-dot { fill: var(--gold); }
+.tr .gm-node-label { font-family: var(--sans); font-size: 12px; font-weight: 600; fill: var(--ink); paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; }
+.tr .gm-node--body .gm-node-label { font-size: 13px; font-weight: 700; }
+
+.tr .gm-edge { fill: none; }
+.tr .gm-edge--strong { stroke: var(--wine); stroke-width: 2.4; }
+.tr .gm-edge--weak { stroke: var(--wine); stroke-width: 1.6; stroke-dasharray: 7 5; opacity: .7; }
+.tr .gm-edge--broken { stroke: var(--ink-mute); stroke-width: 1.4; stroke-dasharray: 2 6; opacity: .6; }
+.tr .gm-edge--info { stroke: var(--gold-deep); stroke-width: 1.6; }
+.tr .gm-edge--decision { stroke: var(--gold); stroke-width: 2.4; }
+.tr .gm-edge--escalation { stroke: var(--gold-deep); stroke-width: 1.8; stroke-dasharray: 6 4; }
+.tr .gm-arrowhead { fill: var(--gold-deep); }
+
+.tr .gm-legend { display: flex; flex-wrap: wrap; gap: 12px 20px; padding: 16px 4px 2px; }
+.tr .gm-leg { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: .02em; color: var(--ink-mute); }
+.tr .gm-leg-dot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+.tr .gm-leg-dot.gm-node--body { background: var(--wine); }
+.tr .gm-leg-dot.gm-node--entity { background: var(--ink-mute); }
+.tr .gm-leg-dot.gm-node--external { background: var(--gold); }
+.tr .gm-leg-line { width: 22px; height: 0; flex: none; }
+.tr .gm-leg-line.gm-edge--strong { border-top: 2.4px solid var(--wine); }
+.tr .gm-leg-line.gm-edge--weak { border-top: 1.6px dashed var(--wine); }
+.tr .gm-leg-line.gm-edge--broken { border-top: 1.6px dotted var(--ink-mute); }
+.tr .gm-leg-line.gm-edge--info { border-top: 1.6px solid var(--gold-deep); }
+.tr .gm-leg-line.gm-edge--decision { border-top: 2.4px solid var(--gold); }
+.tr .gm-leg-line.gm-edge--escalation { border-top: 1.8px dashed var(--gold-deep); }
+.tr .gm-cap { font-family: var(--serif); font-style: italic; color: var(--ink-mute); font-size: 14px; margin: 12px 0 0; }
+
 /* ---- Motion ----------------------------------------------------------- */
 .tr .fade { opacity: 0; transform: translateY(14px); animation: tr-rise .7s cubic-bezier(.2, .7, .2, 1) forwards; }
 .tr .fade.d1 { animation-delay: .06s; } .tr .fade.d2 { animation-delay: .14s; } .tr .fade.d3 { animation-delay: .22s; }
