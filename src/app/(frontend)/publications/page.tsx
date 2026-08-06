@@ -17,6 +17,7 @@ export const metadata = {
 const FILTERS = [
   { value: "", label: "All" },
   { value: "governance-file", label: "Governance Files" },
+  { value: "transformidable-brief", label: "The Transformidable Brief" },
   { value: "article", label: "Articles" },
   { value: "white-paper", label: "White Papers" },
   { value: "annual-report", label: "Annual Reports" },

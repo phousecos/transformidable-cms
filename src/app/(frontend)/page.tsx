@@ -77,7 +77,7 @@ export default async function HomePage() {
                 </p>
                 <div className="hero-cta" style={{ marginTop: 26 }}>
                   <Link className="btn" href="/#research">Read the research agenda <Arrow /></Link>
-                  <Link className="link" href="/#briefing">Subscribe to the briefing</Link>
+                  <Link className="link" href="/#briefing">Subscribe to the Brief</Link>
                 </div>
               </div>
 
