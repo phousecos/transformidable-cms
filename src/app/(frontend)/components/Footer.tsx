@@ -20,9 +20,6 @@ export default function Footer() {
             <Link href="/about" className="text-xs font-medium uppercase tracking-[0.15em] text-parchment/80 transition-colors hover:text-gold focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-gold">
               About
             </Link>
-            <Link href="/reading-room" className="text-xs font-medium uppercase tracking-[0.15em] text-parchment/80 transition-colors hover:text-gold focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-gold">
-              The Reading Room
-            </Link>
             <Link href="/subscribe" className="text-xs font-medium uppercase tracking-[0.15em] text-parchment/80 transition-colors hover:text-gold focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-gold">
               Subscribe
             </Link>

@@ -5,7 +5,7 @@ import { ResearchSubscribe } from "./ResearchNav";
 export function ResearchFooter() {
   return (
     <footer className="footer">
-      <div className="wrap footer-top">
+      <div className="wrap footer-top" id="briefing">
         <p className="kicker">The Governance Briefing</p>
         <p className="footer-mission">
           <em>Transformidable</em>. Capable of sustained transformation through effective
@@ -26,8 +26,6 @@ export function ResearchFooter() {
           <h5>Research</h5>
           <Link href="/research/case-files">Case Files</Link>
           <Link href="/research/notes">Research Notes</Link>
-          <Link href="/research/data">Data</Link>
-          <Link href="/research/methodology">Methodology</Link>
         </div>
         <div className="fcol">
           <h5>Publications</h5>
@@ -38,7 +36,8 @@ export function ResearchFooter() {
         </div>
         <div className="fcol">
           <h5>Explore</h5>
-          <Link href="/events">Events</Link>
+          <Link href="/#events">Events</Link>
+          <Link href="/#briefing">The Governance Briefing</Link>
           <Link href="/about">About</Link>
         </div>
       </div>

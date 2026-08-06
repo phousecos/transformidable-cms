@@ -7,7 +7,6 @@ const navLinks = [
   { href: "/archive", label: "Archive" },
   { href: "/podcast", label: "Podcast" },
   { href: "/about", label: "About" },
-  { href: "/reading-room", label: "The Reading Room" },
 ];
 
 export default function SiteNav() {
