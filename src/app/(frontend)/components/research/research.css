@@ -474,6 +474,83 @@
 /* Keep hero copy comfortably above the field. */
 .tr .hero .hero-in, .tr .idx-hero .idx-hero-in { position: relative; z-index: 1; }
 
+/* Signature anchor star — the "element" that differs per page. */
+.tr .tr-focal-halo { fill: var(--gold); opacity: .12; }
+.tr .tr-focal-ring { fill: none; stroke: var(--gold); stroke-width: 1.2; opacity: .8; }
+.tr .tr-focal-dot { fill: var(--gold); }
+.tr .tr-const-focal { animation: tr-focal-pulse 4.5s ease-in-out infinite; transform-origin: center; }
+@keyframes tr-focal-pulse { 0%, 100% { opacity: .82; } 50% { opacity: 1; } }
+
+/* ---- Sky (ombré hero backdrop) ---------------------------------------- */
+/* The sky is intentionally ALWAYS-DARK: its colors are fixed, not theme
+   tokens, so oxblood never flips to pink and every page keeps a stable,
+   banner-like hero. Hero copy over it uses .tr-onsky (below). */
+.tr .tr-sky { position: absolute; inset: 0; z-index: 0; overflow: hidden; background: #12090c; }
+.tr .tr-sky .tr-sky-glow { position: absolute; inset: 0; pointer-events: none; }
+.tr .tr-sky .tr-constellation { color: #f4edd8; }
+.tr .tr-sky .tr-const-lines line { opacity: .1; }
+.tr .tr-sky .tr-const-dot { fill: #f4edd8; opacity: .5; }
+.tr .tr-sky .tr-const-dot.gold { fill: #e8c451; opacity: .95; }
+.tr .tr-sky .tr-const-ring { stroke: #f4edd8; opacity: .28; }
+.tr .tr-sky .tr-const-ring.gold { stroke: #e8c451; opacity: .8; }
+.tr .tr-sky .tr-focal-halo { fill: #e8c451; opacity: .16; }
+.tr .tr-sky .tr-focal-ring { stroke: #e8c451; }
+.tr .tr-sky .tr-focal-dot { fill: #f6e08a; }
+
+/* Per-page ombré: a vertical dusk gradient + a low horizon glow. Each variant
+   shifts the hue family while staying anchored in oxblood/gold/obsidian. */
+.tr .tr-sky--research .tr-sky-glow,
+.tr .tr-sky--default .tr-sky-glow { background:
+  radial-gradient(115% 78% at 82% 118%, rgba(201,162,39,.10), transparent 56%),
+  linear-gradient(178deg, #0b0809 0%, #170a0e 58%, #300612 100%); }
+
+.tr .tr-sky--publications .tr-sky-glow { background:
+  radial-gradient(115% 78% at 20% 118%, rgba(180,82,110,.12), transparent 58%),
+  linear-gradient(178deg, #0a0810 0%, #170a1e 54%, #2c0a26 100%); }
+
+.tr .tr-sky--podcast .tr-sky-glow { background:
+  radial-gradient(124% 86% at 62% 122%, rgba(120,124,214,.09), transparent 56%),
+  linear-gradient(178deg, #06070d 0%, #0f0c1f 50%, #260814 100%); }
+
+.tr .tr-sky--case-files .tr-sky-glow { background:
+  radial-gradient(115% 76% at 84% 118%, rgba(201,120,39,.12), transparent 56%),
+  linear-gradient(178deg, #0b0807 0%, #1d080c 54%, #3a0a12 100%); }
+
+.tr .tr-sky--events .tr-sky-glow { background:
+  radial-gradient(130% 88% at 60% 124%, rgba(216,150,60,.14), transparent 56%),
+  linear-gradient(178deg, #0c0809 0%, #24080e 58%, #45140e 100%); }
+
+.tr .tr-sky--about .tr-sky-glow { background:
+  radial-gradient(115% 78% at 78% 118%, rgba(201,162,39,.13), transparent 56%),
+  linear-gradient(178deg, #0d0908 0%, #230d12 58%, #3c0616 100%); }
+
+.tr .tr-sky--tools .tr-sky-glow { background:
+  radial-gradient(115% 80% at 76% 120%, rgba(150,120,190,.10), transparent 56%),
+  linear-gradient(178deg, #08090b 0%, #150b17 54%, #2e0a18 100%); }
+
+/* ---- Hero copy laid over a sky ---------------------------------------- */
+/* Opt-in class on the .hero/.idx-hero element. Forces the light-on-dark
+   palette regardless of the page theme, since the sky is always dark. */
+.tr .hero.tr-onsky, .tr .idx-hero.tr-onsky { border-bottom: 0; }
+.tr .tr-onsky .hero-tags span, .tr .tr-onsky .kicker { color: #e8c451; }
+.tr .tr-onsky .hero-tags .dot { background: #e8c451; }
+.tr .tr-onsky .hero-head, .tr .tr-onsky .idx-title { color: #f7f2e6; }
+.tr .tr-onsky .hero-head .em { color: #e8b7c4; }
+.tr .tr-onsky .lead, .tr .tr-onsky .idx-intro { color: #e4d5cf; }
+.tr .tr-onsky .define-card,
+.tr .tr-onsky .hero-latest-card { background: rgba(255,255,255,.05); border-color: rgba(244,237,216,.16); border-left-color: #e8c451; -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+.tr .tr-onsky .hero-latest-label { color: #e8c451; }
+.tr .tr-onsky .hero-latest-title, .tr .tr-onsky .define-card .word2, .tr .tr-onsky .define-card .meaning2 { color: #f7f2e6; }
+.tr .tr-onsky .hero-latest-meta, .tr .tr-onsky .define-card .phon2 { color: #cbb8bd; }
+.tr .tr-onsky .define-card .pos2 { color: #e8b7c4; }
+.tr .tr-onsky .define-card .figlabel { color: #e8c451; }
+.tr .tr-onsky .define-card .meaning2 .q { color: #e8c451; }
+/* The wine "act" button stays gold; the wine link becomes gold on dark. */
+.tr .tr-onsky .link { color: #e8c451; }
+.tr .tr-onsky .link:hover { border-color: #e8c451; }
+/* The homepage hero's ::after wine glow is redundant over a sky. */
+.tr .hero.tr-onsky::after, .tr .idx-hero.tr-onsky::after { display: none; }
+
 /* ---- Governance map (semantic node-link diagram) ---------------------- */
 .tr .gm { margin: 0; }
 .tr .gm-canvas { overflow-x: auto; border: 1px solid var(--rule); background: var(--paper); box-shadow: var(--shadow); }

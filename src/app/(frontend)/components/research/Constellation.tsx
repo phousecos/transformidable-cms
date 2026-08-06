@@ -74,14 +74,19 @@ export function Constellation({
   seed = 7,
   count = 34,
   biasRight = true,
+  focal = null,
   className = "",
 }: {
   seed?: number;
   count?: number;
   biasRight?: boolean;
+  // Normalized 0..100 position(s) of a signature "anchor" star — a brighter,
+  // haloed gold node that gives each page a recognizable element of its own.
+  focal?: { x: number; y: number } | { x: number; y: number }[] | null;
   className?: string;
 }) {
   const { pts, edges } = buildField(seed, count, biasRight);
+  const focals = focal ? (Array.isArray(focal) ? focal : [focal]) : [];
   return (
     <svg
       className={`tr-constellation ${className}`}
@@ -110,6 +115,21 @@ export function Constellation({
           </g>
         ))}
       </g>
+      {focals.length > 0 && (
+        <g className="tr-const-focals">
+          {focals.map((f, i) => {
+            const fx = (f.x / 100) * W;
+            const fy = (f.y / 100) * H;
+            return (
+              <g key={i} className="tr-const-focal">
+                <circle cx={fx} cy={fy} r={16} className="tr-focal-halo" />
+                <circle cx={fx} cy={fy} r={9} className="tr-focal-ring" />
+                <circle cx={fx} cy={fy} r={3.6} className="tr-focal-dot" />
+              </g>
+            );
+          })}
+        </g>
+      )}
     </svg>
   );
 }
