@@ -6,7 +6,7 @@ export function ResearchFooter() {
   return (
     <footer className="footer">
       <div className="wrap footer-top" id="briefing">
-        <p className="kicker">The Governance Briefing</p>
+        <p className="kicker">The Transformidable Brief</p>
         <p className="footer-mission">
           <em>Transformidable</em>. Capable of sustained transformation through effective
           governance, leadership, and institutional resilience.
@@ -37,7 +37,7 @@ export function ResearchFooter() {
         <div className="fcol">
           <h5>Explore</h5>
           <Link href="/#events">Events</Link>
-          <Link href="/#briefing">The Governance Briefing</Link>
+          <Link href="/publications?type=transformidable-brief">The Transformidable Brief</Link>
           <Link href="/about">About</Link>
         </div>
       </div>

@@ -57,6 +57,7 @@ export const Publications: CollectionConfig = {
       defaultValue: 'article',
       options: [
         { label: 'Governance File', value: 'governance-file' },
+        { label: 'The Transformidable Brief', value: 'transformidable-brief' },
         { label: 'Article', value: 'article' },
         { label: 'White Paper', value: 'white-paper' },
         { label: 'Annual Report', value: 'annual-report' },
@@ -113,6 +114,13 @@ export const Publications: CollectionConfig = {
       type: 'text',
       admin: {
         description: 'Optional link to a downloadable PDF or externally hosted version.',
+      },
+    },
+    {
+      name: 'videoUrl',
+      type: 'text',
+      admin: {
+        description: 'Optional YouTube or Vimeo link. When set, the piece plays as a video (used for mixed-media Brief items).',
       },
     },
     {

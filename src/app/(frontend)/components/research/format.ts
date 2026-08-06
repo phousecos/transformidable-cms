@@ -3,6 +3,7 @@
 
 export const TYPE_LABELS: Record<string, string> = {
   "governance-file": "Governance File",
+  "transformidable-brief": "The Transformidable Brief",
   "article": "Article",
   "white-paper": "White Paper",
   "annual-report": "Annual Report",
@@ -11,9 +12,39 @@ export const TYPE_LABELS: Record<string, string> = {
 // The plural section labels the Publications sub-nav and index filter by.
 export const TYPE_PLURALS: Record<string, string> = {
   "governance-file": "The Governance Files",
+  "transformidable-brief": "The Transformidable Brief",
   "article": "Articles",
   "white-paper": "White Papers",
   "annual-report": "Annual Reports",
+}
+
+// Turn a YouTube/Vimeo watch link into an embeddable URL. Returns null if the
+// URL isn't a recognized video host.
+export function videoEmbedUrl(url: unknown): string | null {
+  if (typeof url !== "string" || !url) return null
+  try {
+    const u = new URL(url)
+    const host = u.hostname.replace(/^www\./, "")
+    if (host === "youtu.be") {
+      const id = u.pathname.slice(1)
+      return id ? `https://www.youtube.com/embed/${id}` : null
+    }
+    if (host === "youtube.com" || host === "m.youtube.com") {
+      if (u.pathname === "/watch") {
+        const id = u.searchParams.get("v")
+        return id ? `https://www.youtube.com/embed/${id}` : null
+      }
+      if (u.pathname.startsWith("/embed/")) return url
+    }
+    if (host === "vimeo.com") {
+      const id = u.pathname.split("/").filter(Boolean)[0]
+      return /^\d+$/.test(id || "") ? `https://player.vimeo.com/video/${id}` : null
+    }
+    if (host === "player.vimeo.com") return url
+  } catch {
+    return null
+  }
+  return null
 }
 
 export function monthYear(d: unknown): string {
@@ -40,6 +71,8 @@ export function caseNo(n: unknown): string {
 export function pubMeta(p: any, withDate = false): string[] {
   const meta: string[] = []
   if (p?.type === "governance-file") meta.push("The Governance Files")
+  if (p?.type === "transformidable-brief") meta.push("The Transformidable Brief")
+  if (videoEmbedUrl(p?.videoUrl)) meta.push("Video")
   if (p?.seriesLabel) meta.push(p.seriesLabel)
   if (p?.peerReviewed) meta.push("Peer-reviewed")
   if (p?.pageCount) meta.push(`${p.pageCount} pp`)

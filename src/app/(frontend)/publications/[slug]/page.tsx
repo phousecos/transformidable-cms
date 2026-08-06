@@ -4,7 +4,7 @@ import { getPayload } from "payload";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ResearchShell } from "../../components/research/ResearchShell";
-import { TYPE_LABELS, pubMeta } from "../../components/research/format";
+import { TYPE_LABELS, pubMeta, videoEmbedUrl } from "../../components/research/format";
 import { renderLexical } from "../../components/research/lexical";
 
 export const dynamic = "force-dynamic";
@@ -47,6 +47,7 @@ export default async function PublicationDetail({ params }: { params: Promise<{ 
   const bodyHtml = renderLexical(p.body);
   const meta = pubMeta(p, true);
   const typeLabel = TYPE_LABELS[p.type] || "Publication";
+  const video = videoEmbedUrl(p.videoUrl);
   const isDownload = p.assetUrl && p.assetUrl.startsWith("http");
   const downloadLabel = p.type === "white-paper" || p.type === "annual-report" ? "Download the PDF" : "Read the full version";
 
@@ -78,10 +79,20 @@ export default async function PublicationDetail({ params }: { params: Promise<{ 
             </div>
           )}
 
-          {cover && (
+          {video ? (
+            <div className="detail-video">
+              <iframe
+                src={video}
+                title={p.title}
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          ) : cover ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img className="detail-cover" src={cover} alt="" />
-          )}
+          ) : null}
 
           {bodyHtml ? (
             <div className="prose" dangerouslySetInnerHTML={{ __html: bodyHtml }} />
