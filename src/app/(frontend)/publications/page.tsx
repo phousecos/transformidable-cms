@@ -9,7 +9,7 @@ import { TYPE_LABELS, TYPE_PLURALS, pubMeta } from "../components/research/forma
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Publications — Transformidable",
+  title: "Publications",
   description:
     "The Governance Files, Articles, White Papers, and Annual Reports. The research, argued and on the record.",
 };

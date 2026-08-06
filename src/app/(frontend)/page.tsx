@@ -9,9 +9,10 @@ import { Sky } from "./components/research/Sky";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Transformidable — Governance Research",
+  title: { absolute: "Transformidable | Evidence for Better Transformation Governance" },
   description:
-    "We research how governance, leadership, and institutional decision-making shape organizational resilience.",
+    "Independent research on how governance, leadership, and institutional decision-making shape whether organizational transformation succeeds or fails.",
+  alternates: { canonical: "/" },
 };
 
 const Arrow = ({ s = 14 }: { s?: number }) => (
@@ -72,8 +73,8 @@ export default async function HomePage() {
                 <p className="lead" style={{ maxWidth: "52ch" }}>
                   We research how governance, leadership, and institutional decision-making shape
                   organizational resilience. We publish evidence, advise leaders, develop analytical
-                  tools, and provide expert analysis that helps organizations&mdash;and the legal
-                  system&mdash;understand why complex transformations succeed or fail.
+                  tools, and provide expert analysis that helps organizations, and the legal
+                  system, understand why complex transformations succeed or fail.
                 </p>
                 <div className="hero-cta" style={{ marginTop: 26 }}>
                   <Link className="btn" href="/#research">Read the research agenda <Arrow /></Link>

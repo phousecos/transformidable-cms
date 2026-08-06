@@ -31,9 +31,9 @@ function mediaUrl(m: any): string | null {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const p = await getPublication(slug);
-  if (!p) return { title: "Publication not found — Transformidable" };
+  if (!p) return { title: "Publication not found" };
   return {
-    title: `${p.title} — Transformidable`,
+    title: `${p.title}`,
     description: p.dek || undefined,
   };
 }

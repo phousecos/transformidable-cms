@@ -17,12 +17,12 @@ export async function generateMetadata({ params }: { params: Promise<{ issueNumb
     limit: 1,
   });
   const issue = issueResult.docs[0];
-  if (!issue) return { title: "Issue not found — Transformidable" };
+  if (!issue) return { title: "Issue not found" };
 
   const num = String(issue.issueNumber).padStart(2, "0");
   const title = issue.themeTagline
-    ? `Issue ${num}: ${issue.themeTagline} — Transformidable`
-    : `${issue.title ?? `Issue ${num}`} — Transformidable`;
+    ? `Issue ${num}: ${issue.themeTagline}`
+    : `${issue.title ?? `Issue ${num}`}`;
 
   return {
     title,

@@ -33,8 +33,8 @@ const NAV = [
   {
     // Episodic media you watch or listen to.
     label: "Briefings", href: "/podcast", children: [
-      { no: "03.1", name: "The Governance Files", desc: "The podcast — governance decisions on the record", href: "/podcast" },
-      { no: "03.2", name: "Transformidable Briefing", desc: "Mixed-media briefings — video & articles", href: "/publications?type=transformidable-brief" },
+      { no: "03.1", name: "The Governance Files", desc: "The podcast: governance decisions on the record", href: "/podcast" },
+      { no: "03.2", name: "Transformidable Briefing", desc: "Mixed-media briefings: video and articles", href: "/publications?type=transformidable-brief" },
       { no: "03.3", name: "Webinar Archive", desc: "Past webinars and recordings", href: "/briefings/webinars" },
       { no: "03.4", name: "Live Sessions", desc: "Upcoming and live briefings", href: "/briefings/live" },
     ],
@@ -95,7 +95,7 @@ export function ResearchNav() {
       {/* Masthead */}
       <header className="masthead">
         <div className="wrap masthead-in">
-          <Link className="wordmark" href="/" aria-label="Transformidable — home">
+          <Link className="wordmark" href="/" aria-label="Transformidable, home">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="brandlogo" src="/logo-new.png" alt="Transformidable" width={240} height={60} />
           </Link>

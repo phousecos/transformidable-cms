@@ -8,7 +8,7 @@ import Footer from "../components/Footer";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Archive — Transformidable",
+  title: "Archive",
   description: "Browse past issues of Transformidable.",
 };
 

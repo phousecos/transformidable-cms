@@ -126,7 +126,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
         {graph && (
           <Section id="governance-map" label="Governance Map">
             <GovernanceMap
-              title={`Governance map — ${cf.title || "case"}`}
+              title={`Governance map: ${cf.title || "case"}`}
               caption="Each party wired to the governing body by role. Typed relationships are illustrative, pending case-specific mapping."
               nodes={graph.nodes}
               edges={graph.edges}

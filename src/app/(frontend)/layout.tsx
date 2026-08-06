@@ -2,9 +2,47 @@ import React from "react";
 import Script from "next/script";
 import "./globals.css";
 
+// Canonical public site URL. Set NEXT_PUBLIC_SITE_URL in the environment to the
+// production domain so absolute URLs (OpenGraph, sitemap, canonicals) are right.
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://transformidable.media";
+
+const SITE_TITLE = "Transformidable | Evidence for Better Transformation Governance";
+const SITE_DESCRIPTION =
+  "Independent research on how governance, leadership, and institutional decision-making shape whether organizational transformation succeeds or fails.";
+
 export const metadata = {
-  title: "Transformidable",
-  description: "Where Technology Meets Leadership",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: SITE_TITLE,
+    // Child pages set a bare title (e.g. "Case Files") and this appends the brand.
+    template: "%s | Transformidable",
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: "Transformidable",
+  keywords: [
+    "transformation governance",
+    "governance research",
+    "organizational transformation",
+    "institutional resilience",
+    "leadership",
+    "governance case files",
+  ],
+  authors: [{ name: "Transformidable" }],
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    siteName: "Transformidable",
+    url: siteUrl,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Transformidable" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: ["/og.png"],
+  },
   icons: {
     icon: [
       { url: "/favicon-32-new.png", sizes: "32x32", type: "image/png" },

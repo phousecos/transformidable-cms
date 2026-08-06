@@ -9,7 +9,7 @@ import { fullDate } from "../../components/research/format";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Research Notes — Transformidable",
+  title: "Research Notes",
   description: "Working findings in progress from the governance research.",
 };
 

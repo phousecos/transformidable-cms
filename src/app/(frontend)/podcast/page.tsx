@@ -8,7 +8,7 @@ import { fullDate } from "../components/research/format";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "The Governance Files — Transformidable",
+  title: "The Governance Files",
   description:
     "The Transformidable podcast. Conversations on governance, leadership, and institutional transformation.",
 };
@@ -45,7 +45,7 @@ export default async function PodcastPage() {
           <p className="kicker">Briefings &middot; Podcast</p>
           <h1 className="idx-title">The Governance Files</h1>
           <p className="idx-intro">
-            The Transformidable podcast &mdash; conversations on governance, leadership, and
+            The Transformidable podcast. Conversations on governance, leadership, and
             institutional transformation, examined on the record.
           </p>
         </div>

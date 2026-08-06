@@ -16,7 +16,7 @@ export function ResearchFooter() {
 
       <div className="wrap footer-cols">
         <div className="fcol brand">
-          <Link className="fw" href="/" aria-label="Transformidable — home">
+          <Link className="fw" href="/" aria-label="Transformidable, home">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="brandlogo" src="/logo-new.png" alt="Transformidable" width={240} height={60} />
           </Link>

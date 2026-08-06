@@ -27,8 +27,8 @@ async function getNote(slug: string) {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const n = await getNote(slug);
-  if (!n) return { title: "Research note not found — Transformidable" };
-  return { title: `${n.title} — Transformidable`, description: n.dek || undefined };
+  if (!n) return { title: "Research note not found" };
+  return { title: `${n.title}`, description: n.dek || undefined };
 }
 
 export default async function ResearchNoteDetail({ params }: { params: Promise<{ slug: string }> }) {

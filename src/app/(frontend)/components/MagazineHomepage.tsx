@@ -278,7 +278,7 @@ function SubscribeForm() {
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
         setState("done");
-        setMessage(data.message || "Thanks — you are subscribed.");
+        setMessage(data.message || "Thanks, you are subscribed.");
         setEmail("");
       } else {
         setState("error");
@@ -368,7 +368,7 @@ function IndexView({ issue, flagship, column, books, latestPodcast, issueCount, 
           ) : null}
         </div>
       </article>
-      {heroPhoto ? <img className="cover--bleed" src={heroPhoto} alt="" /> : <div className="ph ph--bleed">photo — full bleed</div>}
+      {heroPhoto ? <img className="cover--bleed" src={heroPhoto} alt="" /> : <div className="ph ph--bleed">photo, full bleed</div>}
 
       <hr className="rule" style={{ marginTop: "var(--section)" }} />
 
