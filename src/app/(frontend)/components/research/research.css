@@ -503,32 +503,32 @@
    in oxblood/gold/obsidian. The wine occupies roughly the left 40%. */
 .tr .tr-sky--research .tr-sky-glow,
 .tr .tr-sky--default .tr-sky-glow { background:
-  radial-gradient(80% 130% at -4% 62%, rgba(201,162,39,.11), transparent 60%),
-  linear-gradient(90deg, #340614 0%, #220810 40%, #140a0c 70%, #0b0809 100%); }
+  radial-gradient(92% 132% at 4% 62%, rgba(201,162,39,.14), transparent 62%),
+  linear-gradient(90deg, #3a0716 0%, #300612 30%, #240a12 58%, #150a0d 80%, #0b0809 100%); }
 
 .tr .tr-sky--publications .tr-sky-glow { background:
-  radial-gradient(80% 130% at -4% 60%, rgba(180,82,110,.13), transparent 60%),
-  linear-gradient(90deg, #2e0a28 0%, #1f0a1e 40%, #120912 70%, #0a0810 100%); }
+  radial-gradient(92% 132% at 4% 60%, rgba(180,82,110,.15), transparent 62%),
+  linear-gradient(90deg, #35102e 0%, #2e0a28 30%, #200a20 58%, #130912 80%, #0a0810 100%); }
 
 .tr .tr-sky--podcast .tr-sky-glow { background:
-  radial-gradient(84% 132% at -4% 60%, rgba(120,124,214,.12), transparent 60%),
-  linear-gradient(90deg, #2a0a1a 0%, #170a18 40%, #0e0a14 70%, #06070d 100%); }
+  radial-gradient(96% 134% at 4% 60%, rgba(120,124,214,.14), transparent 62%),
+  linear-gradient(90deg, #310c20 0%, #2a0a1a 30%, #1a0a1a 58%, #0f0a14 80%, #06070d 100%); }
 
 .tr .tr-sky--case-files .tr-sky-glow { background:
-  radial-gradient(80% 130% at -4% 62%, rgba(201,120,39,.13), transparent 60%),
-  linear-gradient(90deg, #3c0b14 0%, #260a10 40%, #150809 70%, #0b0807 100%); }
+  radial-gradient(92% 132% at 4% 62%, rgba(201,120,39,.15), transparent 62%),
+  linear-gradient(90deg, #440d17 0%, #3c0b14 30%, #290a12 58%, #150809 80%, #0b0807 100%); }
 
 .tr .tr-sky--events .tr-sky-glow { background:
-  radial-gradient(84% 132% at -4% 60%, rgba(216,150,60,.15), transparent 60%),
-  linear-gradient(90deg, #47160f 0%, #2c0c10 40%, #150a0b 70%, #0c0809 100%); }
+  radial-gradient(96% 134% at 4% 60%, rgba(216,150,60,.17), transparent 62%),
+  linear-gradient(90deg, #521a12 0%, #47160f 30%, #300d11 58%, #160a0b 80%, #0c0809 100%); }
 
 .tr .tr-sky--about .tr-sky-glow { background:
-  radial-gradient(80% 130% at -4% 62%, rgba(201,162,39,.14), transparent 60%),
-  linear-gradient(90deg, #3e0718 0%, #290e14 40%, #160b0c 70%, #0d0908 100%); }
+  radial-gradient(92% 132% at 4% 62%, rgba(201,162,39,.16), transparent 62%),
+  linear-gradient(90deg, #47091d 0%, #3e0718 30%, #2b0f15 58%, #160b0c 80%, #0d0908 100%); }
 
 .tr .tr-sky--tools .tr-sky-glow { background:
-  radial-gradient(80% 130% at -4% 60%, rgba(150,120,190,.11), transparent 60%),
-  linear-gradient(90deg, #300b1a 0%, #1d0b18 40%, #100a10 70%, #08090b 100%); }
+  radial-gradient(92% 132% at 4% 60%, rgba(150,120,190,.13), transparent 62%),
+  linear-gradient(90deg, #380d20 0%, #300b1a 30%, #200c1a 58%, #110a11 80%, #08090b 100%); }
 
 /* ---- Hero copy laid over a sky ---------------------------------------- */
 /* Opt-in class on the .hero/.idx-hero element. Forces the light-on-dark
