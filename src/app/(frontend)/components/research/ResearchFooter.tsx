@@ -38,8 +38,6 @@ export function ResearchFooter() {
         </div>
         <div className="fcol">
           <h5>Explore</h5>
-          <Link href="/tools/governance-analytics">Governance Analytics</Link>
-          <Link href="/tools/benchmarks">Benchmarks</Link>
           <Link href="/events">Events</Link>
           <Link href="/about">About</Link>
         </div>
