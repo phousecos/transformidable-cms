@@ -1,104 +1,95 @@
 // @ts-nocheck
 import config from "@payload-config";
 import { getPayload } from "payload";
-import SiteNav from "../components/SiteNav";
-import Footer from "../components/Footer";
+import { ResearchShell } from "../components/research/ResearchShell";
+import { Sky } from "../components/research/Sky";
+import { fullDate } from "../components/research/format";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Podcast — Transformidable",
-  description: "Transformidable Conversations — interviews and insights for technology leaders driving enterprise transformation.",
+  title: "The Governance Files — Transformidable",
+  description:
+    "The Transformidable podcast. Conversations on governance, leadership, and institutional transformation.",
 };
+
+const ExtArrow = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+    <path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
+  </svg>
+);
 
 export default async function PodcastPage() {
   const payload = await getPayload({ config });
 
-  const episodesResult = await payload.find({
-    collection: "podcast-episodes",
-    where: { status: { equals: "published" } },
-    sort: "-publishDate",
-    depth: 2,
-    limit: 50,
-  });
-
-  const episodes = episodesResult.docs;
+  let episodes: any[] = [];
+  try {
+    const res = await payload.find({
+      collection: "podcast-episodes",
+      where: { status: { equals: "published" } },
+      sort: "-publishDate",
+      depth: 2,
+      limit: 50,
+    });
+    episodes = res.docs || [];
+  } catch {
+    // Collection may not be migrated yet in a fresh environment.
+    episodes = [];
+  }
 
   return (
-    <>
-      <SiteNav />
-      <main id="main-content" className="bg-parchment">
-        <div className="mx-auto max-w-5xl px-6 py-16 md:py-20">
-          <h1 className="font-serif text-4xl font-bold italic text-obsidian md:text-5xl">
-            Podcast
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg text-obsidian/60 font-light">
-            Transformidable Conversations — interviews and insights for technology leaders driving enterprise transformation.
+    <ResearchShell>
+      <section className="idx-hero tr-onsky">
+        <Sky variant="podcast" />
+        <div className="wrap idx-hero-in">
+          <p className="kicker">Briefings &middot; Podcast</p>
+          <h1 className="idx-title">The Governance Files</h1>
+          <p className="idx-intro">
+            The Transformidable podcast &mdash; conversations on governance, leadership, and
+            institutional transformation, examined on the record.
           </p>
+        </div>
+      </section>
 
-          {episodes.length > 0 ? (
-            <div className="mt-12 space-y-10">
-              {episodes.map((episode) => {
-                const date = new Date(episode.publishDate);
-                const dateStr = isNaN(date.getTime())
-                  ? ""
-                  : date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
-                const guest = episode.guest && typeof episode.guest === "object" ? episode.guest : null;
-
+      <div className="idx-body">
+        <div className="wrap">
+          {episodes.length === 0 ? (
+            <p className="empty">Episodes will appear here as the series is published.</p>
+          ) : (
+            <div className="pub-list">
+              {episodes.map((ep) => {
+                const guest = ep.guest && typeof ep.guest === "object" ? ep.guest : null;
+                const label = [
+                  ep.season != null ? `S${ep.season}` : null,
+                  ep.episodeNumber != null ? `E${ep.episodeNumber}` : null,
+                ].filter(Boolean).join(" · ");
                 return (
-                  <article key={episode.id} className="border-b border-obsidian/10 pb-10">
-                    <div className="flex items-baseline gap-3">
-                      {episode.season != null && episode.episodeNumber != null && (
-                        <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-oxblood md:text-xs">
-                          S{episode.season} · E{episode.episodeNumber}
-                        </span>
+                  <article className="pub" key={ep.id}>
+                    <span className="p-type">{label || "Episode"}</span>
+                    <div>
+                      <h4>{ep.title}</h4>
+                      {guest && (
+                        <p className="p-meta" style={{ color: "var(--gold-deep)" }}>
+                          with {guest.name}{guest.role ? `, ${guest.role}` : ""}
+                        </p>
                       )}
-                      {dateStr && (
-                        <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-obsidian/40 md:text-xs">
-                          {dateStr}
-                        </span>
-                      )}
-                    </div>
-                    <h2 className="mt-3 font-serif text-xl font-semibold leading-snug text-obsidian md:text-2xl">
-                      {episode.title}
-                    </h2>
-                    {guest && (
-                      <p className="mt-2 text-sm text-gold">
-                        with {guest.name}{guest.role ? `, ${guest.role}` : ""}
-                      </p>
-                    )}
-                    {episode.description && (
-                      <p className="mt-3 text-sm leading-relaxed text-obsidian/60 md:text-base">
-                        {episode.description}
-                      </p>
-                    )}
-                    {episode.audioUrl && (
-                      <div className="mt-4">
-                        <a
-                          href={episode.audioUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`Listen to ${episode.title} (opens in new window)`}
-                          className="inline-block rounded-sm border border-oxblood/60 px-6 py-2 text-[10px] font-medium uppercase tracking-[0.2em] text-oxblood transition-colors hover:bg-oxblood/5 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-oxblood md:text-xs"
-                        >
-                          Listen <span aria-hidden="true">→</span>
-                        </a>
+                      {ep.description && <p className="p-desc">{ep.description}</p>}
+                      <div className="p-meta" style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
+                        {ep.publishDate && <span>{fullDate(ep.publishDate)}</span>}
+                        {ep.audioUrl && (
+                          <a className="link" href={ep.audioUrl} rel="noopener" target="_blank">
+                            Listen <ExtArrow />
+                          </a>
+                        )}
                       </div>
-                    )}
+                    </div>
                   </article>
                 );
               })}
             </div>
-          ) : (
-            <div className="mt-12">
-              <p className="font-serif text-lg text-obsidian/60 italic">
-                No episodes for this period.
-              </p>
-            </div>
           )}
         </div>
-      </main>
-      <Footer />
-    </>
+      </div>
+    </ResearchShell>
   );
 }
