@@ -3,6 +3,7 @@ import config from "@payload-config";
 import { getPayload } from "payload";
 import Link from "next/link";
 import { ResearchShell } from "../../components/research/ResearchShell";
+import { Sky } from "../../components/research/Sky";
 import { caseNo } from "../../components/research/format";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +32,8 @@ export default async function CaseFilesIndex() {
 
   return (
     <ResearchShell>
-      <section className="idx-hero">
+      <section className="idx-hero tr-onsky">
+        <Sky variant="case-files" />
         <div className="wrap idx-hero-in">
           <p className="kicker">Research &middot; Case Files</p>
           <h1 className="idx-title">Case Files</h1>

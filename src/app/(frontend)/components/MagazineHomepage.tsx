@@ -135,19 +135,6 @@ export default function MagazineHomepage({ issue, articles, issues = [], books =
   return (
     <div className="mag">
       <div className="page">
-        {/* Utility bar — the one wine surface. Exits to commerce, subordinate. */}
-        <nav className="utility" aria-label="Shop">
-          <Link href="/reading-room">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M4 19V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14M4 19h6M14 5.5l2-.5a1.5 1.5 0 0 1 1.8 1.1l3 11.6a1.5 1.5 0 0 1-1 1.8l-2 .5" /></svg>
-            <span><span className="long">Shop The </span>Reading Room</span>
-          </Link>
-          <span className="sep" aria-hidden="true"></span>
-          <Link href="/reading-room">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" /></svg>
-            <span className="long">The Transformidable Leader</span>
-            <span className="short">The Book</span>
-          </Link>
-        </nav>
 
         {/* Masthead + nav */}
         <div className="masthead-row">
@@ -465,36 +452,6 @@ function IndexView({ issue, flagship, column, books, latestPodcast, issueCount, 
         </section>
       )}
 
-      <hr className="rule" />
-
-      {/* THE READING ROOM — curated shelf. Lands last. */}
-      {readingBooks.length > 0 && (
-        <section style={{ paddingTop: "var(--section)", paddingBottom: 20 }}>
-          <div className="w drawer-head" style={{ marginBottom: 6 }}>
-            <h2 className="kicker">From the Reading Room</h2>
-            <Link className="link" href="/reading-room">Shop all
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-            </Link>
-          </div>
-          <p className="body w" style={{ marginBottom: 18 }}>Behind this issue. Chosen, not sponsored.</p>
-          <div className="shelf">
-            {readingBooks.map((b: any) => {
-              const cover = mediaUrl(b.cover_image);
-              const href = b.bookshop_url || b.payhip_url || "/reading-room";
-              const external = href.startsWith("http");
-              const Comp: any = external ? "a" : Link;
-              const props = external ? { href, rel: "noopener", target: "_blank" } : { href };
-              return (
-                <Comp className="shelf-item" key={b.id} {...props}>
-                  {cover ? <img className="cover cover--cover" src={cover} alt="" /> : <div className="ph ph--cover">cover</div>}
-                  <div className="shelf-title">{b.title}</div>
-                  <div className="meta">{b.author}</div>
-                </Comp>
-              );
-            })}
-          </div>
-        </section>
-      )}
     </>
   );
 }

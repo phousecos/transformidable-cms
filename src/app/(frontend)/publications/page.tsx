@@ -3,6 +3,7 @@ import config from "@payload-config";
 import { getPayload } from "payload";
 import Link from "next/link";
 import { ResearchShell } from "../components/research/ResearchShell";
+import { Sky } from "../components/research/Sky";
 import { TYPE_LABELS, TYPE_PLURALS, pubMeta } from "../components/research/format";
 
 export const dynamic = "force-dynamic";
@@ -50,7 +51,8 @@ export default async function PublicationsIndex({
 
   return (
     <ResearchShell>
-      <section className="idx-hero">
+      <section className="idx-hero tr-onsky">
+        <Sky variant="publications" />
         <div className="wrap idx-hero-in">
           <p className="kicker">Publications</p>
           <h1 className="idx-title">{heading}</h1>
