@@ -28,12 +28,8 @@ const NAV = [
       { no: "02.4", name: "Annual Reports", desc: "The state of governance, yearly", href: "/publications?type=annual-report" },
     ],
   },
-  {
-    label: "Tools", href: "/tools", children: [
-      { no: "03.1", name: "Governance Analytics", desc: "Score your own governance", href: "/tools/governance-analytics" },
-      { no: "03.2", name: "Benchmarks", desc: "How your sector compares", href: "/tools/benchmarks" },
-    ],
-  },
+  // Tools (Governance Analytics / Benchmarks) is not built yet — hidden from
+  // the nav until it ships. The homepage still shows it as "Coming Soon".
   { label: "Events", href: "/events" },
   { label: "About", href: "/about" },
 ];
@@ -70,10 +66,6 @@ export function ResearchNav() {
           <span className="u-brand">Transformidable</span>
           <div className="u-links">
             <Link className="u-brief" href="/briefing">The Governance Briefing</Link>
-            <Link href="/tools/governance-analytics">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M3 3v18h18" /><path d="M7 14l3-4 3 3 4-6" /></svg>
-              Governance Analytics
-            </Link>
             <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle light and dark theme">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
             </button>

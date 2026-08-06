@@ -185,7 +185,7 @@ export default async function HomePage() {
             {[
               { no: "01", name: "Research", href: "/research", desc: "The evidence base. Primary study of governance in the field.", kids: ["Case Files", "Research Notes", "Data", "Methodology"] },
               { no: "02", name: "Publications", href: "/publications", desc: "What the research becomes. Argued, edited, and on the record.", kids: ["The Governance Files", "Articles", "White Papers", "Annual Reports"] },
-              { no: "03", name: "Tools", href: "/tools", desc: "The research, turned outward. Instruments you can run on yourself.", kids: ["Governance Analytics", "Benchmarks"] },
+              { no: "03", name: "Tools", href: "/#tools", desc: "The research, turned outward. Instruments you can run on yourself.", kids: ["Governance Analytics", "Benchmarks"] },
               { no: "04", name: "Events", href: "/events", desc: "Where the findings are argued in the room. Roundtables and briefings.", kids: ["Roundtables", "Briefings"] },
               { no: "05", name: "About", href: "/about", desc: "Who does the work, how it is funded, and the standards it is held to.", kids: ["Mission", "People", "Standards"] },
             ].map((row) => (
@@ -208,13 +208,14 @@ export default async function HomePage() {
           <CaseFilesFeature caseFiles={caseFiles} />
         </section>
 
-        {/* BENCHMARKS / ANALYTICS (static) */}
-        <section id="tools" className="rule-band">
+        {/* BENCHMARKS / ANALYTICS — not built yet: shown as Coming Soon */}
+        <section id="tools" className="rule-band is-coming-soon">
           <div className="wrap">
             <div className="sec-head">
               <div>
                 <p className="kicker">Tools &middot; Governance Analytics</p>
                 <h2 className="h">Turn the research into a number you can track.</h2>
+                <span className="soon-badge">Coming soon</span>
               </div>
             </div>
             <div className="bench-grid">
@@ -225,9 +226,10 @@ export default async function HomePage() {
                   governance is set up to carry transformation without breaking. Run it on your own
                   organization, then see where you sit against your peers.
                 </p>
-                <Link className="btn" href="/tools/governance-analytics">Open Governance Analytics <Arrow /></Link>
+                <span className="btn btn--disabled" aria-disabled="true">Coming soon</span>
               </div>
-              <div>
+              <div className="stamp-wrap">
+                <span className="stamp" aria-hidden="true">Coming Soon</span>
                 <div className="chart-card">
                   <div className="cc-head">
                     <div>
