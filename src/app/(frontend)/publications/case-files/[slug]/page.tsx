@@ -38,8 +38,8 @@ function mediaUrl(m: any): string | null {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const cf = await getCaseFile(slug);
-  if (!cf) return { title: "Case file not found — Transformidable" };
-  return { title: `${cf.title} — Transformidable`, description: cf.dek || undefined };
+  if (!cf) return { title: "Case file not found" };
+  return { title: `${cf.title}`, description: cf.dek || undefined };
 }
 
 export default async function CaseFileDetail({ params }: { params: Promise<{ slug: string }> }) {

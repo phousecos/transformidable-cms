@@ -50,7 +50,7 @@ export default function SubscribePage() {
           </h1>
           <p className="mt-4 text-base leading-relaxed text-obsidian/60 md:text-lg">
             Subscribe to Transformidable for executive insight on technology strategy,
-            project execution, and leadership — delivered to your inbox.
+            project execution, and leadership, delivered to your inbox.
           </p>
 
           <div className="mt-4 h-[2px] w-16 bg-oxblood" />

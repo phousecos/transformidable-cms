@@ -9,7 +9,7 @@ import { caseNo } from "../../components/research/format";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Case Files — Transformidable",
+  title: "Case Files",
   description:
     "Anatomies of real governance decisions and why they held or failed. The evidence base behind the research.",
 };

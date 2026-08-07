@@ -6,7 +6,7 @@ import { Sky } from "../components/research/Sky";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "About — Transformidable",
+  title: "About",
   description:
     "A research and advisory practice studying how governance, leadership, and institutional decision-making shape organizational resilience.",
 };
@@ -47,8 +47,8 @@ export default function AboutPage() {
             <p>
               Transformidable exists to study those decisions in the open. We trace, case by case, how
               governance and leadership shape whether an organization can carry change without breaking,
-              and we turn what we learn into evidence that leaders and institutions&mdash;and, when a
-              transformation is contested, the legal system&mdash;can actually use.
+              and we turn what we learn into evidence that leaders and institutions can actually use,
+              and that the legal system can rely on when a transformation is contested.
             </p>
             <p>
               The work is deliberately independent. It is not opinion, and it is not a sales pitch for a
@@ -81,8 +81,8 @@ export default function AboutPage() {
               <p>
                 She brings the discipline of a researcher and the vantage point of someone who has watched,
                 up close, how decisions made in board and committee rooms decide whether change takes hold
-                or unwinds. That vantage point&mdash;treating governance as the place where transformation
-                is really won or lost&mdash;is the lens this research is built on.
+                or unwinds. That vantage point, treating governance as the place where transformation
+                is really won or lost, is the lens this research is built on.
               </p>
               <p>
                 It is also what the work adds to the conversation. Transformation is usually discussed in
