@@ -371,7 +371,7 @@
 
 /* ---- Detail pages ----------------------------------------------------- */
 .tr .detail { padding-block: clamp(40px, 6vw, 72px); }
-.tr .detail-wrap { max-width: 760px; margin: 0 auto; padding-inline: clamp(20px, 5vw, 64px); }
+.tr .detail-wrap { max-width: 950px; margin: 0 auto; padding-inline: clamp(20px, 5vw, 64px); }
 .tr .backlink { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--wine); margin-bottom: 26px; }
 .tr .backlink svg { width: 13px; height: 13px; }
 .tr .backlink:hover { gap: 11px; }
@@ -419,7 +419,7 @@
 .tr .cf-card:hover h3 { color: var(--wine); }
 
 /* ---- Case dossier ----------------------------------------------------- */
-.tr .case-layout { max-width: 760px; margin: 0 auto; padding-inline: clamp(20px, 5vw, 64px); }
+.tr .case-layout { max-width: 950px; margin: 0 auto; padding-inline: clamp(20px, 5vw, 64px); }
 .tr .case-content { min-width: 0; }
 .tr .case-toc { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 22px 0 6px; border-top: 1px solid var(--rule); margin-top: 20px; }
 .tr .case-toc-h { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute); margin: 0 6px 0 0; }
@@ -443,6 +443,9 @@
 .tr .case-pill--strength { color: #2f7a4a; border-color: #7fb497; }
 .tr .case-pill--weakness { color: var(--wine); border-color: var(--wine); }
 .tr .case-pill--observation { color: var(--gold-deep); border-color: var(--gold); }
+.tr .case-pill--pending { color: var(--ink-mute); border-color: var(--rule-strong); border-style: dashed; }
+
+.tr .case-pending-note { font-family: var(--serif); font-style: italic; color: var(--ink-mute); font-size: .96rem; margin: 0; }
 
 .tr .case-notes { display: flex; flex-direction: column; gap: 18px; }
 .tr .case-note { border-left: 2px solid var(--rule-strong); padding-left: 16px; }

@@ -78,7 +78,6 @@ try {
       'UCPath is the University of California’s systemwide program to consolidate payroll, academic personnel, timekeeping, and human resources onto a single platform, replacing systems that had been run campus by campus.',
       'The program is a useful governance case precisely because the technology was never the hard part. The hard part was governing a change across independent campuses and medical centers, with oversight, accountability, and employee trust all in play. This overview is scaffolding — expand it with verified, sourced detail.',
     ]),
-    timelineLabel: 'Program milestones (add exact dates)',
     timeline: [
       { time: 'Initiation', title: 'Program chartered to consolidate payroll and HR systemwide', description: 'Replace campus-by-campus systems with one platform.', keyMoment: true },
       { time: 'Build', title: 'Implementation on a common ERP platform', description: 'Design, configuration, and testing.' },
