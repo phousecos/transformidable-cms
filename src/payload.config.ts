@@ -101,7 +101,7 @@ export default buildConfig({
   email:
     process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS
       ? nodemailerAdapter({
-          defaultFromAddress: process.env.EMAIL_FROM || 'updates@transformidable.media',
+          defaultFromAddress: process.env.EMAIL_FROM || 'hello@transformidablethinking.com',
           defaultFromName: 'Transformidable',
           transportOptions: {
             host: process.env.SMTP_HOST,
