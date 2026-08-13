@@ -1,270 +1,312 @@
 import pg from 'pg'
 
-// ── Phase 1: Raw PG connection to diagnose & fix enum mismatches ─────────
-// When pushSchema() recreates enum types and casts TEXT columns back,
-// any row with a value not in the new enum causes error 22P02 (enum_in).
-// We must convert ALL enum columns to TEXT, clean stale data, then drop types.
 const rawCS = process.env.POSTGRES_URL || process.env.DATABASE_URL || ''
 const connectionString = rawCS.includes('sslmode=')
   ? rawCS.replace(/sslmode=[^&]*/, 'sslmode=no-verify')
   : rawCS + (rawCS.includes('?') ? '&' : '?') + 'sslmode=no-verify'
-const client = new pg.Client({ connectionString })
-await client.connect()
 
-// Known value renames (old DB value → new code value)
-const valueRenames: Record<string, string> = {
-  'jerribland.com': 'jerribland',
-  'agentpmo.com': 'agentpmo',
-  'prept.com': 'prept',
-  'lumynr.com': 'lumynr',
-  'vettersgroup.com': 'vettersgroup',
-  'sent': 'published',
-}
+// ── Migration lock ─────────────────────────────────────────────────────
+// This script does destructive, multi-step, non-transactional schema
+// surgery (drop enum types → convert columns to TEXT → push recreates
+// enums → convert back). If two deploys run it at the same time against
+// the same database — a stray Preview build and a Production build, or
+// two Production deploys in quick succession — one process's DROP/ALTER
+// can land in the middle of the other's steps and crash both. A single
+// session-level advisory lock, held for the whole script, makes a second
+// concurrent run wait instead of interleaving. lock_timeout bounds the
+// wait so a stuck/leaked lock fails the build loudly instead of hanging
+// until Vercel's own build timeout.
+const lockClient = new pg.Client({ connectionString })
+await lockClient.connect()
+await lockClient.query("SET lock_timeout = '5min'")
+console.log('[migrate] Acquiring migration lock...')
+await lockClient.query('SELECT pg_advisory_lock(0, hashtext($1))', ['transformidable-cms-migrate'])
+console.log('[migrate] Lock acquired.')
 
-// All tables+columns that hold enum data, with their valid values.
-// Includes main tables, junction tables (hasMany selects), and version tables.
-const enumColumns: { table: string; column: string; validValues: string[] }[] = [
-  // Articles
-  { table: 'articles_syndicate_to', column: 'value', validValues: ['jerribland', 'agentpmo', 'prept', 'lumynr', 'vettersgroup', 'cio-advisra'] },
-  { table: 'articles', column: 'status', validValues: ['draft', 'review', 'scheduled', 'published'] },
-  // Articles versions
-  { table: '_articles_v_version_syndicate_to', column: 'value', validValues: ['jerribland', 'agentpmo', 'prept', 'lumynr', 'vettersgroup', 'cio-advisra'] },
-  { table: '_articles_v', column: 'version_status', validValues: ['draft', 'review', 'scheduled', 'published'] },
-  // Podcast Episodes
-  { table: 'podcast_episodes_syndicate_to', column: 'value', validValues: ['jerribland', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
-  { table: 'podcast_episodes', column: 'status', validValues: ['draft', 'review', 'scheduled', 'published'] },
-  // Podcast Episodes versions
-  { table: '_podcast_episodes_v_version_syndicate_to', column: 'value', validValues: ['jerribland', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
-  { table: '_podcast_episodes_v', column: 'version_status', validValues: ['draft', 'review', 'scheduled', 'published'] },
-  // Newsletter Issues
-  { table: 'newsletter_issues', column: 'status', validValues: ['draft', 'scheduled', 'published'] },
-  // Users
-  { table: 'users', column: 'role', validValues: ['admin', 'editor', 'brandContributor', 'sponsorManager'] },
-  // Authors
-  { table: 'authors', column: 'type', validValues: ['staff', 'guestContributor', 'podcastGuest'] },
-  { table: 'authors_social_links', column: 'platform', validValues: ['linkedin', 'twitter', 'website', 'instagram', 'other'] },
-  // Sponsors
-  { table: 'sponsors_ad_creative', column: 'format', validValues: ['image', 'audio', 'html'] },
-  { table: 'sponsors', column: 'placement_type', validValues: ['podcastMidRoll', 'articleSidebar', 'newsletter'] },
-]
+let payload: any = null
+let fatalError: unknown = null
 
 try {
-  // Dump all enum types and values for diagnostics
-  const { rows: enumRows } = await client.query(`
-    SELECT t.typname AS enum_name, e.enumlabel AS enum_value
-    FROM pg_type t
-    JOIN pg_enum e ON t.oid = e.enumtypid
-    ORDER BY t.typname, e.enumsortorder
-  `)
-  console.log('[migrate] Current DB enums:')
-  for (const row of enumRows) {
-    console.log(`  ${row.enum_name}: ${row.enum_value}`)
+  // ── Phase 1: Raw PG connection to diagnose & fix enum mismatches ───────
+  // When pushSchema() recreates enum types and casts TEXT columns back,
+  // any row with a value not in the new enum causes error 22P02 (enum_in).
+  // We must convert ALL enum columns to TEXT, clean stale data, then drop types.
+  const client = new pg.Client({ connectionString })
+  await client.connect()
+
+  // Known value renames (old DB value → new code value)
+  const valueRenames: Record<string, string> = {
+    'jerribland.com': 'jerribland',
+    'agentpmo.com': 'agentpmo',
+    'prept.com': 'prept',
+    'lumynr.com': 'lumynr',
+    'vettersgroup.com': 'vettersgroup',
+    'sent': 'published',
   }
 
-  // Step 1: Convert ALL enum columns to TEXT (so DROP TYPE doesn't fail)
-  // Query every column that uses a user-defined enum type
-  const { rows: allEnumCols } = await client.query(`
-    SELECT c.table_schema, c.table_name, c.column_name, c.udt_name
-    FROM information_schema.columns c
-    WHERE c.data_type = 'USER-DEFINED'
-      AND c.table_schema = 'public'
-      AND c.udt_name IN (SELECT typname FROM pg_type WHERE oid IN (SELECT enumtypid FROM pg_enum))
-  `)
-  console.log(`[migrate] Found ${allEnumCols.length} enum columns to convert to TEXT`)
+  // All tables+columns that hold enum data, with their valid values.
+  // Includes main tables, junction tables (hasMany selects), and version tables.
+  const enumColumns: { table: string; column: string; validValues: string[] }[] = [
+    // Articles
+    { table: 'articles_syndicate_to', column: 'value', validValues: ['jerribland', 'agentpmo', 'prept', 'lumynr', 'vettersgroup', 'cio-advisra'] },
+    { table: 'articles', column: 'status', validValues: ['draft', 'review', 'scheduled', 'published'] },
+    // Articles versions
+    { table: '_articles_v_version_syndicate_to', column: 'value', validValues: ['jerribland', 'agentpmo', 'prept', 'lumynr', 'vettersgroup', 'cio-advisra'] },
+    { table: '_articles_v', column: 'version_status', validValues: ['draft', 'review', 'scheduled', 'published'] },
+    // Podcast Episodes
+    { table: 'podcast_episodes_syndicate_to', column: 'value', validValues: ['jerribland', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
+    { table: 'podcast_episodes', column: 'status', validValues: ['draft', 'review', 'scheduled', 'published'] },
+    // Podcast Episodes versions
+    { table: '_podcast_episodes_v_version_syndicate_to', column: 'value', validValues: ['jerribland', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
+    { table: '_podcast_episodes_v', column: 'version_status', validValues: ['draft', 'review', 'scheduled', 'published'] },
+    // Newsletter Issues
+    { table: 'newsletter_issues', column: 'status', validValues: ['draft', 'scheduled', 'published'] },
+    // Users
+    { table: 'users', column: 'role', validValues: ['admin', 'editor', 'brandContributor', 'sponsorManager'] },
+    // Authors
+    { table: 'authors', column: 'type', validValues: ['staff', 'guestContributor', 'podcastGuest'] },
+    { table: 'authors_social_links', column: 'platform', validValues: ['linkedin', 'twitter', 'website', 'instagram', 'other'] },
+    // Sponsors
+    { table: 'sponsors_ad_creative', column: 'format', validValues: ['image', 'audio', 'html'] },
+    { table: 'sponsors', column: 'placement_type', validValues: ['podcastMidRoll', 'articleSidebar', 'newsletter'] },
+  ]
 
-  for (const col of allEnumCols) {
-    try {
-      await client.query(
-        `ALTER TABLE "${col.table_name}" ALTER COLUMN "${col.column_name}" TYPE TEXT USING "${col.column_name}"::TEXT`
+  try {
+    // Dump all enum types and values for diagnostics
+    const { rows: enumRows } = await client.query(`
+      SELECT t.typname AS enum_name, e.enumlabel AS enum_value
+      FROM pg_type t
+      JOIN pg_enum e ON t.oid = e.enumtypid
+      ORDER BY t.typname, e.enumsortorder
+    `)
+    console.log('[migrate] Current DB enums:')
+    for (const row of enumRows) {
+      console.log(`  ${row.enum_name}: ${row.enum_value}`)
+    }
+
+    // Step 1: Convert ALL enum columns to TEXT (so DROP TYPE doesn't fail)
+    // Query every column that uses a user-defined enum type
+    const { rows: allEnumCols } = await client.query(`
+      SELECT c.table_schema, c.table_name, c.column_name, c.udt_name
+      FROM information_schema.columns c
+      WHERE c.data_type = 'USER-DEFINED'
+        AND c.table_schema = 'public'
+        AND c.udt_name IN (SELECT typname FROM pg_type WHERE oid IN (SELECT enumtypid FROM pg_enum))
+    `)
+    console.log(`[migrate] Found ${allEnumCols.length} enum columns to convert to TEXT`)
+
+    for (const col of allEnumCols) {
+      try {
+        await client.query(
+          `ALTER TABLE "${col.table_name}" ALTER COLUMN "${col.column_name}" TYPE TEXT USING "${col.column_name}"::TEXT`
+        )
+        console.log(`  Converted ${col.table_name}.${col.column_name} (was ${col.udt_name}) to TEXT`)
+      } catch (e: any) {
+        console.log(`  Warning converting ${col.table_name}.${col.column_name}: ${e.message}`)
+      }
+    }
+
+    // Step 2: Drop ALL Payload enum types
+    const payloadEnumTypes = [...new Set(enumRows
+      .map((r: any) => r.enum_name as string)
+      .filter((n: string) => n.startsWith('enum_'))
+    )]
+    for (const enumName of payloadEnumTypes) {
+      await client.query(`DROP TYPE IF EXISTS "${enumName}" CASCADE`)
+      console.log(`  Dropped enum ${enumName}`)
+    }
+
+    // Step 3: Clean data in ALL known tables — rename stale values, null invalids
+    for (const { table, column, validValues } of enumColumns) {
+      // Check if table exists
+      const { rows: tableExists } = await client.query(
+        `SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1`,
+        [table]
       )
-      console.log(`  Converted ${col.table_name}.${col.column_name} (was ${col.udt_name}) to TEXT`)
-    } catch (e: any) {
-      console.log(`  Warning converting ${col.table_name}.${col.column_name}: ${e.message}`)
-    }
-  }
+      if (!tableExists.length) {
+        console.log(`  Table ${table} does not exist — skipping`)
+        continue
+      }
 
-  // Step 2: Drop ALL Payload enum types
-  const payloadEnumTypes = [...new Set(enumRows
-    .map((r: any) => r.enum_name as string)
-    .filter((n: string) => n.startsWith('enum_'))
-  )]
-  for (const enumName of payloadEnumTypes) {
-    await client.query(`DROP TYPE IF EXISTS "${enumName}" CASCADE`)
-    console.log(`  Dropped enum ${enumName}`)
-  }
+      // Check if column exists
+      const { rows: colExists } = await client.query(
+        `SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 AND column_name = $2`,
+        [table, column]
+      )
+      if (!colExists.length) {
+        console.log(`  Column ${table}.${column} does not exist — skipping`)
+        continue
+      }
 
-  // Step 3: Clean data in ALL known tables — rename stale values, null invalids
-  for (const { table, column, validValues } of enumColumns) {
-    // Check if table exists
-    const { rows: tableExists } = await client.query(
-      `SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1`,
-      [table]
-    )
-    if (!tableExists.length) {
-      console.log(`  Table ${table} does not exist — skipping`)
-      continue
-    }
+      // Apply known renames
+      for (const [oldVal, newVal] of Object.entries(valueRenames)) {
+        const res = await client.query(
+          `UPDATE "${table}" SET "${column}" = $1 WHERE "${column}" = $2`,
+          [newVal, oldVal]
+        )
+        if (res.rowCount && res.rowCount > 0) {
+          console.log(`  Updated ${table}.${column}: '${oldVal}' → '${newVal}' (${res.rowCount} rows)`)
+        }
+      }
 
-    // Check if column exists
-    const { rows: colExists } = await client.query(
-      `SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 AND column_name = $2`,
-      [table, column]
-    )
-    if (!colExists.length) {
-      console.log(`  Column ${table}.${column} does not exist — skipping`)
-      continue
-    }
-
-    // Apply known renames
-    for (const [oldVal, newVal] of Object.entries(valueRenames)) {
+      // Null out any remaining values that aren't in the valid set
       const res = await client.query(
-        `UPDATE "${table}" SET "${column}" = $1 WHERE "${column}" = $2`,
-        [newVal, oldVal]
+        `UPDATE "${table}" SET "${column}" = NULL WHERE "${column}" IS NOT NULL AND "${column}" != ALL($1)`,
+        [validValues]
       )
       if (res.rowCount && res.rowCount > 0) {
-        console.log(`  Updated ${table}.${column}: '${oldVal}' → '${newVal}' (${res.rowCount} rows)`)
+        console.log(`  Nulled ${res.rowCount} invalid values in ${table}.${column}`)
       }
     }
 
-    // Null out any remaining values that aren't in the valid set
-    const res = await client.query(
-      `UPDATE "${table}" SET "${column}" = NULL WHERE "${column}" IS NOT NULL AND "${column}" != ALL($1)`,
-      [validValues]
-    )
-    if (res.rowCount && res.rowCount > 0) {
-      console.log(`  Nulled ${res.rowCount} invalid values in ${table}.${column}`)
-    }
-  }
-
-  // Step 4: Truncate version history tables to avoid SET NOT NULL failures
-  // during schema push. These tables only store historical snapshots — the
-  // actual articles/episodes in the main tables are unaffected.
-  // This is far more robust than trying to backfill every possible NULL column.
-  const versionTables = ['_articles_v', '_podcast_episodes_v']
-  for (const vt of versionTables) {
-    try {
-      // Also truncate associated junction tables first (FK constraints)
-      const junctionTable = `${vt}_version_syndicate_to`
-      await client.query(`TRUNCATE TABLE "${junctionTable}" CASCADE`).catch(() => {})
-      const res = await client.query(`TRUNCATE TABLE "${vt}" CASCADE`)
-      console.log(`  Truncated ${vt} (version history cleared)`)
-    } catch (e: any) {
-      if (!e.message.includes('does not exist')) {
-        console.log(`  Could not truncate ${vt}: ${e.message}`)
+    // Step 4: Truncate version history tables to avoid SET NOT NULL failures
+    // during schema push. These tables only store historical snapshots — the
+    // actual articles/episodes in the main tables are unaffected.
+    // This is far more robust than trying to backfill every possible NULL column.
+    const versionTables = ['_articles_v', '_podcast_episodes_v']
+    for (const vt of versionTables) {
+      try {
+        // Also truncate associated junction tables first (FK constraints)
+        const junctionTable = `${vt}_version_syndicate_to`
+        await client.query(`TRUNCATE TABLE "${junctionTable}" CASCADE`).catch(() => {})
+        const res = await client.query(`TRUNCATE TABLE "${vt}" CASCADE`)
+        console.log(`  Truncated ${vt} (version history cleared)`)
+      } catch (e: any) {
+        if (!e.message.includes('does not exist')) {
+          console.log(`  Could not truncate ${vt}: ${e.message}`)
+        }
       }
     }
+
+    // Step 5: Drop tables/columns that were renamed or removed in code. Without
+    // this, drizzle-kit push sees an add+drop pair and stops to ask "Is X
+    // created or renamed from Y?" — an interactive prompt that hangs a
+    // non-interactive CI build. Pre-dropping the old objects makes the change a
+    // set of unambiguous CREATEs/ADDs, which push applies without prompting.
+    // All statements are IF EXISTS, so they are no-ops on a fresh database.
+    const staleTables = ['case_files_exhibit', 'case_files_research_notes']
+    for (const t of staleTables) {
+      try {
+        await client.query(`DROP TABLE IF EXISTS "${t}" CASCADE`)
+        console.log(`  Dropped stale table ${t} (renamed/removed in code)`)
+      } catch (e: any) {
+        console.log(`  Could not drop ${t}: ${e.message}`)
+      }
+    }
+    const staleColumns: { table: string; column: string }[] = [
+      { table: 'case_files', column: 'body' },
+      { table: 'case_files', column: 'exhibit_label' },
+    ]
+    for (const { table, column } of staleColumns) {
+      try {
+        await client.query(`ALTER TABLE IF EXISTS "${table}" DROP COLUMN IF EXISTS "${column}"`)
+        console.log(`  Dropped stale column ${table}.${column} (renamed/removed in code)`)
+      } catch (e: any) {
+        console.log(`  Could not drop ${table}.${column}: ${e.message}`)
+      }
+    }
+
+    console.log('[migrate] Phase 1 complete — enums dropped and data cleaned.')
+  } catch (e: any) {
+    console.error('[migrate] Phase 1 error:', e.message)
+    console.error(e)
+  } finally {
+    await client.end()
   }
 
-  // Step 5: Drop tables/columns that were renamed or removed in code. Without
-  // this, drizzle-kit push sees an add+drop pair and stops to ask "Is X
-  // created or renamed from Y?" — an interactive prompt that hangs a
-  // non-interactive CI build. Pre-dropping the old objects makes the change a
-  // set of unambiguous CREATEs/ADDs, which push applies without prompting.
-  // All statements are IF EXISTS, so they are no-ops on a fresh database.
-  const staleTables = ['case_files_exhibit', 'case_files_research_notes']
-  for (const t of staleTables) {
-    try {
-      await client.query(`DROP TABLE IF EXISTS "${t}" CASCADE`)
-      console.log(`  Dropped stale table ${t} (renamed/removed in code)`)
-    } catch (e: any) {
-      console.log(`  Could not drop ${t}: ${e.message}`)
+  // ── Phase 2: Normal Payload init + schema push ─────────────────────────
+  const { getPayload } = await import('payload')
+  const { default: config } = await import('./payload.config.ts')
+
+  payload = await getPayload({ config })
+  const adapter = payload.db as any
+
+  console.log('[migrate] Pushing schema to database...')
+  const { pushSchema } = adapter.requireDrizzleKit()
+  const { apply, hasDataLoss, warnings, statements } = await pushSchema(
+    adapter.schema,
+    adapter.drizzle,
+    adapter.schemaName ? [adapter.schemaName] : undefined,
+    adapter.tablesFilter,
+    adapter.extensions?.postgis ? ['postgis'] : undefined,
+  )
+
+  console.log('[migrate] Statements to apply:', JSON.stringify(statements, null, 2))
+
+  if (warnings.length) {
+    console.log('[migrate] Push warnings:', warnings.join('\n'))
+    if (hasDataLoss) {
+      console.log('[migrate] DATA LOSS WARNING — proceeding (legacy columns preserved via hidden fields)')
     }
   }
-  const staleColumns: { table: string; column: string }[] = [
-    { table: 'case_files', column: 'body' },
-    { table: 'case_files', column: 'exhibit_label' },
-  ]
-  for (const { table, column } of staleColumns) {
-    try {
-      await client.query(`ALTER TABLE IF EXISTS "${table}" DROP COLUMN IF EXISTS "${column}"`)
-      console.log(`  Dropped stale column ${table}.${column} (renamed/removed in code)`)
-    } catch (e: any) {
-      console.log(`  Could not drop ${table}.${column}: ${e.message}`)
+
+  await apply()
+  console.log('[migrate] Schema push complete.')
+
+  await payload.db.migrate()
+
+  // ── Phase 2.5: Seed the Topic vocabulary (idempotent) ──────────────────
+  try {
+    const { seedTopics } = await import('./seed/topics.ts')
+    await seedTopics(payload)
+    console.log('[migrate] Topic seed complete.')
+  } catch (e: any) {
+    // Never let seeding break the deploy.
+    console.error('[migrate] Topic seed error:', e.message)
+  }
+
+  // ── Phase 2.6: Retire Unlimited Powerhouse (authors + brand pillars) ───
+  try {
+    const { retireUnlimitedPowerhouse } = await import('./seed/retire-unlimited-powerhouse.ts')
+    await retireUnlimitedPowerhouse(payload)
+    console.log('[migrate] Unlimited Powerhouse retirement complete.')
+  } catch (e: any) {
+    console.error('[migrate] Unlimited Powerhouse retirement error:', e.message)
+  }
+
+  // ── Phase 3: Enable Row Level Security on all public tables ────────────
+  // Supabase exposes the public schema through PostgREST. Without RLS, the
+  // anon/authenticated API roles can read every row. Payload connects as the
+  // schema owner / a BYPASSRLS role, so enabling RLS without any policies
+  // locks out the API while leaving Payload unaffected. Don't FORCE RLS —
+  // that would apply it to the owner too and break Payload.
+  const rlsClient = new pg.Client({ connectionString })
+  await rlsClient.connect()
+  try {
+    const { rows: publicTables } = await rlsClient.query(`
+      SELECT tablename
+      FROM pg_tables
+      WHERE schemaname = 'public'
+    `)
+    for (const { tablename } of publicTables) {
+      await rlsClient.query(`ALTER TABLE "public"."${tablename}" ENABLE ROW LEVEL SECURITY`)
     }
+    console.log(`[migrate] RLS enabled on ${publicTables.length} public tables.`)
+  } catch (e: any) {
+    console.error('[migrate] RLS enablement error:', e.message)
+    throw e
+  } finally {
+    await rlsClient.end()
   }
-
-  console.log('[migrate] Phase 1 complete — enums dropped and data cleaned.')
-} catch (e: any) {
-  console.error('[migrate] Phase 1 error:', e.message)
-  console.error(e)
+} catch (e: unknown) {
+  fatalError = e
 } finally {
-  await client.end()
+  // Always release the lock, success or failure, so a crashed build
+  // doesn't leave the next deploy waiting out the full lock_timeout.
+  await lockClient
+    .query('SELECT pg_advisory_unlock(0, hashtext($1))', ['transformidable-cms-migrate'])
+    .catch((e: any) => console.error('[migrate] Failed to release migration lock:', e.message))
+  await lockClient.end().catch(() => {})
+  console.log('[migrate] Lock released.')
 }
 
-// ── Phase 2: Normal Payload init + schema push ───────────────────────────
-const { getPayload } = await import('payload')
-const { default: config } = await import('./payload.config.ts')
-
-const payload = await getPayload({ config })
-const adapter = payload.db as any
-
-console.log('[migrate] Pushing schema to database...')
-const { pushSchema } = adapter.requireDrizzleKit()
-const { apply, hasDataLoss, warnings, statements } = await pushSchema(
-  adapter.schema,
-  adapter.drizzle,
-  adapter.schemaName ? [adapter.schemaName] : undefined,
-  adapter.tablesFilter,
-  adapter.extensions?.postgis ? ['postgis'] : undefined,
-)
-
-console.log('[migrate] Statements to apply:', JSON.stringify(statements, null, 2))
-
-if (warnings.length) {
-  console.log('[migrate] Push warnings:', warnings.join('\n'))
-  if (hasDataLoss) {
-    console.log('[migrate] DATA LOSS WARNING — proceeding (legacy columns preserved via hidden fields)')
-  }
+if (payload) {
+  await payload.destroy().catch(() => {})
 }
 
-await apply()
-console.log('[migrate] Schema push complete.')
-
-await payload.db.migrate()
-
-// ── Phase 2.5: Seed the Topic vocabulary (idempotent) ────────────────────
-try {
-  const { seedTopics } = await import('./seed/topics.ts')
-  await seedTopics(payload)
-  console.log('[migrate] Topic seed complete.')
-} catch (e: any) {
-  // Never let seeding break the deploy.
-  console.error('[migrate] Topic seed error:', e.message)
+if (fatalError) {
+  console.error('[migrate] Fatal error:', fatalError)
+  process.exit(1)
 }
 
-// ── Phase 2.6: Retire Unlimited Powerhouse (authors + brand pillars) ─────
-try {
-  const { retireUnlimitedPowerhouse } = await import('./seed/retire-unlimited-powerhouse.ts')
-  await retireUnlimitedPowerhouse(payload)
-  console.log('[migrate] Unlimited Powerhouse retirement complete.')
-} catch (e: any) {
-  console.error('[migrate] Unlimited Powerhouse retirement error:', e.message)
-}
-
-// ── Phase 3: Enable Row Level Security on all public tables ──────────────
-// Supabase exposes the public schema through PostgREST. Without RLS, the
-// anon/authenticated API roles can read every row. Payload connects as the
-// schema owner / a BYPASSRLS role, so enabling RLS without any policies
-// locks out the API while leaving Payload unaffected. Don't FORCE RLS —
-// that would apply it to the owner too and break Payload.
-const rlsClient = new pg.Client({ connectionString })
-await rlsClient.connect()
-try {
-  const { rows: publicTables } = await rlsClient.query(`
-    SELECT tablename
-    FROM pg_tables
-    WHERE schemaname = 'public'
-  `)
-  for (const { tablename } of publicTables) {
-    await rlsClient.query(`ALTER TABLE "public"."${tablename}" ENABLE ROW LEVEL SECURITY`)
-  }
-  console.log(`[migrate] RLS enabled on ${publicTables.length} public tables.`)
-} catch (e: any) {
-  console.error('[migrate] RLS enablement error:', e.message)
-  throw e
-} finally {
-  await rlsClient.end()
-}
-
-await payload.destroy()
 process.exit(0)
