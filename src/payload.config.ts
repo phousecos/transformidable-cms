@@ -4,7 +4,7 @@ import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
-import { resendAdapter } from '@payloadcms/email-resend'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import sharp from 'sharp'
 
 import { Users } from './collections/Users.ts'
@@ -91,16 +91,29 @@ export default buildConfig({
   editor: lexicalEditor(),
 
   // Case-follow digest emails (see api/cron/case-digest) need an adapter to
-  // actually send through. Falls back to Payload's default no-op/console
-  // adapter when RESEND_API_KEY isn't set, so local dev without the key
-  // doesn't break.
-  email: process.env.RESEND_API_KEY
-    ? resendAdapter({
-        defaultFromAddress: process.env.EMAIL_FROM || 'updates@transformidable.media',
-        defaultFromName: 'Transformidable',
-        apiKey: process.env.RESEND_API_KEY,
-      })
-    : undefined,
+  // actually send through. Sends via Proton SMTP. Falls back to Payload's
+  // default no-op/console adapter when the SMTP env vars aren't set, so
+  // local dev without them doesn't break.
+  // Note: if SMTP_HOST points at a local Proton Mail Bridge instance, it
+  // must be reachable from wherever this app runs (e.g. a persistent
+  // server or a Bridge instance exposed to Vercel) — Bridge running on a
+  // developer's laptop won't be reachable from serverless functions.
+  email:
+    process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS
+      ? nodemailerAdapter({
+          defaultFromAddress: process.env.EMAIL_FROM || 'updates@transformidable.media',
+          defaultFromName: 'Transformidable',
+          transportOptions: {
+            host: process.env.SMTP_HOST,
+            port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 587,
+            secure: process.env.SMTP_SECURE === 'true',
+            auth: {
+              user: process.env.SMTP_USER,
+              pass: process.env.SMTP_PASS,
+            },
+          },
+        })
+      : undefined,
 
   collections: [
     // Active collections
