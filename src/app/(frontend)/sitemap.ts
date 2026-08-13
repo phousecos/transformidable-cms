@@ -4,7 +4,7 @@ import { getPayload } from "payload";
 
 export const dynamic = "force-dynamic";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://transformidable.media";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://transformidablethinking.com";
 
 // Static, always-present routes (the coming-soon placeholders are included so
 // the structure is discoverable; drop any you'd rather keep out of the index).

@@ -2,8 +2,8 @@
 
 **Version:** 1.2.0
 **Last Updated:** 2026-03-24
-**Production URL:** `https://cms.transformidable.media`
-**Media CDN:** `https://assets.transformidable.media`
+**Production URL:** `https://cms.transformidablethinking.com`
+**Media CDN:** `https://assets.transformidablethinking.com`
 
 ---
 
