@@ -21,10 +21,10 @@ const ExtLink = ({ href, children }: any) => (
   </a>
 );
 
-function Section({ id, label, children }: any) {
+function Section({ id, label, pending, children }: any) {
   return (
     <section className="case-section" id={id}>
-      <h2 className="case-h">{label}</h2>
+      <h2 className="case-h">{label}{pending && <span className="case-pill case-pill--pending">Pending</span>}</h2>
       {children}
     </section>
   );
@@ -45,70 +45,69 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
   const pod = cf.podcastEpisode && typeof cf.podcastEpisode === "object" ? cf.podcastEpisode : null;
   const aiSummary = typeof cf.aiSummary === "string" ? cf.aiSummary.trim() : "";
 
-  // Build the section table of contents from whatever the case actually has.
-  const toc: { id: string; label: string }[] = [];
-  if (overviewHtml) toc.push({ id: "overview", label: "Overview" });
-  if (timeline.length) toc.push({ id: "timeline", label: "Timeline" });
-  if (orgs.length) toc.push({ id: "organizations", label: "Organizations" });
+  // Core dossier sections (mirroring the CMS admin tabs) always appear, showing
+  // a "Pending" status when the case doesn't have that content yet. Genuinely
+  // optional extras only show up once there's something to show.
+  const toc: { id: string; label: string }[] = [
+    { id: "overview", label: "Overview" },
+    { id: "timeline", label: "Timeline" },
+    { id: "organizations", label: "Organizations" },
+  ];
   if (graph) toc.push({ id: "governance-map", label: "Governance Map" });
-  if (documents.length) toc.push({ id: "documents", label: "Documents" });
-  if (audits.length) toc.push({ id: "audit-reports", label: "Audit Reports" });
-  if (news.length) toc.push({ id: "news-coverage", label: "News Coverage" });
+  toc.push({ id: "documents", label: "Documents" });
+  toc.push({ id: "audit-reports", label: "Audit Reports" });
+  toc.push({ id: "news-coverage", label: "News Coverage" });
   if (notes.length) toc.push({ id: "research-notes", label: "Research Notes" });
-  if (mechanisms.length) toc.push({ id: "governance-mechanisms", label: "Governance Mechanisms" });
+  toc.push({ id: "governance-mechanisms", label: "Governance Mechanisms" });
   if (pod) toc.push({ id: "podcast", label: "Podcast Episode" });
   if (aiSummary) toc.push({ id: "ai-summary", label: "AI Summary" });
-  if (lessons.length) toc.push({ id: "lessons-learned", label: "Lessons Learned" });
+  toc.push({ id: "lessons-learned", label: "Lessons Learned" });
   if (related.length) toc.push({ id: "related", label: "Related Cases" });
-
-  if (toc.length === 0) {
-    return (
-      <div className="detail-wrap">
-        <p className="detail-note">This case file is being assembled. Check back soon.</p>
-      </div>
-    );
-  }
 
   return (
     <div className="case-layout">
-      {toc.length > 1 && (
-        <nav className="case-toc" aria-label="Case sections">
-          <p className="case-toc-h">On this case</p>
-          {toc.map((t) => <a key={t.id} href={`#${t.id}`}>{t.label}</a>)}
-        </nav>
-      )}
+      <nav className="case-toc" aria-label="Case sections">
+        <p className="case-toc-h">On this case</p>
+        {toc.map((t) => <a key={t.id} href={`#${t.id}`}>{t.label}</a>)}
+      </nav>
 
       <div className="case-content">
-        {overviewHtml && (
-          <Section id="overview" label="Overview">
+        <Section id="overview" label="Overview" pending={!overviewHtml}>
+          {overviewHtml ? (
             <div className="prose" style={{ marginTop: 0 }} dangerouslySetInnerHTML={{ __html: overviewHtml }} />
-          </Section>
-        )}
+          ) : (
+            <p className="case-pending-note">Overview not yet available.</p>
+          )}
+        </Section>
 
-        {timeline.length > 0 && (
-          <Section id="timeline" label="Timeline">
-            {cf.timelineLabel && <p className="case-cap">{cf.timelineLabel}</p>}
-            <div className="exhibit" style={{ marginTop: cf.timelineLabel ? 14 : 0 }}>
-              <div className="exhibit-body">
-                <div className="timeline">
-                  {timeline.map((row: any, i: number) => (
-                    <div className="tl-row" key={i}>
-                      <span className="tl-time">{row.time}</span>
-                      <span className="tl-mark"><span className={`tl-dot${row.keyMoment ? " key" : ""}`} /><span className="tl-line" /></span>
-                      <div className="tl-body">
-                        <div className="t">{row.title}</div>
-                        {row.description && <div className="d">{row.description}</div>}
+        <Section id="timeline" label="Timeline" pending={timeline.length === 0}>
+          {timeline.length > 0 ? (
+            <>
+              {cf.timelineLabel && <p className="case-cap">{cf.timelineLabel}</p>}
+              <div className="exhibit" style={{ marginTop: cf.timelineLabel ? 14 : 0 }}>
+                <div className="exhibit-body">
+                  <div className="timeline">
+                    {timeline.map((row: any, i: number) => (
+                      <div className="tl-row" key={i}>
+                        <span className="tl-time">{row.time}</span>
+                        <span className="tl-mark"><span className={`tl-dot${row.keyMoment ? " key" : ""}`} /><span className="tl-line" /></span>
+                        <div className="tl-body">
+                          <div className="t">{row.title}</div>
+                          {row.description && <div className="d">{row.description}</div>}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          </Section>
-        )}
+            </>
+          ) : (
+            <p className="case-pending-note">Timeline not yet available.</p>
+          )}
+        </Section>
 
-        {orgs.length > 0 && (
-          <Section id="organizations" label="Organizations">
+        <Section id="organizations" label="Organizations" pending={orgs.length === 0}>
+          {orgs.length > 0 ? (
             <div className="case-rows">
               {orgs.map((o: any, i: number) => (
                 <div className="case-row" key={i}>
@@ -120,8 +119,10 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
                 </div>
               ))}
             </div>
-          </Section>
-        )}
+          ) : (
+            <p className="case-pending-note">Organizations not yet documented.</p>
+          )}
+        </Section>
 
         {graph && (
           <Section id="governance-map" label="Governance Map">
@@ -134,8 +135,8 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
           </Section>
         )}
 
-        {documents.length > 0 && (
-          <Section id="documents" label="Documents">
+        <Section id="documents" label="Documents" pending={documents.length === 0}>
+          {documents.length > 0 ? (
             <div className="case-rows">
               {documents.map((d: any, i: number) => {
                 const href = d.url || mediaUrl(d.file);
@@ -153,11 +154,13 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
                 );
               })}
             </div>
-          </Section>
-        )}
+          ) : (
+            <p className="case-pending-note">No documents added yet.</p>
+          )}
+        </Section>
 
-        {audits.length > 0 && (
-          <Section id="audit-reports" label="Audit Reports">
+        <Section id="audit-reports" label="Audit Reports" pending={audits.length === 0}>
+          {audits.length > 0 ? (
             <div className="case-rows">
               {audits.map((a: any, i: number) => {
                 const href = a.url || mediaUrl(a.file);
@@ -175,11 +178,13 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
                 );
               })}
             </div>
-          </Section>
-        )}
+          ) : (
+            <p className="case-pending-note">No audit reports added yet.</p>
+          )}
+        </Section>
 
-        {news.length > 0 && (
-          <Section id="news-coverage" label="News Coverage">
+        <Section id="news-coverage" label="News Coverage" pending={news.length === 0}>
+          {news.length > 0 ? (
             <div className="case-rows">
               {news.map((n: any, i: number) => (
                 <div className="case-row" key={i}>
@@ -194,8 +199,10 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
                 </div>
               ))}
             </div>
-          </Section>
-        )}
+          ) : (
+            <p className="case-pending-note">No news coverage added yet.</p>
+          )}
+        </Section>
 
         {notes.length > 0 && (
           <Section id="research-notes" label="Research Notes">
@@ -216,8 +223,8 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
           </Section>
         )}
 
-        {mechanisms.length > 0 && (
-          <Section id="governance-mechanisms" label="Governance Mechanisms">
+        <Section id="governance-mechanisms" label="Governance Mechanisms" pending={mechanisms.length === 0}>
+          {mechanisms.length > 0 ? (
             <div className="case-rows">
               {mechanisms.map((m: any, i: number) => (
                 <div className="case-row" key={i}>
@@ -230,8 +237,10 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
                 </div>
               ))}
             </div>
-          </Section>
-        )}
+          ) : (
+            <p className="case-pending-note">Governance mechanisms not yet documented.</p>
+          )}
+        </Section>
 
         {pod && (
           <Section id="podcast" label="Podcast Episode">
@@ -256,8 +265,8 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
           </Section>
         )}
 
-        {lessons.length > 0 && (
-          <Section id="lessons-learned" label="Lessons Learned">
+        <Section id="lessons-learned" label="Lessons Learned" pending={lessons.length === 0}>
+          {lessons.length > 0 ? (
             <ol className="case-lessons">
               {lessons.map((l: any, i: number) => (
                 <li key={i}>
@@ -266,8 +275,10 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
                 </li>
               ))}
             </ol>
-          </Section>
-        )}
+          ) : (
+            <p className="case-pending-note">Lessons learned not yet documented.</p>
+          )}
+        </Section>
 
         {related.length > 0 && (
           <Section id="related" label="Related Cases">

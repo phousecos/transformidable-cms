@@ -4,6 +4,7 @@ import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
+import { resendAdapter } from '@payloadcms/email-resend'
 import sharp from 'sharp'
 
 import { Users } from './collections/Users.ts'
@@ -17,6 +18,8 @@ import { Verticals } from './collections/Verticals.ts'
 import { Topics } from './collections/Topics.ts'
 import { Books } from './collections/Books.ts'
 import { Subscribers } from './collections/Subscribers.ts'
+import { CaseFollows } from './collections/CaseFollows.ts'
+import { CaseSubmissions } from './collections/CaseSubmissions.ts'
 import { SiteSettings } from './globals/SiteSettings.ts'
 import { TransformidableFeature } from './globals/TransformidableFeature.ts'
 
@@ -87,6 +90,18 @@ export default buildConfig({
 
   editor: lexicalEditor(),
 
+  // Case-follow digest emails (see api/cron/case-digest) need an adapter to
+  // actually send through. Falls back to Payload's default no-op/console
+  // adapter when RESEND_API_KEY isn't set, so local dev without the key
+  // doesn't break.
+  email: process.env.RESEND_API_KEY
+    ? resendAdapter({
+        defaultFromAddress: process.env.EMAIL_FROM || 'updates@transformidable.media',
+        defaultFromName: 'Transformidable',
+        apiKey: process.env.RESEND_API_KEY,
+      })
+    : undefined,
+
   collections: [
     // Active collections
     Users,
@@ -100,6 +115,8 @@ export default buildConfig({
     Topics,
     Books,
     Subscribers,
+    CaseFollows,
+    CaseSubmissions,
     // Legacy collections — hidden from nav, kept for data access
     { ...Authors, admin: { ...Authors.admin, hidden: true } },
     { ...BrandPillars, admin: { ...BrandPillars.admin, hidden: true } },

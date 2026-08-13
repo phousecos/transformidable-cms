@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import { ResearchShell } from "../../../components/research/ResearchShell";
 import { caseNo, fullDate } from "../../../components/research/format";
 import { CaseDossier } from "../../../components/research/CaseDossier";
+import { FollowCaseForm } from "../../../components/research/FollowCaseForm";
+import { SubmitToCaseForm } from "../../../components/research/SubmitToCaseForm";
 
 export const dynamic = "force-dynamic";
 
@@ -85,6 +87,19 @@ export default async function CaseFileDetail({ params }: { params: Promise<{ slu
         <CaseDossier caseFile={cf} />
 
         <div className="detail-wrap">
+          <div className="case-engage">
+            <div className="case-engage-card">
+              <h2 className="case-h">Stay informed</h2>
+              <p className="case-engage-p">Get a daily email when new information is added to this case.</p>
+              <FollowCaseForm caseSlug={cf.slug} />
+            </div>
+            <div className="case-engage-card">
+              <h2 className="case-h">Contribute to this case</h2>
+              <p className="case-engage-p">Have a document or a correction? Send it to our research team for review.</p>
+              <SubmitToCaseForm caseSlug={cf.slug} />
+            </div>
+          </div>
+
           <div className="detail-foot">
             <Link className="link" href="/publications/case-files">More case files
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
