@@ -13,15 +13,36 @@ const connectionString = rawCS.includes('sslmode=')
 // two Production deploys in quick succession — one process's DROP/ALTER
 // can land in the middle of the other's steps and crash both. A single
 // session-level advisory lock, held for the whole script, makes a second
-// concurrent run wait instead of interleaving. lock_timeout bounds the
-// wait so a stuck/leaked lock fails the build loudly instead of hanging
-// until Vercel's own build timeout.
+// concurrent run wait instead of interleaving.
+//
+// This uses pg_try_advisory_lock (non-blocking) in a bounded retry loop
+// rather than the blocking pg_advisory_lock. A blocking lock is only as
+// safe as every holder's guarantee to release it — if a previous run gets
+// force-killed (a Vercel build timeout, an OOM) before its cleanup code
+// runs, the lock leaks and every future deploy hangs on it forever (or
+// until the platform's own statement_timeout kills the wait, which is
+// what happened here). Giving up after a bounded wait and proceeding
+// without the lock trades a small window of race risk for a build that
+// can never be permanently bricked by a stuck lock.
+const LOCK_KEY = 'transformidable-cms-migrate'
 const lockClient = new pg.Client({ connectionString })
 await lockClient.connect()
-await lockClient.query("SET lock_timeout = '5min'")
+
+let haveLock = false
 console.log('[migrate] Acquiring migration lock...')
-await lockClient.query('SELECT pg_advisory_lock(0, hashtext($1))', ['transformidable-cms-migrate'])
-console.log('[migrate] Lock acquired.')
+for (let attempt = 1; attempt <= 6; attempt++) {
+  const { rows } = await lockClient.query('SELECT pg_try_advisory_lock(0, hashtext($1)) AS locked', [LOCK_KEY])
+  if (rows[0].locked) {
+    haveLock = true
+    console.log('[migrate] Lock acquired.')
+    break
+  }
+  console.log(`[migrate] Lock held by another process (attempt ${attempt}/6) — retrying in 5s...`)
+  await new Promise((resolve) => setTimeout(resolve, 5000))
+}
+if (!haveLock) {
+  console.warn('[migrate] Could not acquire migration lock after 30s — a previous run may have leaked it. Proceeding without it rather than hanging the build.')
+}
 
 let payload: any = null
 let fatalError: unknown = null
@@ -291,13 +312,15 @@ try {
 } catch (e: unknown) {
   fatalError = e
 } finally {
-  // Always release the lock, success or failure, so a crashed build
-  // doesn't leave the next deploy waiting out the full lock_timeout.
-  await lockClient
-    .query('SELECT pg_advisory_unlock(0, hashtext($1))', ['transformidable-cms-migrate'])
-    .catch((e: any) => console.error('[migrate] Failed to release migration lock:', e.message))
+  // Only release if we actually hold it — unlocking a lock this session
+  // never acquired is a harmless no-op, but logging would be misleading.
+  if (haveLock) {
+    await lockClient
+      .query('SELECT pg_advisory_unlock(0, hashtext($1))', [LOCK_KEY])
+      .catch((e: any) => console.error('[migrate] Failed to release migration lock:', e.message))
+    console.log('[migrate] Lock released.')
+  }
   await lockClient.end().catch(() => {})
-  console.log('[migrate] Lock released.')
 }
 
 if (payload) {
