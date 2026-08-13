@@ -4,7 +4,7 @@ import "./globals.css";
 
 // Canonical public site URL. Set NEXT_PUBLIC_SITE_URL in the environment to the
 // production domain so absolute URLs (OpenGraph, sitemap, canonicals) are right.
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://transformidable.media";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://transformidablethinking.com";
 
 const SITE_TITLE = "Transformidable | Evidence for Better Transformation Governance";
 const SITE_DESCRIPTION =

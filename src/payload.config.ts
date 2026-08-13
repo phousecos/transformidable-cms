@@ -54,7 +54,7 @@ const serverURL = process.env.VERCEL_PROJECT_PRODUCTION_URL
 // origin here lets it issue authenticated cookie-bearing requests.
 const csrfOrigins = [
   serverURL,
-  'https://cms.transformidable.media',
+  'https://cms.transformidablethinking.com',
 ].filter(Boolean) as string[]
 
 export default buildConfig({
@@ -63,8 +63,8 @@ export default buildConfig({
   // CORS: origins permitted to read responses from the Payload REST/GraphQL
   // API. These are the public brand sites that may call the read-only API.
   cors: [
-    'https://transformidable.media',
-    'https://www.transformidable.media',
+    'https://transformidablethinking.com',
+    'https://www.transformidablethinking.com',
     'https://jerribland.com',
     'https://lumynr.com',
     'https://agentpmo.com',
@@ -164,7 +164,7 @@ export default buildConfig({
 
   plugins: [
     // Vercel Blob Storage for media uploads
-    // Serves from assets.transformidable.media in production
+    // Serves from assets.transformidablethinking.com in production
     ...(process.env.BLOB_READ_WRITE_TOKEN
       ? [
           vercelBlobStorage({

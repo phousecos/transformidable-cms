@@ -1,5 +1,5 @@
 // @ts-nocheck
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://transformidable.media";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://transformidablethinking.com";
 
 export default function robots() {
   return {

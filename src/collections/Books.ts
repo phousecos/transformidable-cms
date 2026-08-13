@@ -7,7 +7,7 @@ export const Books: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'author', 'section', 'is_current_selection', 'status'],
-    description: 'The Reading Room — curated book catalog for transformidable.media/reading-room',
+    description: 'The Reading Room — curated book catalog for transformidablethinking.com/reading-room',
   },
   access: {
     create: isLoggedIn,

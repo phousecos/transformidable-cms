@@ -22,7 +22,7 @@ filters/personalizes by **Topic slug**, and renders the body.
 
 `GET {PAYLOAD_CMS_URL}/api/articles`
 
-Base URL (production): `https://cms.transformidable.media`
+Base URL (production): `https://cms.transformidablethinking.com`
 
 ### Fields you'll read off each article
 

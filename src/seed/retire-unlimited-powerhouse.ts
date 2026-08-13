@@ -14,7 +14,7 @@ import type { Payload } from 'payload'
 const OLD_AUTHOR_NAMES = ['Unlimited Powerhouse', 'UnlimITed Powerhouse']
 const NEW_AUTHOR_NAME = 'Transformidable'
 const OLD_DOMAIN = 'unlimitedpowerhouse.com'
-const NEW_DOMAIN = 'transformidable.media'
+const NEW_DOMAIN = 'transformidablethinking.com'
 
 export async function retireUnlimitedPowerhouse(payload: Payload): Promise<void> {
   // 1. Authors
