@@ -450,6 +450,15 @@
 .tr .mech-panel .mp-h { font-family: var(--serif); font-weight: 700; font-size: clamp(1.4rem, 3vw, 1.75rem); color: var(--ink); margin: 0 0 10px; }
 .tr .mech-panel .mp-q { font-family: var(--serif); font-style: italic; color: var(--wine); font-size: 1.05rem; margin: 0; }
 
+/* ---- Analytical sequence diagram (Codebook: How the analysis works) --- */
+.tr .seq-flow { display: flex; align-items: center; gap: 4px; overflow-x: auto; padding: 4px 2px 12px; }
+.tr .seq-item { display: flex; align-items: center; gap: 4px; flex: 0 0 auto; }
+.tr .seq-step { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 0 0 auto; width: 108px; padding: 14px 10px; background: var(--paper); border: 1px solid var(--rule-strong); border-radius: 6px; text-align: center; }
+.tr .seq-step.is-last { border-style: dashed; }
+.tr .seq-step .seq-n { display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 999px; background: var(--wine); color: #fff; font-family: var(--sans); font-size: 11px; font-weight: 700; }
+.tr .seq-step span:last-child { font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink); line-height: 1.25; }
+.tr .seq-arrow { flex: 0 0 auto; color: var(--ink-mute); }
+
 .tr .case-section { padding-top: 30px; margin-top: 30px; border-top: 1px solid var(--rule); scroll-margin-top: 90px; }
 .tr .case-h { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--wine); margin: 0 0 18px; }
 .tr .case-cap { font-family: var(--serif); font-style: italic; color: var(--ink-mute); font-size: 14px; margin: 0; }

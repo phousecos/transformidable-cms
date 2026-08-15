@@ -10,6 +10,8 @@ export const metadata = {
     "The analytical framework behind Transformidable's research: how technology governance is defined, evidenced, and assessed, independent of outcome.",
 };
 
+const SEQUENCE = ["Evidence", "Governance", "Design & Operation", "Effectiveness", "Consequences", "Relationship"];
+
 export default function GovernanceCodebookPage() {
   return (
     <ResearchShell>
@@ -129,10 +131,20 @@ export default function GovernanceCodebookPage() {
 
           <section className="case-section" id="how-the-analysis-works">
             <h2 className="case-h">How the analysis works</h2>
-            <div className="prose" style={{ marginTop: 0 }}>
-              <p style={{ fontFamily: "var(--sans)", fontWeight: 700, letterSpacing: ".02em" }}>
-                Evidence → Governance → Design &amp; Operation → Effectiveness → Consequences → Relationship
-              </p>
+            <div className="seq-flow" role="list" aria-label="Analytical sequence">
+              {SEQUENCE.map((step, i) => (
+                <div className="seq-item" key={step}>
+                  <div className={`seq-step${i === SEQUENCE.length - 1 ? " is-last" : ""}`} role="listitem">
+                    <span className="seq-n">{i + 1}</span>
+                    <span>{step}</span>
+                  </div>
+                  {i < SEQUENCE.length - 1 && (
+                    <svg className="seq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="prose" style={{ marginTop: 20 }}>
               <p>
                 Each governance mechanism found in the evidence is described first, then examined for
                 how it was designed and how it actually operated in practice, and separately for the
