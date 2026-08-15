@@ -156,7 +156,7 @@ export default async function HomePage() {
               </div>
               <div className="inquiry">
                 <span className="qno">Technology</span>
-                <h3>How should organizations govern emerging technologies?</h3>
+                <h3>How is technology actually governed, independent of outcome?</h3>
                 <p>Oversight for systems that outpace the structures meant to govern them.</p>
               </div>
               <div className="inquiry">

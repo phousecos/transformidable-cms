@@ -11,14 +11,6 @@ export const metadata = {
     "A research and advisory practice studying how governance, leadership, and institutional decision-making shape organizational resilience.",
 };
 
-const AGENDA = [
-  ["Governance", "How do governance decisions influence organizational outcomes?"],
-  ["Leadership", "What leadership behaviors enable successful transformation?"],
-  ["Institutions", "Why do some organizations become resilient while others fail?"],
-  ["Technology", "How should organizations govern emerging technologies?"],
-  ["Evidence", "What can public failures teach us about better governance?"],
-];
-
 export default function AboutPage() {
   return (
     <ResearchShell>
@@ -59,14 +51,13 @@ export default function AboutPage() {
 
           <section className="case-section" id="agenda">
             <h2 className="case-h">The research agenda</h2>
-            <p className="body" style={{ marginBottom: 20 }}>
-              Five questions organize the work. Each is pursued through primary case research, then
-              published as case files, articles, and reports.
-            </p>
             <div className="prose" style={{ marginTop: 0 }}>
-              {AGENDA.map(([term, q]) => (
-                <p key={term}><strong>{term}.</strong> {q}</p>
-              ))}
+              <p>
+                Five questions organize the work, spanning governance, leadership, institutions,
+                technology, and evidence. Each is pursued through primary case research, then published
+                as case files, articles, and reports.
+              </p>
+              <p><Link className="link" href="/research/agenda">Read the full agenda</Link></p>
             </div>
           </section>
 
