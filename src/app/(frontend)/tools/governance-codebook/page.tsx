@@ -310,11 +310,6 @@ export default function GovernanceCodebookPage() {
             </div>
           </section>
 
-          <p className="detail-note">
-            The codebook describes governance first. The evidence determines what the research
-            concludes.
-          </p>
-
           <div className="detail-foot" style={{ display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap" }}>
             <Link className="btn" href="/publications/case-files">
               Read the case files
