@@ -184,7 +184,7 @@ export default async function HomePage() {
             </div>
 
             {[
-              { no: "01", name: "Research", href: "/research/agenda", desc: "The evidence base. Primary study of governance in the field.", kids: ["Research Agenda", "Methodology", "Governance Mechanisms", "Datasets", "Research Projects"] },
+              { no: "01", name: "Research", href: "/research/agenda", desc: "The evidence base. Primary study of governance in the field.", kids: ["Research Agenda", "Datasets", "Research Projects"] },
               { no: "02", name: "Publications", href: "/publications", desc: "What the research becomes. Argued, edited, and on the record.", kids: ["Case Files", "Articles", "White Papers", "Research Notes", "Annual Reports"] },
               { no: "03", name: "Briefings", href: "/podcast", desc: "The research, in conversation. Watch and listen.", kids: ["The Governance Files", "Transformidable Briefing", "Webinar Archive", "Live Sessions"] },
               { no: "04", name: "Tools", href: "/tools/governance-codebook", desc: "The research, turned outward. Instruments you can run on yourself.", kids: ["Governance Codebook", "Governance Watch", "Benchmarks", "Risk Models"] },

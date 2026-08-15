@@ -16,8 +16,6 @@ const STATIC_PATHS = [
   "/podcast",
   "/about",
   "/research/agenda",
-  "/research/methodology",
-  "/research/governance-mechanisms",
   "/research/datasets",
   "/research/projects",
   "/briefings/webinars",

@@ -1,8 +1,8 @@
-// @ts-nocheck
-import { ComingSoon } from "../../components/research/ComingSoon";
+import { redirect } from "next/navigation";
 
-export const metadata = { title: "Methodology" };
-
-export default function Page() {
-  return <ComingSoon kicker="Research · Methodology" title="Methodology" sky="research" intro="How we study governance: methods, standards, and the evidence base." />;
+// Methodology is covered by the Codebook's Overview, Outcome Neutrality,
+// How the Analysis Works, and Evidence & Research Standards sections
+// instead of as a separate page. Redirect any existing links/bookmarks.
+export default function MethodologyRedirect() {
+  redirect("/tools/governance-codebook#overview");
 }

@@ -1,8 +1,8 @@
-// @ts-nocheck
-import { ComingSoon } from "../../components/research/ComingSoon";
+import { redirect } from "next/navigation";
 
-export const metadata = { title: "Governance Mechanisms" };
-
-export default function Page() {
-  return <ComingSoon kicker="Research · Governance Mechanisms" title="Governance Mechanisms" sky="research" intro="The mechanisms that make governance hold, catalogued and assessed." />;
+// This is the G1-G10 taxonomy, now the interactive domain picker on the
+// Codebook page instead of a separate page. Redirect any existing
+// links/bookmarks.
+export default function GovernanceMechanismsRedirect() {
+  redirect("/tools/governance-codebook#domains");
 }
