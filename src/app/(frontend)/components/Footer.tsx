@@ -23,6 +23,9 @@ export default function Footer() {
             <Link href="/subscribe" className="text-xs font-medium uppercase tracking-[0.15em] text-parchment/80 transition-colors hover:text-gold focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-gold">
               Subscribe
             </Link>
+            <Link href="/contact" className="text-xs font-medium uppercase tracking-[0.15em] text-parchment/80 transition-colors hover:text-gold focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-gold">
+              Contact
+            </Link>
           </div>
         </div>
         <div className="mt-8 text-center sm:text-left">

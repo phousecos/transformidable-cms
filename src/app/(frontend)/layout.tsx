@@ -1,5 +1,6 @@
 import React from "react";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 // Canonical public site URL. Set NEXT_PUBLIC_SITE_URL in the environment to the
@@ -65,6 +66,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
           Skip to main content
         </a>
         {children}
+        <Analytics />
       </body>
     </html>
   );
