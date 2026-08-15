@@ -61,6 +61,7 @@ export function ResearchFooter() {
         <span className="footer-legal-links">
           <Link href="/#events">Events</Link>
           <Link href="/about">About</Link>
+          <Link href="/contact">Contact</Link>
         </span>
         <span>Set in Source Serif &amp; Archivo</span>
       </div>

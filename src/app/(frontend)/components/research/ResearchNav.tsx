@@ -51,6 +51,7 @@ const NAV = [
   },
   { label: "Events", href: "/#events" },
   { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export function ResearchNav() {
