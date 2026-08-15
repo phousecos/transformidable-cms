@@ -387,7 +387,7 @@
 .tr .detail-exhibit { margin-top: 34px; max-width: 560px; }
 .tr .prose { font-family: var(--serif); font-size: 1.06rem; line-height: 1.75; color: var(--ink-body); max-width: 65ch; margin-top: 34px; }
 .tr .prose p { margin: 0 0 20px; }
-.tr .prose h2, .tr .prose h3 { font-family: var(--sans); color: var(--ink); line-height: 1.25; margin: 34px 0 12px; }
+.tr .prose h2, .tr .prose h3 { font-family: var(--sans); color: var(--ink); line-height: 1.25; margin: 34px 0 12px; scroll-margin-top: 90px; }
 .tr .prose h2 { font-size: 1.5rem; }
 .tr .prose h3 { font-size: 1.2rem; }
 .tr .prose blockquote { margin: 24px 0; padding-left: 18px; border-left: 2px solid var(--wine); font-style: italic; color: var(--ink); }
@@ -425,6 +425,16 @@
 .tr .case-toc-h { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute); margin: 0 6px 0 0; }
 .tr .case-toc a { font-family: var(--sans); font-size: 11.5px; font-weight: 600; letter-spacing: .03em; color: var(--ink-body); border: 1px solid var(--rule-strong); border-radius: 999px; padding: 6px 12px; }
 .tr .case-toc a:hover { border-color: var(--wine); color: var(--wine); }
+
+/* ---- Long-form reference page with sidebar nav (e.g. Codebook) -------- */
+.tr .ref-layout { max-width: 1180px; margin: 0 auto; padding-inline: clamp(20px, 5vw, 64px); display: grid; gap: clamp(28px, 4vw, 56px); grid-template-columns: 1fr; }
+@media (min-width: 900px) { .tr .ref-layout { grid-template-columns: 200px 1fr; align-items: start; } }
+.tr .ref-nav { display: none; }
+@media (min-width: 900px) { .tr .ref-nav { display: block; position: sticky; top: 90px; } }
+.tr .ref-nav-h { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute); margin: 0 0 12px; }
+.tr .ref-nav a { display: block; font-family: var(--sans); font-size: 12.5px; font-weight: 600; color: var(--ink-body); padding: 7px 0 7px 12px; border-left: 2px solid var(--rule); line-height: 1.35; }
+.tr .ref-nav a:hover { color: var(--wine); border-left-color: var(--wine); }
+.tr .ref-content { min-width: 0; }
 
 .tr .case-section { padding-top: 30px; margin-top: 30px; border-top: 1px solid var(--rule); scroll-margin-top: 90px; }
 .tr .case-h { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--wine); margin: 0 0 18px; }

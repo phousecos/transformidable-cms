@@ -129,7 +129,20 @@ export default function GovernanceCodebookPage() {
       </section>
 
       <article className="detail">
-        <div className="detail-wrap">
+        <div className="ref-layout">
+          <nav className="ref-nav" aria-label="On this page">
+            <p className="ref-nav-h">On this page</p>
+            <a href="#overview">Overview</a>
+            <a href="#governance-matter">The Governance Matter</a>
+            <a href="#outcome-neutrality">Outcome neutrality</a>
+            <a href="#domains">The ten domains</a>
+            <a href="#how-the-analysis-works">How the analysis works</a>
+            <a href="#evidence-standards">Evidence &amp; standards</a>
+            <a href="#version-status">Version &amp; status</a>
+            <a href="#codebook-and-cases">Codebook &amp; cases</a>
+          </nav>
+
+          <div className="ref-content">
           <div className="detail-meta">
             <span className="dm"><b>Version</b> 0.1</span>
             <span className="dm"><b>Status</b> Prototype</span>
@@ -137,7 +150,7 @@ export default function GovernanceCodebookPage() {
             <span className="dm"><b>Maintainer</b> Jerri Bland, Ed.D., PMP</span>
           </div>
 
-          <div className="prose" style={{ marginTop: 34 }}>
+          <div className="prose" id="overview" style={{ marginTop: 34, scrollMarginTop: 90 }}>
             <p>
               The Technology Governance Codebook supports systematic, outcome-neutral analysis of
               technology governance. It is the research instrument behind every Governance Files case:
@@ -210,6 +223,12 @@ export default function GovernanceCodebookPage() {
                 assigned secondary domains when independently supported. The ten domains are the core
                 of the taxonomy.
               </p>
+            </div>
+            <nav className="case-toc" aria-label="Jump to a domain">
+              <p className="case-toc-h">Jump to</p>
+              {DOMAINS.map((d) => <a key={d.code} href={`#${d.code}`}>{d.code}</a>)}
+            </nav>
+            <div className="prose" style={{ marginTop: 0 }}>
               {DOMAINS.map((d) => (
                 <div key={d.code}>
                   <h3 id={d.code}>{d.code} — {d.name}</h3>
@@ -316,6 +335,7 @@ export default function GovernanceCodebookPage() {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
             </Link>
             <Link className="link" href="/about">About the research</Link>
+          </div>
           </div>
         </div>
       </article>
