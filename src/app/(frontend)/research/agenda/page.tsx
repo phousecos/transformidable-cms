@@ -13,7 +13,7 @@ const THREADS = [
   {
     term: "Governance",
     question: "How do governance decisions influence organizational outcomes?",
-    body: "Outcomes are usually traced back to strategy, technology, or an individual's failure. This thread traces them further back, to the decisions, and the decision rights, that actually produced them: who had authority, who was accountable, and what happened when the two didn't line up.",
+    body: "Outcomes, whether success or failure, are usually traced back to strategy, technology, or an individual. This thread traces them further back, to the decisions, and the decision rights, that actually produced them: who had authority, who was accountable, and what happened when the two didn't line up.",
   },
   {
     term: "Leadership",
@@ -47,20 +47,38 @@ export default function ResearchAgendaPage() {
           <p className="kicker">Research · Agenda</p>
           <h1 className="idx-title">The Research Agenda</h1>
           <p className="idx-intro">
-            Five questions organize the work. Each is pursued through primary case research, then
-            published as case files, articles, and reports.
+            How governance shapes transformation, whether the outcome is favorable, adverse, or still
+            unresolved.
           </p>
         </div>
       </section>
 
       <article className="detail">
         <div className="detail-wrap">
-          {THREADS.map((t, i) => (
-            <section
-              key={t.term}
-              className="case-section"
-              style={i === 0 ? { marginTop: 0, paddingTop: 0, borderTop: "none" } : undefined}
-            >
+          <div className="prose" style={{ marginTop: 0 }}>
+            <p>
+              The objective of the Transformidable research program is not to catalog technology
+              failures or prescribe a universal model of good governance.
+            </p>
+            <p>
+              It is to build a systematic body of evidence about how technology is governed in
+              practice; how authority, accountability, oversight, risk, information, policy,
+              escalation, and intervention operate across different contexts; and how those
+              governance mechanisms relate to institutional consequences.
+            </p>
+            <p>
+              Over time, comparative analysis of that evidence should allow Transformidable to
+              identify recurring patterns, test governance propositions, develop evidence-based
+              frameworks, and improve the practice of technology governance.
+            </p>
+            <p>
+              Five questions organize how that evidence is gathered. Each is pursued through primary
+              case research, then published as case files, articles, and reports.
+            </p>
+          </div>
+
+          {THREADS.map((t) => (
+            <section key={t.term} className="case-section">
               <h2 className="case-h">{t.term}</h2>
               <div className="prose" style={{ marginTop: 0 }}>
                 <blockquote>{t.question}</blockquote>
