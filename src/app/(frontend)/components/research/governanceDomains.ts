@@ -1,6 +1,6 @@
-// Shared source of truth for the G1-G10 taxonomy, drawn from the Technology
-// Governance Codebook. Used by both /tools/governance-codebook and
-// /tools/mechanism-explorer so the two pages can never drift on meaning.
+// Source of truth for the G1-G10 taxonomy, drawn from the Technology
+// Governance Codebook. Consumed by MechanismExplorer, the interactive
+// domain picker embedded on the /tools/governance-codebook page.
 export const DOMAINS = [
   {
     code: "G1",

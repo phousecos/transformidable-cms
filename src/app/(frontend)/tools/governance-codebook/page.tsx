@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { ResearchShell } from "../../components/research/ResearchShell";
 import { Sky } from "../../components/research/Sky";
-import { DOMAINS } from "../../components/research/governanceDomains";
+import { MechanismExplorer } from "../../components/research/MechanismExplorer";
 
 export const metadata = {
   title: "Governance Codebook",
@@ -118,24 +118,12 @@ export default function GovernanceCodebookPage() {
             <div className="prose" style={{ marginTop: 0 }}>
               <p>
                 Every coded piece of evidence is assigned one primary governance domain, and may be
-                assigned secondary domains when independently supported. The ten domains are the core
-                of the taxonomy.
+                assigned secondary domains when independently supported. Select a domain to see its
+                definition, the question it asks, and what it covers.
               </p>
             </div>
-            <nav className="case-toc" aria-label="Jump to a domain">
-              <p className="case-toc-h">Jump to</p>
-              {DOMAINS.map((d) => <a key={d.code} href={`#${d.code}`}>{d.code}</a>)}
-            </nav>
-            <div className="prose" style={{ marginTop: 0 }}>
-              {DOMAINS.map((d) => (
-                <div key={d.code}>
-                  <h3 id={d.code}>{d.code} — {d.name}</h3>
-                  <p>{d.definition}</p>
-                  <p><strong>Core question:</strong> {d.question}</p>
-                  <p><strong>Includes:</strong> {d.includes}</p>
-                  {d.note && <p><em>{d.note}</em></p>}
-                </div>
-              ))}
+            <div style={{ marginTop: 20 }}>
+              <MechanismExplorer />
             </div>
           </section>
 

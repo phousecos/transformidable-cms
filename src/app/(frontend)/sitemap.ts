@@ -23,7 +23,6 @@ const STATIC_PATHS = [
   "/briefings/webinars",
   "/briefings/live",
   "/tools/governance-codebook",
-  "/tools/mechanism-explorer",
   "/tools/governance-watch",
   "/tools/assessments",
   "/tools/benchmarks",
