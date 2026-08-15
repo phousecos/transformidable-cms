@@ -15,10 +15,8 @@ const NAV = [
   {
     label: "Research", href: "/research/agenda", children: [
       { no: "01.1", name: "Research Agenda", desc: "The questions we set out to answer", href: "/research/agenda" },
-      { no: "01.2", name: "Methodology", desc: "How we study governance", href: "/research/methodology" },
-      { no: "01.3", name: "Governance Mechanisms", desc: "The mechanisms that make governance hold", href: "/research/governance-mechanisms" },
-      { no: "01.4", name: "Datasets", desc: "The data behind the research", href: "/research/datasets" },
-      { no: "01.5", name: "Research Projects", desc: "Active lines of inquiry", href: "/research/projects" },
+      { no: "01.2", name: "Datasets", desc: "The data behind the research", href: "/research/datasets" },
+      { no: "01.3", name: "Research Projects", desc: "Active lines of inquiry", href: "/research/projects" },
     ],
   },
   {

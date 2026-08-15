@@ -25,8 +25,6 @@ export function ResearchFooter() {
         <div className="fcol">
           <h5>Research</h5>
           <Link href="/research/agenda">Research Agenda</Link>
-          <Link href="/research/methodology">Methodology</Link>
-          <Link href="/research/governance-mechanisms">Governance Mechanisms</Link>
           <Link href="/research/datasets">Datasets</Link>
           <Link href="/research/projects">Research Projects</Link>
         </div>
