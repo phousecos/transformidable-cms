@@ -1,8 +1,7 @@
-// @ts-nocheck
-import { ComingSoon } from "../../components/research/ComingSoon";
+import { redirect } from "next/navigation";
 
-export const metadata = { title: "Mechanism Explorer" };
-
-export default function Page() {
-  return <ComingSoon kicker="Tools · Mechanism Explorer" title="Mechanism Explorer" sky="tools" intro="Explore governance mechanisms and how they interact." />;
+// The domain picker now lives inline on the Codebook page instead of as a
+// separate, near-identical page. Redirect any existing links/bookmarks.
+export default function MechanismExplorerRedirect() {
+  redirect("/tools/governance-codebook#domains");
 }

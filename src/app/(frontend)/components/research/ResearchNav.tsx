@@ -42,11 +42,10 @@ const NAV = [
   {
     label: "Tools", href: "/tools/governance-codebook", children: [
       { no: "04.1", name: "Governance Codebook", desc: "A structured governance reference", href: "/tools/governance-codebook" },
-      { no: "04.2", name: "Mechanism Explorer", desc: "Explore mechanisms and how they interact", href: "/tools/mechanism-explorer" },
-      { no: "04.3", name: "Governance Watch", desc: "Monitoring governance signals", href: "/tools/governance-watch" },
-      { no: "04.4", name: "Assessment Tools", desc: "Assess your own governance", href: "/tools/assessments" },
-      { no: "04.5", name: "Benchmarks", desc: "How your sector compares", href: "/tools/benchmarks" },
-      { no: "04.6", name: "Risk Models", desc: "Anticipate governance risk", href: "/tools/risk-models" },
+      { no: "04.2", name: "Governance Watch", desc: "Monitoring governance signals", href: "/tools/governance-watch" },
+      { no: "04.3", name: "Assessment Tools", desc: "Assess your own governance", href: "/tools/assessments" },
+      { no: "04.4", name: "Benchmarks", desc: "How your sector compares", href: "/tools/benchmarks" },
+      { no: "04.5", name: "Risk Models", desc: "Anticipate governance risk", href: "/tools/risk-models" },
     ],
   },
   { label: "Events", href: "/#events" },
