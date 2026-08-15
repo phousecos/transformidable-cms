@@ -161,8 +161,8 @@ export default async function HomePage() {
               </div>
               <div className="inquiry">
                 <span className="qno">Evidence</span>
-                <h3>What can public failures teach us about better governance?</h3>
-                <p>Reading the public record of breakdowns for lessons that transfer.</p>
+                <h3>What does the public record reveal about governance and outcomes?</h3>
+                <p>Reading litigation, audits, and public records for the decisions that shaped what happened next.</p>
               </div>
               <Link className="inquiry call" href="/research/agenda">
                 <p className="ck">The research agenda, in full. Five threads, one body of evidence.</p>

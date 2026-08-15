@@ -33,8 +33,8 @@ const THREADS = [
   },
   {
     term: "Evidence",
-    question: "What can public failures teach us about better governance?",
-    body: "Litigation, audits, and public records document governance decisions more candidly than most organizations ever will voluntarily. This thread reads that public record for lessons that transfer to organizations that haven't yet been tested.",
+    question: "What does the public record reveal about governance and outcomes?",
+    body: "Litigation, audits, and public records document governance decisions more candidly than most organizations ever will voluntarily. This thread reads that public record for the decisions, across favorable, adverse, and mixed outcomes, that actually shaped what happened.",
   },
 ];
 
