@@ -16,6 +16,27 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    // The Payload admin computes form state on the server: every keystroke,
+    // and every "add row" on an array field, POSTs the *entire* serialized
+    // form state back through a Next Server Action. That payload runs roughly
+    // 2.5–3x the size of the document itself, because form state carries both
+    // `value` and `initialValue` (plus validation metadata) for every field,
+    // and rich text fields carry their whole Lexical tree twice.
+    //
+    // Next caps Server Action bodies at 1 MB by default. Past that, the action
+    // fails with a 413 — and Payload's getFormState swallows the error and
+    // returns no state, so a newly added array row never receives its
+    // server-rendered fields and shimmers forever with no error shown. A large
+    // Case File dossier (long overview plus a full timeline, documents, audits,
+    // and coverage) crosses 1 MB of form state at roughly 370 KB of content.
+    //
+    // 4 MB, not more: Vercel caps serverless function request bodies at 4.5 MB,
+    // so a higher value here would not actually be deliverable in production.
+    serverActions: {
+      bodySizeLimit: '4mb',
+    },
+  },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
