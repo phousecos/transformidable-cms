@@ -46,17 +46,53 @@ const connectionString =
       : rawConnectionString + (rawConnectionString.includes('?') ? '&' : '?') + 'sslmode=no-verify'
     : rawConnectionString
 
-const serverURL = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : process.env.NEXT_PUBLIC_SERVER_URL || ''
+// Prefer an explicitly configured URL over Vercel's guess.
+// VERCEL_PROJECT_PRODUCTION_URL is set on every deployment and names the
+// project's *primary* production domain. This project serves both the public
+// site and the admin, so that primary domain is not necessarily the host the
+// admin is browsed at — and letting it win meant NEXT_PUBLIC_SERVER_URL could
+// never take effect in production, however it was set. serverURL feeds the
+// CSRF allowlist below (Payload appends it during config sanitization), so
+// pointing it at the wrong host silently locks the admin out of its own API.
+const serverURL =
+  process.env.NEXT_PUBLIC_SERVER_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : '')
 
-// Origins that own the admin session cookie. CSRF-validated state-changing
-// requests must come from one of these. Keep this list tight — adding an
-// origin here lets it issue authenticated cookie-bearing requests.
-const csrfOrigins = [
-  serverURL,
-  'https://cms.transformidablethinking.com',
-].filter(Boolean) as string[]
+// Origins allowed to carry the admin session cookie on API requests.
+//
+// Payload matches the browser's Origin header against this list with an exact
+// string comparison (auth/extractJWT.js). On a miss it does not reject the
+// request — it silently drops the session cookie, so the call is processed as
+// unauthenticated and returns 401. Nothing identifies CSRF as the reason.
+//
+// In the admin that failure is invisible and badly misleading: adding an array
+// row 401s on the doc-preferences call it makes first, so the new row shimmers
+// forever with no error; and logout cannot authenticate, so the cookie is
+// never cleared and you land back on the dashboard still logged in. Meanwhile
+// every page still renders fine, because server-side rendering reads the
+// cookie directly and never goes through this check.
+//
+// So: every host the admin is actually served from must be listed here, and
+// the cost of omitting one is hours of misdirected debugging.
+const csrfOrigins = Array.from(
+  new Set(
+    [
+      serverURL,
+      'https://cms.transformidablethinking.com',
+      // Vercel gives each deployment its own hostnames. Without these, the
+      // admin hits the same silent 401 on every preview deployment.
+      process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`,
+      process.env.VERCEL_BRANCH_URL && `https://${process.env.VERCEL_BRANCH_URL}`,
+      process.env.VERCEL_PROJECT_PRODUCTION_URL &&
+        `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`,
+      // Escape hatch: comma-separated extra origins. Lets a domain change be
+      // fixed with an env var instead of a code change and a redeploy.
+      ...(process.env.PAYLOAD_CSRF_ORIGINS?.split(',').map((origin) => origin.trim()) ?? []),
+    ].filter(Boolean) as string[],
+  ),
+)
 
 export default buildConfig({
   serverURL,
