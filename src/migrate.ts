@@ -217,6 +217,12 @@ try {
     const staleColumns: { table: string; column: string }[] = [
       { table: 'case_files', column: 'body' },
       { table: 'case_files', column: 'exhibit_label' },
+      // Interim coding fields, replaced by the per-question codes (design,
+      // operational, evidence, relationship, effectiveness). Dropping them here
+      // keeps the schema push from seeing an add+drop pair and stopping to ask
+      // whether a column was renamed — an interactive prompt that hangs the build.
+      { table: 'case_files_governance_mechanisms', column: 'domain' },
+      { table: 'case_files_governance_mechanisms', column: 'outcome' },
     ]
     for (const { table, column } of staleColumns) {
       try {

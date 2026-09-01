@@ -1,5 +1,7 @@
 import type { CollectionConfig, Where } from 'payload'
 import { isLoggedIn } from '../access/checkRole.ts'
+import { DOMAINS } from '../lib/governanceDomains.ts'
+import { CONSEQUENCE_TYPES, SEGMENT_TYPES, selectOptions } from '../lib/governanceCodebook.ts'
 
 // Case Files — primary field research: anatomies of real governance decisions
 // and their outcomes. Each file is a dossier assembled from many sources
@@ -291,62 +293,97 @@ export const CaseFiles: CollectionConfig = {
             {
               name: 'governanceMechanisms',
               type: 'array',
-              labels: { singular: 'Mechanism', plural: 'Mechanisms' },
+              labels: { singular: 'Coded finding', plural: 'Coded findings' },
               admin: {
                 description:
-                  'The governance structures at play, and how each held up. Code a row to a codebook domain and an outcome to plot it on the case chart — rows missing either are still listed, but are counted as uncoded rather than charted.',
+                  'One row per coded segment from the coding sheet. Normally loaded with `npm run import:coding` rather than typed here — re-running that import makes this list match the CSV exactly, so hand edits to an imported case will be overwritten.',
+                initCollapsed: true,
               },
               fields: [
                 {
                   type: 'row',
                   fields: [
-                    { name: 'name', type: 'text', required: true, admin: { width: '65%', description: 'e.g. "Board oversight committee".' } },
                     {
-                      name: 'assessment',
-                      type: 'select',
-                      admin: { width: '35%', description: '(Legacy) Superseded by Outcome below; kept so existing rows keep their value.' },
-                      options: [
-                        { label: 'Strength', value: 'strength' },
-                        { label: 'Weakness', value: 'weakness' },
-                        { label: 'Observation', value: 'observation' },
-                      ],
+                      // The coding sheet's own id (e.g. "D2-01"). It is the key
+                      // the importer matches on, so changing one here detaches
+                      // the row from its source and the next import re-creates it.
+                      name: 'segment',
+                      type: 'text',
+                      admin: { width: '25%', description: 'Segment id from the coding sheet.' },
                     },
+                    {
+                      name: 'segmentType',
+                      type: 'select',
+                      defaultValue: 'narrative-finding',
+                      admin: {
+                        width: '35%',
+                        description: 'Only narrative findings are tallied in the tables.',
+                      },
+                      options: SEGMENT_TYPES.map((t) => ({ label: t.label, value: t.value })),
+                    },
+                    {
+                      name: 'primaryDomain',
+                      type: 'select',
+                      admin: { width: '40%', description: 'The domain this finding is counted under.' },
+                      options: DOMAINS.map((d) => ({ label: `${d.code} — ${d.short}`, value: d.code })),
+                    },
+                  ],
+                },
+                {
+                  name: 'name',
+                  type: 'text',
+                  required: true,
+                  admin: { description: 'The governance mechanism, as worded in the coding sheet.' },
+                },
+                {
+                  // Recorded because the codebook allows a segment to touch more
+                  // than one domain, but deliberately NOT counted: tallying a
+                  // finding under every domain it touches would inflate every
+                  // total and double-count the same evidence.
+                  name: 'secondaryDomains',
+                  type: 'select',
+                  hasMany: true,
+                  admin: { description: 'Other domains this finding touches. Recorded, not counted.' },
+                  options: DOMAINS.map((d) => ({ label: `${d.code} — ${d.short}`, value: d.code })),
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'design', type: 'select', admin: { width: '50%', description: 'Q1 — Was it set up? (§8 design state)' }, options: selectOptions('design') },
+                    { name: 'operational', type: 'select', admin: { width: '50%', description: 'Q2 — Did it work in practice? (§8 operational state)' }, options: selectOptions('operational') },
                   ],
                 },
                 {
                   type: 'row',
                   fields: [
-                    {
-                      // Values are the G-codes from governanceDomains.ts. Keep the
-                      // two lists in step: a code here that the taxonomy doesn't
-                      // define is dropped from the chart.
-                      name: 'domain',
-                      type: 'select',
-                      admin: { width: '50%', description: 'Which codebook domain (G1–G10) this finding is coded to.' },
-                      options: [
-                        { label: 'G1 — Structure & Authority', value: 'G1' },
-                        { label: 'G2 — Decision Rights', value: 'G2' },
-                        { label: 'G3 — Oversight & Assurance', value: 'G3' },
-                        { label: 'G4 — Risk & Control', value: 'G4' },
-                        { label: 'G5 — Information & Transparency', value: 'G5' },
-                        { label: 'G6 — Vendor & Third-Party', value: 'G6' },
-                        { label: 'G7 — Change & Lifecycle', value: 'G7' },
-                        { label: 'G8 — Data, Access & Security', value: 'G8' },
-                        { label: 'G9 — Stakeholder & External', value: 'G9' },
-                        { label: 'G10 — Adaptation & Learning', value: 'G10' },
-                      ],
-                    },
-                    {
-                      name: 'outcome',
-                      type: 'select',
-                      admin: { width: '50%', description: 'Question 2 — did it work in practice?' },
-                      options: [
-                        { label: 'Worked as intended', value: 'worked' },
-                        { label: 'Worked, with limits', value: 'limited' },
-                        { label: 'Fell short', value: 'fell-short' },
-                        { label: 'Not enough evidence', value: 'insufficient' },
-                      ],
-                    },
+                    { name: 'evidence', type: 'select', admin: { width: '50%', description: 'Q3 — How solid is the proof? (§8 evidence state)' }, options: selectOptions('evidence') },
+                    { name: 'relationship', type: 'select', admin: { width: '50%', description: 'Q4 — Did it matter? (§11 governance–consequence relationship)' }, options: selectOptions('relationship') },
+                  ],
+                },
+                {
+                  name: 'effectiveness',
+                  type: 'select',
+                  admin: { description: 'Overall — did it work? (§9 effectiveness). Assessed after the other four, not inferred from the outcome.' },
+                  options: selectOptions('effectiveness'),
+                },
+                {
+                  name: 'consequenceTypes',
+                  type: 'select',
+                  hasMany: true,
+                  admin: { description: '§10 consequence domains. Recorded separately from governance.' },
+                  options: CONSEQUENCE_TYPES.map((c) => ({ label: c, value: c })),
+                },
+                {
+                  name: 'assessment',
+                  type: 'select',
+                  admin: {
+                    description:
+                      '(Legacy) The old Strength/Weakness/Observation scale, superseded by the coded questions above. Kept so pre-coding rows do not lose their value.',
+                  },
+                  options: [
+                    { label: 'Strength', value: 'strength' },
+                    { label: 'Weakness', value: 'weakness' },
+                    { label: 'Observation', value: 'observation' },
                   ],
                 },
                 { name: 'description', type: 'textarea' },
