@@ -41,10 +41,29 @@ import { QUESTIONS, optionFor } from "../../../../lib/governanceCodebook";
 const DOMAIN_ORDER = new Map(DOMAINS.map((d, i) => [d.code, i]));
 const domainMeta = (code) => DOMAINS.find((d) => d.code === code) || { code, short: code, name: code };
 
-/** Findings that count toward the tables: narrative findings with a domain. */
+/**
+ * Findings that count toward the tables: narrative findings with a domain.
+ *
+ * A blank segment type counts as a narrative finding, matching the field's own
+ * declared default. That default only ever applied to rows created after the
+ * field was added, so every row written before it — the seeded placeholders,
+ * anything typed in the admin early on — carries a blank. Requiring an explicit
+ * value there meant a row with a domain and all five answers coded still
+ * silently failed to appear, with nothing on the page to say which field was
+ * missing. Nobody chooses "blank" to mean "not a finding".
+ *
+ * This does not weaken the exclusion the field exists for: the importer always
+ * writes an explicit type, so a recommendation, entity response, auditor
+ * comment or follow-up loaded from a coding sheet still carries its real type
+ * and is still left out of the tally.
+ */
 function countable(mechanisms) {
   return (Array.isArray(mechanisms) ? mechanisms : []).filter(
-    (m) => m && typeof m === "object" && m.segmentType === "narrative-finding" && DOMAIN_ORDER.has(m.primaryDomain),
+    (m) =>
+      m &&
+      typeof m === "object" &&
+      (!m.segmentType || m.segmentType === "narrative-finding") &&
+      DOMAIN_ORDER.has(m.primaryDomain),
   );
 }
 
