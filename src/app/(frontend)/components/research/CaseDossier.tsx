@@ -2,9 +2,15 @@
 import Link from "next/link";
 import { fullDate, caseNo } from "./format";
 import { renderLexical } from "./lexical";
-import { GovernanceOutcomes, tallyOutcomes } from "./GovernanceOutcomes";
+import { GovernanceOutcomes, tallyFindings } from "./GovernanceOutcomes";
+import { QUESTIONS, optionFor } from "../../../../lib/governanceCodebook";
+import { DOMAINS } from "../../../../lib/governanceDomains";
 
 const ASSESSMENT: Record<string, string> = { strength: "Strength", weakness: "Weakness", observation: "Observation" };
+const SEGMENT_TYPE_LABEL: Record<string, string> = {
+  "narrative-finding": "Narrative finding", recommendation: "Recommendation",
+  "entity-response": "Entity response", "auditor-comment": "Auditor comment", "rec-follow-up": "Rec. follow-up",
+};
 const DOC_TYPES: Record<string, string> = {
   filing: "Filing", contract: "Contract", memo: "Memo", report: "Report",
   presentation: "Presentation", correspondence: "Correspondence", other: "Document",
@@ -34,7 +40,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
   const overviewHtml = renderLexical(cf.overview);
   const timeline = has(cf.timeline) ? cf.timeline : [];
   const orgs = has(cf.organizations) ? cf.organizations : [];
-  const outcomes = tallyOutcomes(cf.governanceMechanisms);
+  const outcomes = tallyFindings(cf.governanceMechanisms);
   const documents = has(cf.documents) ? cf.documents : [];
   const audits = has(cf.auditReports) ? cf.auditReports : [];
   const news = has(cf.newsCoverage) ? cf.newsCoverage : [];
@@ -53,7 +59,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
     { id: "timeline", label: "Timeline" },
     { id: "organizations", label: "Organizations" },
   ];
-  if (outcomes.domains.length) toc.push({ id: "governance-outcomes", label: "Governance Outcomes" });
+  if (outcomes.counted) toc.push({ id: "governance-outcomes", label: "Governance Outcomes" });
   toc.push({ id: "documents", label: "Documents" });
   toc.push({ id: "audit-reports", label: "Audit Reports" });
   toc.push({ id: "news-coverage", label: "News Coverage" });
@@ -124,12 +130,9 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
           )}
         </Section>
 
-        {outcomes.domains.length > 0 && (
+        {outcomes.counted > 0 && (
           <Section id="governance-outcomes" label="Governance Outcomes">
-            <GovernanceOutcomes
-              mechanisms={cf.governanceMechanisms}
-              caption="Bar length is how many findings were coded to that domain, not a share of a fixed width — a domain with two findings reads as two findings, and the figure at the end of each bar is that count. Domains with no coded findings are omitted."
-            />
+            <GovernanceOutcomes mechanisms={cf.governanceMechanisms} />
           </Section>
         )}
 
@@ -224,16 +227,37 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
         <Section id="governance-mechanisms" label="Governance Mechanisms" pending={mechanisms.length === 0}>
           {mechanisms.length > 0 ? (
             <div className="case-rows">
-              {mechanisms.map((m: any, i: number) => (
-                <div className="case-row" key={i}>
-                  <div className="case-row-main">
-                    <div className="case-row-title">{m.name}
-                      {m.assessment && <span className={`case-pill case-pill--${m.assessment}`}>{ASSESSMENT[m.assessment]}</span>}
+              {mechanisms.map((m: any, i: number) => {
+                const dom = DOMAINS.find((d: any) => d.code === m.primaryDomain);
+                const type = SEGMENT_TYPE_LABEL[m.segmentType];
+                return (
+                  <div className="case-row" key={i}>
+                    <div className="case-row-main">
+                      <div className="case-row-title">{m.name}
+                        {dom && <span className="case-pill">{dom.code} {dom.short}</span>}
+                        {/* Everything except a narrative finding is labelled, so a
+                            recommendation or an entity's own response is never
+                            read as a finding about the entity. */}
+                        {type && m.segmentType !== "narrative-finding" && <span className="case-pill case-pill--pending">{type}</span>}
+                        {m.assessment && <span className={`case-pill case-pill--${m.assessment}`}>{ASSESSMENT[m.assessment]}</span>}
+                      </div>
+                      {m.description && <p className="case-row-desc">{m.description}</p>}
+                      <div className="case-codes">
+                        {QUESTIONS.map((q: any) => {
+                          const opt = m[q.key] ? optionFor(q.key, m[q.key]) : null;
+                          if (!opt) return null;
+                          return (
+                            <span className="case-code" key={q.key} title={`${q.tag} — ${q.question} · ${opt.meaning}`}>
+                              <b>{q.tag}</b> {opt.code} {opt.label}
+                            </span>
+                          );
+                        })}
+                      </div>
+                      {m.segment && <span className="case-row-meta">Segment {m.segment}</span>}
                     </div>
-                    {m.description && <p className="case-row-desc">{m.description}</p>}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <p className="case-pending-note">Governance mechanisms not yet documented.</p>

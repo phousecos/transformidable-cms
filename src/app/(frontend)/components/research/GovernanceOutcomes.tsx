@@ -1,155 +1,159 @@
 // @ts-nocheck
 /**
- * GovernanceOutcomes — a case file's coded findings, by codebook domain.
+ * GovernanceOutcomes — a case file's coded findings, one table per question.
  *
- * Answers Question 2 of the method ("did it work in practice?") for each of the
- * G1-G10 governance domains. Every governance mechanism coded with both a
- * `domain` and an `outcome` becomes one finding; the chart is the tally.
+ * The method asks five things of every coded segment (Technology Governance
+ * Codebook §8, §9, §11). This renders one stacked-bar table per question, each
+ * broken down by governance domain, from the same set of findings:
  *
- * This replaced a node-link "governance map" that derived its edges by regex
- * over each organization's free-text role and wired everything to one hub. That
- * drawing was hub-and-spoke by construction and showed inferred relationships in
- * the same visual language as evidence. This shows only what an author coded.
+ *   Q1  Was it set up?            Q3  How solid is the proof?
+ *   Q2  Did it work in practice?  Q4  Did it matter?        Overall  Did it work?
  *
- * Encoding notes, since they are deliberate:
+ * Only narrative findings are tallied. Recommendations, entity responses,
+ * auditor comments and recommendation follow-ups are stored and remain part of
+ * the record, but an entity's account of itself is not a finding about it, and
+ * a recommendation is not yet one. The counts here reproduce the four-questions
+ * summary sheet exactly, which is why that sheet is never imported.
  *
- * - Bars are scaled by COUNT against the busiest domain, not stretched to equal
- *   width. With a handful of findings per domain, a full-width bar reading
- *   "100% fell short" off n=2 overstates the evidence; bar length here is how
- *   much evidence there is, and the segments are its composition. Pass
- *   scale="share" for equal-width 100% bars if the comparison matters more.
- * - "Not enough evidence" is absence of a finding rather than a fourth verdict,
- *   so it is hatched and grey — and hatching is also what keeps it separable
- *   from "fell short" for red-blind readers, where the two hues converge.
- * - Outcome colors are a fixed status scale (good/warning/serious), stepped
- *   separately for light and dark and validated for CVD separation and contrast
- *   against each surface. They are reserved: don't reuse them for anything else.
+ * A finding is counted under its PRIMARY domain only. Secondary domains are
+ * recorded on the finding but not tallied: counting one finding under every
+ * domain it touches would inflate every total and double-count one piece of
+ * evidence.
+ *
+ * Encoding notes, all deliberate:
+ *
+ * - Bars are scaled by COUNT against the busiest domain in that table, not
+ *   stretched to equal width. At two or three findings per domain, a full-width
+ *   bar reading "100% fell short" overstates the evidence; here bar length is
+ *   how much evidence there is and the segments are its composition.
+ * - Verdict scales (Q1, Q2, Overall) are colored good -> serious. Q3 and Q4 are
+ *   NOT verdicts — weak evidence is a fact about the record, and "no link to
+ *   outcome" is a clean result, not a bad one — so those read as an ordinal
+ *   ramp instead. `kind` on each question decides which.
+ * - The indeterminate answer in every scale ("Unclear", "Not evidenced", "Not
+ *   enough evidence") is hatched as well as grey: it is the absence of a
+ *   conclusion rather than one more verdict, and the hatching is what keeps it
+ *   separable from the serious step for red-blind readers.
  */
-import { DOMAINS } from "./governanceDomains";
+import { DOMAINS } from "../../../../lib/governanceDomains";
+import { QUESTIONS, optionFor } from "../../../../lib/governanceCodebook";
 
-// Fixed severity order. Also the stacking order, the legend order, and the
-// column order in the table view — one order everywhere, so a segment's
-// position carries meaning alongside its color.
-export const OUTCOMES = [
-  { value: "worked", label: "Worked as intended", cls: "go-seg--worked" },
-  { value: "limited", label: "Worked, with limits", cls: "go-seg--limited" },
-  { value: "fell-short", label: "Fell short", cls: "go-seg--fell-short" },
-  { value: "insufficient", label: "Not enough evidence", cls: "go-seg--insufficient" },
-];
-
-const OUTCOME_VALUES = new Set(OUTCOMES.map((o) => o.value));
 const DOMAIN_ORDER = new Map(DOMAINS.map((d, i) => [d.code, i]));
+const domainMeta = (code) => DOMAINS.find((d) => d.code === code) || { code, short: code, name: code };
+
+/** Findings that count toward the tables: narrative findings with a domain. */
+function countable(mechanisms) {
+  return (Array.isArray(mechanisms) ? mechanisms : []).filter(
+    (m) => m && typeof m === "object" && m.segmentType === "narrative-finding" && DOMAIN_ORDER.has(m.primaryDomain),
+  );
+}
 
 /**
- * Tally coded findings by domain.
- *
- * Only rows carrying BOTH a known domain and a known outcome are charted; the
- * rest are returned as `uncoded` so the page can say so rather than quietly
- * charting a subset and implying it is the whole.
+ * Tally one question across domains. Findings not coded for this question are
+ * skipped for this table only — a segment can be coded for Q1 and not yet Q4.
  */
-export function tallyOutcomes(mechanisms) {
-  const rows = Array.isArray(mechanisms) ? mechanisms : [];
+export function tallyQuestion(mechanisms, question) {
   const byDomain = new Map();
   let coded = 0;
-  let uncoded = 0;
-
-  for (const m of rows) {
-    if (!m || typeof m !== "object") continue;
-    const domain = typeof m.domain === "string" ? m.domain : null;
-    const outcome = typeof m.outcome === "string" ? m.outcome : null;
-    if (!domain || !DOMAIN_ORDER.has(domain) || !outcome || !OUTCOME_VALUES.has(outcome)) {
-      uncoded += 1;
-      continue;
-    }
-    if (!byDomain.has(domain)) byDomain.set(domain, { domain, total: 0, counts: {} });
-    const row = byDomain.get(domain);
-    row.counts[outcome] = (row.counts[outcome] || 0) + 1;
+  for (const m of countable(mechanisms)) {
+    const code = m[question.key];
+    if (!code || !optionFor(question.key, code)) continue;
+    if (!byDomain.has(m.primaryDomain)) byDomain.set(m.primaryDomain, { domain: m.primaryDomain, total: 0, counts: {} });
+    const row = byDomain.get(m.primaryDomain);
+    row.counts[code] = (row.counts[code] || 0) + 1;
     row.total += 1;
     coded += 1;
   }
 
-  // Worst first: most "fell short", then most "worked, with limits", then least
-  // "worked as intended". Equal shares break toward the better-evidenced domain
-  // — three findings that all fell short is a firmer result than one that did —
-  // and then to codebook order, so the chart is stable across renders. Domains
-  // with no findings are absent, not empty rows.
-  const share = (row, key) => (row.counts[key] || 0) / row.total;
+  // Rank by how far down the scale a domain's findings sit, weighting each
+  // answer by its position: a domain whose findings cluster at the bad end of
+  // the scale rises. Ties break toward the better-evidenced domain, then to
+  // codebook order so the order is stable across renders.
+  const weight = (row) => {
+    let sum = 0;
+    let n = 0;
+    for (const o of question.options) {
+      if (o.slot === "none") continue; // an unknown answer is not a severity
+      const c = row.counts[o.code] || 0;
+      sum += c * o.slot;
+      n += c;
+    }
+    return n ? sum / n : 0;
+  };
   const domains = [...byDomain.values()].sort(
-    (a, b) =>
-      share(b, "fell-short") - share(a, "fell-short") ||
-      share(b, "limited") - share(a, "limited") ||
-      share(a, "worked") - share(b, "worked") ||
-      b.total - a.total ||
-      DOMAIN_ORDER.get(a.domain) - DOMAIN_ORDER.get(b.domain),
+    (a, b) => weight(b) - weight(a) || b.total - a.total || DOMAIN_ORDER.get(a.domain) - DOMAIN_ORDER.get(b.domain),
   );
-
-  return { domains, coded, uncoded, max: domains.reduce((n, d) => Math.max(n, d.total), 0) };
+  return { domains, coded, max: domains.reduce((n, d) => Math.max(n, d.total), 0) };
 }
 
-function domainMeta(code) {
-  return DOMAINS.find((d) => d.code === code) || { code, short: code, name: code };
+/** Overall counts for the section header. */
+export function tallyFindings(mechanisms) {
+  const all = Array.isArray(mechanisms) ? mechanisms : [];
+  const counted = countable(mechanisms);
+  return { total: all.length, counted: counted.length, other: all.length - counted.length };
 }
 
-function rowSummary(row) {
-  const parts = OUTCOMES.filter((o) => row.counts[o.value]).map(
-    (o) => `${row.counts[o.value]} ${o.label.toLowerCase()}`,
-  );
-  const meta = domainMeta(row.domain);
-  const n = row.total === 1 ? "1 finding" : `${row.total} findings`;
-  return `${meta.code} ${meta.short}: ${n} — ${parts.join(", ")}.`;
+/**
+ * Paint an answer from its scale's palette. Answers with no slot are not points
+ * on the scale — conflicting evidence, not applicable, unknown — and render
+ * hatched grey rather than borrowing a step that would imply a severity they
+ * do not carry.
+ */
+function segClass(option, question) {
+  return option.slot === "none" ? "go-seg--none" : `go-seg--${question.palette}${option.slot}`;
 }
 
-export function GovernanceOutcomes({ mechanisms, caption, scale = "count" }) {
-  const { domains, coded, uncoded, max } = tallyOutcomes(mechanisms);
+function QuestionTable({ mechanisms, question }) {
+  const { domains, coded, max } = tallyQuestion(mechanisms, question);
   if (!domains.length) return null;
-
-  const used = OUTCOMES.filter((o) => domains.some((d) => d.counts[o.value]));
+  const used = question.options.filter((o) => domains.some((d) => d.counts[o.code]));
 
   return (
-    <figure className="go">
-      <h3 className="go-title">Which parts of the governance actually worked?</h3>
+    <section className="go-q" aria-labelledby={`go-q-${question.key}`}>
+      <h3 className="go-title" id={`go-q-${question.key}`}>
+        <span className="go-tag">{question.tag}</span> {question.question}
+      </h3>
       <p className="go-sub">
-        Question 2 — “Did it work in practice?” — for each type of governance ·{" "}
-        {coded} coded {coded === 1 ? "finding" : "findings"}
-        {uncoded > 0 && ` · ${uncoded} not yet coded`}
+        {question.about} · {question.section} · {coded} coded {coded === 1 ? "finding" : "findings"}
       </p>
 
       <ul className="go-rows">
         {domains.map((row) => {
           const meta = domainMeta(row.domain);
-          // Count-scaled bars measure against the busiest domain; share-scaled
-          // bars all run full width.
-          const width = scale === "share" ? 100 : (row.total / max) * 100;
+          const parts = question.options
+            .filter((o) => row.counts[o.code])
+            .map((o) => `${row.counts[o.code]} ${o.label.toLowerCase()}`);
           return (
-            <li className="go-row" key={row.domain} aria-label={rowSummary(row)}>
+            <li
+              className="go-row"
+              key={row.domain}
+              aria-label={`${meta.code} ${meta.short}: ${row.total} ${row.total === 1 ? "finding" : "findings"} — ${parts.join(", ")}.`}
+            >
               <div className="go-key" aria-hidden="true">
                 <span className="go-code">{meta.code}</span>
                 <span className="go-name">{meta.short}</span>
               </div>
               <div className="go-track" aria-hidden="true">
-                <div className="go-bar" style={{ width: `${width}%` }}>
-                  {OUTCOMES.map((o) => {
-                    const n = row.counts[o.value] || 0;
+                <div className="go-bar" style={{ width: `${(row.total / max) * 100}%` }}>
+                  {question.options.map((o, i) => {
+                    const n = row.counts[o.code] || 0;
                     if (!n) return null;
-                    // Only label a segment that is wide enough to hold the number
-                    // with padding; otherwise it lives in the tooltip and table.
-                    const fits = (n / (scale === "share" ? row.total : max)) >= 0.12;
                     return (
                       <span
-                        className={`go-seg ${o.cls}`}
-                        key={o.value}
+                        className={`go-seg ${segClass(o, question)}`}
+                        key={o.code}
                         style={{ flexGrow: n }}
-                        title={`${meta.code} ${meta.short} — ${o.label}: ${n} of ${row.total}`}
+                        title={`${meta.code} ${meta.short} — ${o.code} ${o.label}: ${n} of ${row.total}`}
                       >
-                        {fits && <span className="go-seg-val">{n}</span>}
+                        {/* Label only where it fits with padding; otherwise the
+                            number lives in the tooltip, the row total and the table. */}
+                        {n / max >= 0.12 && <span className="go-seg-val">{n}</span>}
                       </span>
                     );
                   })}
                 </div>
               </div>
-              <div className="go-n" aria-hidden="true">
-                {row.total}
-              </div>
+              <div className="go-n" aria-hidden="true">{row.total}</div>
             </li>
           );
         })}
@@ -157,8 +161,8 @@ export function GovernanceOutcomes({ mechanisms, caption, scale = "count" }) {
 
       <div className="go-legend" aria-hidden="true">
         {used.map((o) => (
-          <span className="go-leg" key={o.value}>
-            <span className={`go-leg-swatch ${o.cls}`} />
+          <span className="go-leg" key={o.code} title={o.meaning}>
+            <span className={`go-leg-swatch ${segClass(o, question)}`} />
             {o.label}
           </span>
         ))}
@@ -169,15 +173,13 @@ export function GovernanceOutcomes({ mechanisms, caption, scale = "count" }) {
         <div className="go-table-scroll">
           <table className="go-table">
             <caption className="go-table-cap">
-              Coded findings by governance domain{uncoded > 0 && `, excluding ${uncoded} uncoded`}
+              {question.tag} — {question.question} · narrative findings by primary domain
             </caption>
             <thead>
               <tr>
                 <th scope="col">Domain</th>
-                {OUTCOMES.map((o) => (
-                  <th scope="col" key={o.value}>
-                    {o.label}
-                  </th>
+                {question.options.map((o) => (
+                  <th scope="col" key={o.code} title={o.meaning}>{o.code} {o.label}</th>
                 ))}
                 <th scope="col">Total</th>
               </tr>
@@ -187,12 +189,8 @@ export function GovernanceOutcomes({ mechanisms, caption, scale = "count" }) {
                 const meta = domainMeta(row.domain);
                 return (
                   <tr key={row.domain}>
-                    <th scope="row">
-                      {meta.code} {meta.short}
-                    </th>
-                    {OUTCOMES.map((o) => (
-                      <td key={o.value}>{row.counts[o.value] || 0}</td>
-                    ))}
+                    <th scope="row">{meta.code} {meta.short}</th>
+                    {question.options.map((o) => <td key={o.code}>{row.counts[o.code] || 0}</td>)}
                     <td>{row.total}</td>
                   </tr>
                 );
@@ -201,8 +199,25 @@ export function GovernanceOutcomes({ mechanisms, caption, scale = "count" }) {
           </table>
         </div>
       </details>
+    </section>
+  );
+}
 
-      {caption && <figcaption className="go-cap">{caption}</figcaption>}
-    </figure>
+export function GovernanceOutcomes({ mechanisms }) {
+  const { counted, other } = tallyFindings(mechanisms);
+  if (!counted) return null;
+  const tables = QUESTIONS.map((q) => <QuestionTable key={q.key} mechanisms={mechanisms} question={q} />).filter(Boolean);
+
+  return (
+    <div className="go">
+      <p className="go-intro">
+        Every coded segment is put to the same five questions and tallied by governance domain.
+        {" "}
+        {counted} narrative {counted === 1 ? "finding" : "findings"} are counted here
+        {other > 0 && `; ${other} further ${other === 1 ? "segment" : "segments"} — recommendations, entity responses and follow-ups — are recorded but not tallied`}.
+        Each finding counts once, under its primary domain.
+      </p>
+      {tables}
+    </div>
   );
 }

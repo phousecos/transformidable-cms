@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { DOMAINS } from "./governanceDomains";
+import { DOMAINS } from "../../../../lib/governanceDomains";
 
 export function MechanismExplorer() {
   const [active, setActive] = useState(DOMAINS[0].code);

@@ -646,97 +646,148 @@
 .tr .tr-onsky .idx-filter:hover { color: #f7f2e6; border-color: #e8c451; }
 .tr .tr-onsky .idx-filter.is-active { background: #e8c451; color: #1a1210; border-color: #e8c451; }
 
-/* ---- Governance outcomes (coded findings by codebook domain) ----------- */
-/* Status scale, not a categorical palette: good / warning / serious, plus a
-   hatched neutral for absence of evidence. Stepped separately for light and
-   dark and validated per surface for CVD separation and contrast — re-run the
-   check before changing a value, and don't reuse these hues for anything else.
-   Each fill carries its own label ink because the readable one flips between
-   the darker and lighter steps. */
+/* ---- Governance outcomes (coded findings by question and domain) -------- */
+/* Two palettes, both computed rather than picked by eye, and both re-validated
+   against the surface they sit on before any value here changes.
+
+   STATUS (4 steps) paints the three scales that are verdicts on the governance:
+   Q1 was it set up, Q2 did it work, Overall. Four steps and not five because
+   five ordered status steps cannot all sit inside the dark theme's usable
+   lightness band while keeping every adjacent pair distinguishable.
+
+   RAMP (5 steps, single hue) paints the two scales that are NOT verdicts: how
+   well evidenced a finding is, and how strongly it is linked to the outcome.
+   Painting those with status colors would turn "single-source evidence" or
+   "no link to outcome" into an accusation. A ramp is judged on lightness
+   order, not hue adjacency, which is also why it can afford five steps.
+
+   Every fill carries its own label ink because the readable one flips along
+   each scale; all clear 4.5:1 on their own fill. */
 .tr .go {
-  --go-worked: #2f7a4a;        --go-worked-ink: #f7f3ea;
-  --go-limited: #a9861a;       --go-limited-ink: #1a1210;
-  --go-fell-short: #8f1d3a;    --go-fell-short-ink: #f7f3ea;
-  --go-insufficient: #7c6c70;  --go-insufficient-ink: #ffffff;
+  --go-status1: #006238; --go-status1-ink: #ffffff;
+  --go-status2: #2f9c80; --go-status2-ink: #0c0708;
+  --go-status3: #ab8718; --go-status3-ink: #0c0708;
+  --go-status4: #8f1d3a; --go-status4-ink: #ffffff;
+  --go-ramp1: #cf93a4; --go-ramp1-ink: #0c0708;
+  --go-ramp2: #ba6f85; --go-ramp2-ink: #0c0708;
+  --go-ramp3: #a44d67; --go-ramp3-ink: #ffffff;
+  --go-ramp4: #86304c; --go-ramp4-ink: #ffffff;
+  --go-ramp5: #5f0f2e; --go-ramp5-ink: #ffffff;
+  --go-none: #7c6c70; --go-none-ink: #ffffff;
   margin: 0;
 }
 @media (prefers-color-scheme: dark) {
   .tr .go {
-    --go-worked: #2a8154;        --go-worked-ink: #ffffff;
-    --go-limited: #c8811f;       --go-limited-ink: #1b1113;
-    --go-fell-short: #d75c80;    --go-fell-short-ink: #1b1113;
-    --go-insufficient: #8a787c;  --go-insufficient-ink: #0c0708;
+    --go-status1: #00734f; --go-status1-ink: #ffffff;
+    --go-status2: #35ab8d; --go-status2-ink: #0c0708;
+    --go-status3: #c8811f; --go-status3-ink: #0c0708;
+    --go-status4: #d75c80; --go-status4-ink: #0c0708;
+    --go-ramp1: #7a3f4d; --go-ramp1-ink: #ffffff;
+    --go-ramp2: #96505f; --go-ramp2-ink: #ffffff;
+    --go-ramp3: #b16273; --go-ramp3-ink: #0c0708;
+    --go-ramp4: #cc7488; --go-ramp4-ink: #0c0708;
+    --go-ramp5: #e78aa2; --go-ramp5-ink: #0c0708;
+    --go-none: #8a787c; --go-none-ink: #0c0708;
   }
 }
 :root[data-theme="dark"] .tr .go {
-  --go-worked: #2a8154;        --go-worked-ink: #ffffff;
-  --go-limited: #c8811f;       --go-limited-ink: #1b1113;
-  --go-fell-short: #d75c80;    --go-fell-short-ink: #1b1113;
-  --go-insufficient: #8a787c;  --go-insufficient-ink: #0c0708;
+  --go-status1: #00734f; --go-status1-ink: #ffffff;
+  --go-status2: #35ab8d; --go-status2-ink: #0c0708;
+  --go-status3: #c8811f; --go-status3-ink: #0c0708;
+  --go-status4: #d75c80; --go-status4-ink: #0c0708;
+  --go-ramp1: #7a3f4d; --go-ramp1-ink: #ffffff;
+  --go-ramp2: #96505f; --go-ramp2-ink: #ffffff;
+  --go-ramp3: #b16273; --go-ramp3-ink: #0c0708;
+  --go-ramp4: #cc7488; --go-ramp4-ink: #0c0708;
+  --go-ramp5: #e78aa2; --go-ramp5-ink: #0c0708;
+  --go-none: #8a787c; --go-none-ink: #0c0708;
 }
 :root[data-theme="light"] .tr .go {
-  --go-worked: #2f7a4a;        --go-worked-ink: #f7f3ea;
-  --go-limited: #a9861a;       --go-limited-ink: #1a1210;
-  --go-fell-short: #8f1d3a;    --go-fell-short-ink: #f7f3ea;
-  --go-insufficient: #7c6c70;  --go-insufficient-ink: #ffffff;
+  --go-status1: #006238; --go-status1-ink: #ffffff;
+  --go-status2: #2f9c80; --go-status2-ink: #0c0708;
+  --go-status3: #ab8718; --go-status3-ink: #0c0708;
+  --go-status4: #8f1d3a; --go-status4-ink: #ffffff;
+  --go-ramp1: #cf93a4; --go-ramp1-ink: #0c0708;
+  --go-ramp2: #ba6f85; --go-ramp2-ink: #0c0708;
+  --go-ramp3: #a44d67; --go-ramp3-ink: #ffffff;
+  --go-ramp4: #86304c; --go-ramp4-ink: #ffffff;
+  --go-ramp5: #5f0f2e; --go-ramp5-ink: #ffffff;
+  --go-none: #7c6c70; --go-none-ink: #ffffff;
 }
 
-.tr .go-title { font-family: var(--serif); font-size: clamp(1.25rem, 2.2vw, 1.6rem); font-weight: 700; line-height: 1.25; color: var(--ink); margin: 0 0 10px; }
-.tr .go-sub { font-family: var(--mono); font-size: 11.5px; line-height: 1.6; letter-spacing: .04em; color: var(--ink-mute); margin: 0 0 22px; }
+.tr .go-intro { font-family: var(--serif); font-size: 1.0625rem; line-height: 1.72; color: var(--ink-body); max-width: var(--measure); margin: 0 0 40px; }
+/* .tr section carries the page-level padding-block; these are subsections
+   inside an already-padded case section, so reset it or every table gains ~180px
+   of dead space. */
+.tr .go-q { margin: 0 0 44px; padding-block: 0; }
+.tr .go-q:last-child { margin-bottom: 0; }
+.tr .go-title { font-family: var(--serif); font-size: clamp(1.15rem, 2vw, 1.45rem); font-weight: 700; line-height: 1.25; color: var(--ink); margin: 0 0 8px; }
+.tr .go-tag { font-family: var(--sans); font-size: .62em; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--wine); vertical-align: .18em; margin-right: 6px; }
+.tr .go-sub { font-family: var(--mono); font-size: 11px; line-height: 1.6; letter-spacing: .03em; color: var(--ink-mute); margin: 0 0 20px; }
 
-.tr .go-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
-.tr .go-row { display: grid; grid-template-columns: minmax(0, 200px) 1fr 3ch; align-items: center; gap: 8px 18px; }
-
+.tr .go-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.tr .go-row { display: grid; grid-template-columns: minmax(0, 200px) 1fr 3ch; align-items: center; gap: 6px 18px; }
 .tr .go-key { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
-.tr .go-code { font-family: var(--sans); font-size: 12.5px; font-weight: 700; color: var(--ink); flex: none; }
-.tr .go-name { font-family: var(--sans); font-size: 13px; color: var(--ink-body); line-height: 1.3; }
+.tr .go-code { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink); flex: none; }
+.tr .go-name { font-family: var(--sans); font-size: 12.5px; color: var(--ink-body); line-height: 1.3; }
 
 .tr .go-track { min-width: 0; }
 /* 2px gaps let the surface through between segments instead of a border, and
-   only the bar's outer ends are rounded, so the stack still reads as one bar. */
-.tr .go-bar { display: flex; gap: 2px; height: 26px; min-width: 2px; }
-.tr .go-seg { display: flex; align-items: center; justify-content: center; min-width: 3px; background: var(--go-insufficient); }
+   only the bar's outer ends are rounded, so a stack still reads as one bar. */
+.tr .go-bar { display: flex; gap: 2px; height: 24px; min-width: 2px; }
+.tr .go-seg { display: flex; align-items: center; justify-content: center; min-width: 3px; background: var(--go-none); }
 .tr .go-seg:first-child { border-radius: 4px 0 0 4px; }
 .tr .go-seg:last-child { border-radius: 0 4px 4px 0; }
 .tr .go-seg:only-child { border-radius: 4px; }
 .tr .go-seg-val { font-family: var(--sans); font-size: 11px; font-weight: 700; line-height: 1; padding: 0 6px; }
 
-.tr .go-seg--worked { background: var(--go-worked); }
-.tr .go-seg--worked .go-seg-val { color: var(--go-worked-ink); }
-.tr .go-seg--limited { background: var(--go-limited); }
-.tr .go-seg--limited .go-seg-val { color: var(--go-limited-ink); }
-.tr .go-seg--fell-short { background: var(--go-fell-short); }
-.tr .go-seg--fell-short .go-seg-val { color: var(--go-fell-short-ink); }
-/* Hatched, not just grey: "not enough evidence" is the absence of a finding
-   rather than a fourth verdict, and the texture is what keeps it apart from
-   "fell short" for red-blind readers, where the two hues converge. */
-.tr .go-seg--insufficient {
-  background-color: var(--go-insufficient);
+.tr .go-seg--status1 { background: var(--go-status1); }
+.tr .go-seg--status1 .go-seg-val { color: var(--go-status1-ink); }
+.tr .go-seg--status2 { background: var(--go-status2); }
+.tr .go-seg--status2 .go-seg-val { color: var(--go-status2-ink); }
+.tr .go-seg--status3 { background: var(--go-status3); }
+.tr .go-seg--status3 .go-seg-val { color: var(--go-status3-ink); }
+.tr .go-seg--status4 { background: var(--go-status4); }
+.tr .go-seg--status4 .go-seg-val { color: var(--go-status4-ink); }
+.tr .go-seg--ramp1 { background: var(--go-ramp1); }
+.tr .go-seg--ramp1 .go-seg-val { color: var(--go-ramp1-ink); }
+.tr .go-seg--ramp2 { background: var(--go-ramp2); }
+.tr .go-seg--ramp2 .go-seg-val { color: var(--go-ramp2-ink); }
+.tr .go-seg--ramp3 { background: var(--go-ramp3); }
+.tr .go-seg--ramp3 .go-seg-val { color: var(--go-ramp3-ink); }
+.tr .go-seg--ramp4 { background: var(--go-ramp4); }
+.tr .go-seg--ramp4 .go-seg-val { color: var(--go-ramp4-ink); }
+.tr .go-seg--ramp5 { background: var(--go-ramp5); }
+.tr .go-seg--ramp5 .go-seg-val { color: var(--go-ramp5-ink); }
+
+/* Hatched, not merely grey. These answers are not points on the scale —
+   conflicting evidence, not applicable, unknown — and the texture is also what
+   keeps them apart from the serious end for red-blind readers. */
+.tr .go-seg--none {
+  background-color: var(--go-none);
   background-image: repeating-linear-gradient(135deg, rgba(255, 255, 255, .34) 0 2px, transparent 2px 6px);
 }
-.tr .go-seg--insufficient .go-seg-val { color: var(--go-insufficient-ink); }
+.tr .go-seg--none .go-seg-val { color: var(--go-none-ink); }
 
-.tr .go-n { font-family: var(--mono); font-size: 11.5px; color: var(--ink-mute); text-align: right; }
+.tr .go-n { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); text-align: right; }
 
-.tr .go-legend { display: flex; flex-wrap: wrap; gap: 10px 20px; padding: 22px 0 0; margin-top: 18px; border-top: 1px solid var(--rule); }
-.tr .go-leg { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: .02em; color: var(--ink-mute); }
-.tr .go-leg-swatch { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+.tr .go-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 16px 0 0; margin-top: 14px; border-top: 1px solid var(--rule); }
+.tr .go-leg { display: inline-flex; align-items: center; gap: 7px; font-family: var(--sans); font-size: 10.5px; font-weight: 600; letter-spacing: .02em; color: var(--ink-mute); }
+.tr .go-leg-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
 
-.tr .go-table-wrap { margin-top: 18px; }
-.tr .go-table-toggle { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-mute); cursor: pointer; }
+.tr .go-table-wrap { margin-top: 14px; }
+.tr .go-table-toggle { font-family: var(--sans); font-size: 10.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-mute); cursor: pointer; }
 .tr .go-table-toggle:hover { color: var(--wine); }
-.tr .go-table-scroll { overflow-x: auto; margin-top: 14px; }
-.tr .go-table { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: 12.5px; }
-.tr .go-table-cap { text-align: left; font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--ink-mute); padding-bottom: 10px; }
-.tr .go-table th, .tr .go-table td { text-align: left; padding: 8px 14px 8px 0; border-bottom: 1px solid var(--rule); white-space: nowrap; }
-/* Let the outcome headers wrap so the Total column fits without the table
-   needing a horizontal scroll on a normal desktop width; the container still
-   scrolls if it has to. */
-.tr .go-table thead th { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-mute); font-weight: 700; white-space: normal; vertical-align: bottom; min-width: 6.5ch; }
+.tr .go-table-scroll { overflow-x: auto; margin-top: 12px; }
+.tr .go-table { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: 12px; }
+.tr .go-table-cap { text-align: left; font-family: var(--serif); font-style: italic; font-size: 12.5px; color: var(--ink-mute); padding-bottom: 8px; }
+.tr .go-table th, .tr .go-table td { text-align: left; padding: 7px 12px 7px 0; border-bottom: 1px solid var(--rule); }
+.tr .go-table tbody th, .tr .go-table td { white-space: nowrap; }
+/* Let the answer headers wrap so Total fits without a horizontal scroll at a
+   normal desktop width; the container still scrolls if it has to. */
+.tr .go-table thead th { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-mute); font-weight: 700; white-space: normal; vertical-align: bottom; min-width: 6ch; }
 .tr .go-table tbody th { font-weight: 600; color: var(--ink); }
 .tr .go-table td { color: var(--ink-body); font-variant-numeric: tabular-nums; }
-
-.tr .go-cap { font-family: var(--serif); font-style: italic; color: var(--ink-mute); font-size: 14px; margin: 18px 0 0; }
 
 @media (max-width: 640px) {
   /* Label above its bar, and drop in-segment numbers rather than clip them —
@@ -745,6 +796,10 @@
   .tr .go-key { grid-column: 1 / -1; }
   .tr .go-seg-val { display: none; }
 }
+
+.tr .case-codes { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 8px 0 4px; }
+.tr .case-code { font-family: var(--mono); font-size: 10.5px; letter-spacing: .02em; color: var(--ink-mute); }
+.tr .case-code b { color: var(--wine); font-weight: 700; margin-right: 3px; }
 
 /* ---- Motion ----------------------------------------------------------- */
 .tr .fade { opacity: 0; transform: translateY(14px); animation: tr-rise .7s cubic-bezier(.2, .7, .2, 1) forwards; }
