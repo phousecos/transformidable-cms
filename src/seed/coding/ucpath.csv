@@ -1,0 +1,31 @@
+Segment,Primary domain,Secondary domain(s),Type,Governance mechanism,Q1 — Was it set up?,Q2 — Did it work in practice?,Q3 — How solid is the proof?,Q4 — Did it matter?,Overall — did it work? (effectiveness),Consequence type,code:Design(§8),code:Operational(§8),code:Evidence(§8),code:Relationship(§11),code:Effectiveness(§9)
+D2-01,G1,G9,Narrative finding,IT-governance jurisdiction; no state oversight,Set up — clearly,Worked as intended,Corroborated,Unclear,Not enough evidence,Strategic,D1,O1,E2,R9,A9
+D2-02,G1,G2,Narrative finding,UCPath delivery governance structure (PMO/steering),Set up — clearly,Worked as intended,Direct evidence,Unclear,"Worked, with limits",,D1,O1,E1,R9,A2
+D2-03,G2,G1,Narrative finding,Final decision authority & accountability (sponsors),Set up — clearly,Worked as intended,Direct evidence,Unclear,"Worked, with limits",,D1,O1,E1,R9,A2
+D2-04,G6,G10,Narrative finding,Oracle released for non-performance; insourced,Set up — partially,"Worked, with exceptions",Direct evidence,Contributed,"Worked, with limits",Financial; Operational,D2,O2,E1,R2,A2
+D2-05,G2,G5,Narrative finding,"Funding authority (bond, campus assessments)",Set up — clearly,Worked as intended,Direct evidence,Contributed,"Worked, with limits",Financial,D1,O1,E1,R2,A2
+D2-06,G9,G4,Narrative finding,Legislative appropriation condition (Budget Act),Set up — clearly,Worked as intended,Direct evidence,Possible link,"Worked, with limits",Financial,D1,O1,E1,R1,A2
+D2-07,G5,G3,Narrative finding,No timely/consistent updates to Regents,Never set up,Didn't operate,Direct evidence,Major contributor,Fell short,Strategic; Financial,D3,O4,E1,R3,A4
+D2-08,G5,G3,Narrative finding,"79 communications, only 5 substantive",Set up — partially,Bypassed / overridden,Direct evidence,Major contributor,Fell short,Strategic,D2,O3,E1,R3,A4
+D2-09,G5,G2,Narrative finding,Cost understated to board ($220M vs $345M; 7-8% vs 30%),Set up — partially,Bypassed / overridden,Corroborated,Major contributor,Fell short,Strategic,D2,O3,E2,R3,A4
+D2-10,G5,G3,Narrative finding,July-2015 Regents directive not honored for months,Set up — partially,Didn't operate,Direct evidence,Major contributor,Fell short,Strategic,D2,O4,E1,R3,A4
+D2-11,G1,G5,Narrative finding,Structural gap: bylaws omit Regents-reporting link,Never set up,Didn't operate,Direct evidence,Major contributor,Fell short,Strategic; Financial,D3,O4,E1,R3,A4
+D2-12,G10,G5,Narrative finding,July-2017 governance change (add Regents),Set up — partially,"Worked, with exceptions",Direct evidence,Possible link,Materially limited,,D2,O2,E1,R1,A3
+D2-13,G3,G2,Narrative finding,One-way communication; $20M/3-month thresholds,Set up — partially,"Worked, with exceptions",Direct evidence,Contributed,Materially limited,,D2,O2,E1,R2,A3
+D2-14,G1,G3,Narrative finding,Finance & Capital Strategies charter covers UCPath,Set up — clearly,"Worked, with exceptions",Corroborated,Possible link,Materially limited,,D1,O2,E2,R1,A3
+D2-15,G7,G5,Narrative finding,Aggressive schedule; integrated plan abandoned,Set up — partially,Bypassed / overridden,Corroborated,Major contributor,Fell short,Financial; Operational,D2,O3,E2,R3,A4
+D2-16,G7,G2,Narrative finding,Change management: small changes bypass assessment,Set up — partially,Bypassed / overridden,Direct evidence,Major contributor,Fell short,Financial,D2,O3,E1,R3,A4
+D2-17,G4,G3,Narrative finding,Risk register tracked but not monitored,Set up — partially,Bypassed / overridden,Direct evidence,Contributed,Fell short,Operational; Financial,D2,O3,E1,R2,A4
+D2-18,G3,G6,Narrative finding,No independent verification & validation (IV&V),Never set up,Didn't operate,Direct evidence,Contributed,Fell short,Financial; Operational,D3,O4,E1,R2,A4
+D2-19,G10,G7,Narrative finding,Lessons learned: business transformation vs IT,Set up — partially,"Worked, with exceptions",Direct evidence,Possible link,Materially limited,Strategic,D2,O2,E1,R1,A3
+D2-20,G3,G6,Narrative finding,Invoice review/approval control operated (positive),Set up — clearly,Worked as intended,Corroborated,No link to outcome,"Worked, with limits",,D1,O1,E2,R0,A2
+D2-21,G6,G7,Narrative finding,Vaguely worded IT-contract deliverables,Set up — partially,"Worked, with exceptions",Corroborated,Contributed,Materially limited,Financial,D2,O2,E2,R2,A3
+D2-22,G5,G3,Recommendation,Recommendation: IT status-reporting standards,Unclear,Not yet applicable,Not evidenced,Unclear,Not enough evidence,,D9,O5,E9,R9,A9
+D2-23,G1,G3,Entity response,Entity claim: governance 'diversified and rigorous',Set up — clearly,Unclear,Conflicting evidence,Unclear,Not enough evidence,,D1,O9,E4,R9,A9
+D2-24,G3,G6,Entity response,Entity response: disputes blanket IV&V,Set up — partially,Unclear,Conflicting evidence,Unclear,Not enough evidence,,D2,O9,E4,R9,A9
+D2-25,G3,G1,Auditor comment,Auditor challenge: governance overstated,Set up — clearly,Worked as intended,Direct evidence,Unclear,"Worked, with limits",,D1,O1,E1,R9,A2
+D1-01,G10,G7,Rec. follow-up,Contract-database plan — Fully Implemented,Set up — partially,Worked as intended,Direct evidence,Possible link,"Worked, with limits",,D2,O1,E1,R1,A2
+D1-02,G5,G3,Rec. follow-up,Regents IT reporting standards — Pending,Unclear,Not yet applicable,Direct evidence,Unclear,Not enough evidence,,D9,O5,E1,R9,A9
+D1-03,G10,G5,Rec. follow-up,Cost-reporting guidelines — No Action Taken,Never set up,Didn't operate,Direct evidence,Contributed,Fell short,Strategic,D3,O4,E1,R2,A4
+D1-04,G10,G4,Rec. follow-up,IT PM guidelines (incl IV&V) — Partially Implemented,Set up — partially,"Worked, with exceptions",Direct evidence,Possible link,Materially limited,,D2,O2,E1,R1,A3
+D1-05,G6,G7,Rec. follow-up,Deliverable-expectations requirement — Partial,Set up — partially,"Worked, with exceptions",Direct evidence,Possible link,Materially limited,,D2,O2,E1,R1,A3
