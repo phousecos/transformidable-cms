@@ -282,6 +282,55 @@ try {
     console.error('[migrate] Topic seed error:', e.message)
   }
 
+  // ── Phase 2.7: Load committed governance coding sheets ─────────────────
+  // Every CSV in src/seed/coding is applied to the case file whose slug matches
+  // its filename (coding/ucpath.csv -> the "ucpath" case). This is how coding
+  // reaches production: the sheet is edited in the repo and the deploy applies
+  // it, so no one needs a local checkout or the production database URL.
+  //
+  // Applying is idempotent — it reconciles the case's findings to the sheet, so
+  // re-running on every deploy is a no-op once they already match.
+  //
+  // A bad sheet must not take the site down with it, so a failure here is
+  // logged and the deploy continues, matching the seeds above. It is not silent
+  // though: the problems are printed in full, and the case page shows its
+  // Governance Outcomes section as Pending rather than pretending to be
+  // complete, so a sheet that failed to load is visible rather than assumed.
+  try {
+    const { readdirSync, readFileSync, existsSync } = await import('fs')
+    const nodePath = await import('path')
+    const { fileURLToPath } = await import('url')
+    // Resolve from this file, not the working directory: the build invokes
+    // this script from the project root today, but that is not a guarantee.
+    const here = nodePath.dirname(fileURLToPath(import.meta.url))
+    const codingDir = nodePath.resolve(here, 'seed/coding')
+    if (existsSync(codingDir)) {
+      const { parseCodingSheet, applyCoding } = await import('./lib/importCoding.ts')
+      const sheets = readdirSync(codingDir).filter((f: string) => f.toLowerCase().endsWith('.csv'))
+      if (!sheets.length) console.log('[migrate] No coding sheets to load.')
+      for (const sheet of sheets) {
+        const caseSlug = sheet.replace(/\.csv$/i, '')
+        const parsed = parseCodingSheet(readFileSync(nodePath.join(codingDir, sheet), 'utf8'))
+        if (parsed.problems.length) {
+          console.error(`[migrate] Coding sheet ${sheet} has ${parsed.problems.length} problem(s) — not applied:`)
+          for (const problem of parsed.problems) console.error(`    • ${problem}`)
+          continue
+        }
+        const result = await applyCoding(payload, caseSlug, parsed)
+        if (result.error) {
+          console.error(`[migrate] Coding sheet ${sheet}: ${result.error} — not applied.`)
+          continue
+        }
+        console.log(
+          `[migrate] Coding ${caseSlug}: ${result.total} segments (${result.counted} narrative findings) · ` +
+            `+${result.added.length} ~${result.changed.length} -${result.removed.length}`,
+        )
+      }
+    }
+  } catch (e: any) {
+    console.error('[migrate] Coding sheet load error:', e.message)
+  }
+
   // ── Phase 2.6: Retire Unlimited Powerhouse (authors + brand pillars) ───
   try {
     const { retireUnlimitedPowerhouse } = await import('./seed/retire-unlimited-powerhouse.ts')
