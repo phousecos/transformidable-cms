@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { fullDate, caseNo } from "./format";
 import { renderLexical } from "./lexical";
-import { GovernanceMap, deriveGraphFromCase } from "./GovernanceMap";
+import { GovernanceOutcomes, tallyOutcomes } from "./GovernanceOutcomes";
 
 const ASSESSMENT: Record<string, string> = { strength: "Strength", weakness: "Weakness", observation: "Observation" };
 const DOC_TYPES: Record<string, string> = {
@@ -34,7 +34,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
   const overviewHtml = renderLexical(cf.overview);
   const timeline = has(cf.timeline) ? cf.timeline : [];
   const orgs = has(cf.organizations) ? cf.organizations : [];
-  const graph = deriveGraphFromCase(cf);
+  const outcomes = tallyOutcomes(cf.governanceMechanisms);
   const documents = has(cf.documents) ? cf.documents : [];
   const audits = has(cf.auditReports) ? cf.auditReports : [];
   const news = has(cf.newsCoverage) ? cf.newsCoverage : [];
@@ -53,7 +53,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
     { id: "timeline", label: "Timeline" },
     { id: "organizations", label: "Organizations" },
   ];
-  if (graph) toc.push({ id: "governance-map", label: "Governance Map" });
+  if (outcomes.domains.length) toc.push({ id: "governance-outcomes", label: "Governance Outcomes" });
   toc.push({ id: "documents", label: "Documents" });
   toc.push({ id: "audit-reports", label: "Audit Reports" });
   toc.push({ id: "news-coverage", label: "News Coverage" });
@@ -124,13 +124,11 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
           )}
         </Section>
 
-        {graph && (
-          <Section id="governance-map" label="Governance Map">
-            <GovernanceMap
-              title={`Governance map: ${cf.title || "case"}`}
-              caption="Each party wired to the governing body by role. Typed relationships are illustrative, pending case-specific mapping."
-              nodes={graph.nodes}
-              edges={graph.edges}
+        {outcomes.domains.length > 0 && (
+          <Section id="governance-outcomes" label="Governance Outcomes">
+            <GovernanceOutcomes
+              mechanisms={cf.governanceMechanisms}
+              caption="Bar length is how many findings were coded to that domain, not a share of a fixed width — a domain with two findings reads as two findings, and the figure at the end of each bar is that count. Domains with no coded findings are omitted."
             />
           </Section>
         )}

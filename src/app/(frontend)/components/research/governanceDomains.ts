@@ -1,9 +1,16 @@
 // Source of truth for the G1-G10 taxonomy, drawn from the Technology
-// Governance Codebook. Consumed by MechanismExplorer, the interactive
-// domain picker embedded on the /tools/governance-codebook page.
+// Governance Codebook. Consumed by MechanismExplorer, the interactive domain
+// picker embedded on the /tools/governance-codebook page, and by
+// GovernanceOutcomes, which plots a case file's coded findings by domain.
+//
+// `short` is the chart label; `name` is the full codebook title. The `code`
+// values are also the stored values of the `domain` select on each case file's
+// governance mechanisms, so they are data, not just display strings — renaming
+// one orphans every finding already coded to it.
 export const DOMAINS = [
   {
     code: "G1",
+    short: "Structure & Authority",
     name: "Governance Structure & Authority",
     definition:
       "The formal or practical allocation of governance authority over a technology matter, including governing bodies, retained and delegated authority, organizational jurisdiction, and governance capacity.",
@@ -14,6 +21,7 @@ export const DOMAINS = [
   },
   {
     code: "G2",
+    short: "Decision Rights",
     name: "Decision Rights & Accountability",
     definition:
       "The allocation of rights to recommend, approve, reject, authorize, suspend, terminate, accept risk, or otherwise make consequential technology decisions, together with accountability for those decisions.",
@@ -23,6 +31,7 @@ export const DOMAINS = [
   },
   {
     code: "G3",
+    short: "Oversight & Assurance",
     name: "Oversight, Assurance & Challenge",
     definition:
       "Mechanisms used to independently monitor, validate, challenge, review, or assure technology performance, governance, compliance, controls, readiness, or risk.",
@@ -34,6 +43,7 @@ export const DOMAINS = [
   },
   {
     code: "G4",
+    short: "Risk & Control",
     name: "Risk, Policy & Control Governance",
     definition:
       "Structures through which technology risks, policies, standards, thresholds, controls, exceptions, and acceptable-use conditions are established and governed.",
@@ -44,6 +54,7 @@ export const DOMAINS = [
   },
   {
     code: "G5",
+    short: "Information & Transparency",
     name: "Information, Transparency & Escalation",
     definition:
       "The production, quality, flow, presentation, elevation, and use of information required for technology governance and decision-making.",
@@ -54,6 +65,7 @@ export const DOMAINS = [
   },
   {
     code: "G6",
+    short: "Vendor & Third-Party",
     name: "Vendor & Third-Party Governance",
     definition:
       "Governance of vendors, integrators, consultants, model providers, contractors, cloud providers, and other external parties upon whom the organization depends.",
@@ -64,6 +76,7 @@ export const DOMAINS = [
   },
   {
     code: "G7",
+    short: "Change & Lifecycle",
     name: "Change, Configuration & Lifecycle Governance",
     definition:
       "Governance of material changes to technology, configuration, scope, models, functionality, use, deployment conditions, or operating environment throughout the technology lifecycle.",
@@ -74,6 +87,7 @@ export const DOMAINS = [
   },
   {
     code: "G8",
+    short: "Data, Access & Security",
     name: "Data, Access, Privacy & Security Governance",
     definition:
       "Governance mechanisms controlling technology-related data quality, use, access, privilege, segregation, privacy, confidentiality, security, and integrity.",
@@ -84,6 +98,7 @@ export const DOMAINS = [
   },
   {
     code: "G9",
+    short: "Stakeholder & External",
     name: "Stakeholder, External & Institutional Governance",
     definition:
       "Governance mechanisms through which affected stakeholders, institutional obligations, external authorities, and broader organizational interests influence technology decisions.",
@@ -94,6 +109,7 @@ export const DOMAINS = [
   },
   {
     code: "G10",
+    short: "Adaptation & Learning",
     name: "Adaptation, Intervention & Learning",
     definition:
       "The ability of governance structures to reconsider prior decisions, intervene, recover, adapt, and learn when technology, evidence, performance, risk, or circumstances materially change.",

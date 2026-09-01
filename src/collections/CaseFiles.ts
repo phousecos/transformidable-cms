@@ -292,7 +292,10 @@ export const CaseFiles: CollectionConfig = {
               name: 'governanceMechanisms',
               type: 'array',
               labels: { singular: 'Mechanism', plural: 'Mechanisms' },
-              admin: { description: 'The governance structures at play, and how each held up.' },
+              admin: {
+                description:
+                  'The governance structures at play, and how each held up. Code a row to a codebook domain and an outcome to plot it on the case chart — rows missing either are still listed, but are counted as uncoded rather than charted.',
+              },
               fields: [
                 {
                   type: 'row',
@@ -301,11 +304,47 @@ export const CaseFiles: CollectionConfig = {
                     {
                       name: 'assessment',
                       type: 'select',
-                      admin: { width: '35%' },
+                      admin: { width: '35%', description: '(Legacy) Superseded by Outcome below; kept so existing rows keep their value.' },
                       options: [
                         { label: 'Strength', value: 'strength' },
                         { label: 'Weakness', value: 'weakness' },
                         { label: 'Observation', value: 'observation' },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      // Values are the G-codes from governanceDomains.ts. Keep the
+                      // two lists in step: a code here that the taxonomy doesn't
+                      // define is dropped from the chart.
+                      name: 'domain',
+                      type: 'select',
+                      admin: { width: '50%', description: 'Which codebook domain (G1–G10) this finding is coded to.' },
+                      options: [
+                        { label: 'G1 — Structure & Authority', value: 'G1' },
+                        { label: 'G2 — Decision Rights', value: 'G2' },
+                        { label: 'G3 — Oversight & Assurance', value: 'G3' },
+                        { label: 'G4 — Risk & Control', value: 'G4' },
+                        { label: 'G5 — Information & Transparency', value: 'G5' },
+                        { label: 'G6 — Vendor & Third-Party', value: 'G6' },
+                        { label: 'G7 — Change & Lifecycle', value: 'G7' },
+                        { label: 'G8 — Data, Access & Security', value: 'G8' },
+                        { label: 'G9 — Stakeholder & External', value: 'G9' },
+                        { label: 'G10 — Adaptation & Learning', value: 'G10' },
+                      ],
+                    },
+                    {
+                      name: 'outcome',
+                      type: 'select',
+                      admin: { width: '50%', description: 'Question 2 — did it work in practice?' },
+                      options: [
+                        { label: 'Worked as intended', value: 'worked' },
+                        { label: 'Worked, with limits', value: 'limited' },
+                        { label: 'Fell short', value: 'fell-short' },
+                        { label: 'Not enough evidence', value: 'insufficient' },
                       ],
                     },
                   ],
