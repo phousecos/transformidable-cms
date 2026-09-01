@@ -646,41 +646,105 @@
 .tr .tr-onsky .idx-filter:hover { color: #f7f2e6; border-color: #e8c451; }
 .tr .tr-onsky .idx-filter.is-active { background: #e8c451; color: #1a1210; border-color: #e8c451; }
 
-/* ---- Governance map (semantic node-link diagram) ---------------------- */
-.tr .gm { margin: 0; }
-.tr .gm-canvas { overflow-x: auto; border: 1px solid var(--rule); background: var(--paper); box-shadow: var(--shadow); }
-.tr .gm-svg { display: block; width: 100%; min-width: 520px; height: auto; }
+/* ---- Governance outcomes (coded findings by codebook domain) ----------- */
+/* Status scale, not a categorical palette: good / warning / serious, plus a
+   hatched neutral for absence of evidence. Stepped separately for light and
+   dark and validated per surface for CVD separation and contrast — re-run the
+   check before changing a value, and don't reuse these hues for anything else.
+   Each fill carries its own label ink because the readable one flips between
+   the darker and lighter steps. */
+.tr .go {
+  --go-worked: #2f7a4a;        --go-worked-ink: #f7f3ea;
+  --go-limited: #a9861a;       --go-limited-ink: #1a1210;
+  --go-fell-short: #8f1d3a;    --go-fell-short-ink: #f7f3ea;
+  --go-insufficient: #7c6c70;  --go-insufficient-ink: #ffffff;
+  margin: 0;
+}
+@media (prefers-color-scheme: dark) {
+  .tr .go {
+    --go-worked: #2a8154;        --go-worked-ink: #ffffff;
+    --go-limited: #c8811f;       --go-limited-ink: #1b1113;
+    --go-fell-short: #d75c80;    --go-fell-short-ink: #1b1113;
+    --go-insufficient: #8a787c;  --go-insufficient-ink: #0c0708;
+  }
+}
+:root[data-theme="dark"] .tr .go {
+  --go-worked: #2a8154;        --go-worked-ink: #ffffff;
+  --go-limited: #c8811f;       --go-limited-ink: #1b1113;
+  --go-fell-short: #d75c80;    --go-fell-short-ink: #1b1113;
+  --go-insufficient: #8a787c;  --go-insufficient-ink: #0c0708;
+}
+:root[data-theme="light"] .tr .go {
+  --go-worked: #2f7a4a;        --go-worked-ink: #f7f3ea;
+  --go-limited: #a9861a;       --go-limited-ink: #1a1210;
+  --go-fell-short: #8f1d3a;    --go-fell-short-ink: #f7f3ea;
+  --go-insufficient: #7c6c70;  --go-insufficient-ink: #ffffff;
+}
 
-.tr .gm-node-dot { stroke: var(--paper); stroke-width: 2; }
-.tr .gm-node--body .gm-node-dot { fill: var(--wine); }
-.tr .gm-node--entity .gm-node-dot { fill: var(--ink-mute); }
-.tr .gm-node--external .gm-node-dot { fill: var(--gold); }
-.tr .gm-node-label { font-family: var(--sans); font-size: 12px; font-weight: 600; fill: var(--ink); paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; }
-.tr .gm-node--body .gm-node-label { font-size: 13px; font-weight: 700; }
+.tr .go-title { font-family: var(--serif); font-size: clamp(1.25rem, 2.2vw, 1.6rem); font-weight: 700; line-height: 1.25; color: var(--ink); margin: 0 0 10px; }
+.tr .go-sub { font-family: var(--mono); font-size: 11.5px; line-height: 1.6; letter-spacing: .04em; color: var(--ink-mute); margin: 0 0 22px; }
 
-.tr .gm-edge { fill: none; }
-.tr .gm-edge--strong { stroke: var(--wine); stroke-width: 2.4; }
-.tr .gm-edge--weak { stroke: var(--wine); stroke-width: 1.6; stroke-dasharray: 7 5; opacity: .7; }
-.tr .gm-edge--broken { stroke: var(--ink-mute); stroke-width: 1.4; stroke-dasharray: 2 6; opacity: .6; }
-.tr .gm-edge--info { stroke: var(--gold-deep); stroke-width: 1.6; }
-.tr .gm-edge--decision { stroke: var(--gold); stroke-width: 2.4; }
-.tr .gm-edge--escalation { stroke: var(--gold-deep); stroke-width: 1.8; stroke-dasharray: 6 4; }
-.tr .gm-arrowhead { fill: var(--gold-deep); }
+.tr .go-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.tr .go-row { display: grid; grid-template-columns: minmax(0, 200px) 1fr 3ch; align-items: center; gap: 8px 18px; }
 
-.tr .gm-legend { display: flex; flex-wrap: wrap; gap: 12px 20px; padding: 16px 4px 2px; }
-.tr .gm-leg { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: .02em; color: var(--ink-mute); }
-.tr .gm-leg-dot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
-.tr .gm-leg-dot.gm-node--body { background: var(--wine); }
-.tr .gm-leg-dot.gm-node--entity { background: var(--ink-mute); }
-.tr .gm-leg-dot.gm-node--external { background: var(--gold); }
-.tr .gm-leg-line { width: 22px; height: 0; flex: none; }
-.tr .gm-leg-line.gm-edge--strong { border-top: 2.4px solid var(--wine); }
-.tr .gm-leg-line.gm-edge--weak { border-top: 1.6px dashed var(--wine); }
-.tr .gm-leg-line.gm-edge--broken { border-top: 1.6px dotted var(--ink-mute); }
-.tr .gm-leg-line.gm-edge--info { border-top: 1.6px solid var(--gold-deep); }
-.tr .gm-leg-line.gm-edge--decision { border-top: 2.4px solid var(--gold); }
-.tr .gm-leg-line.gm-edge--escalation { border-top: 1.8px dashed var(--gold-deep); }
-.tr .gm-cap { font-family: var(--serif); font-style: italic; color: var(--ink-mute); font-size: 14px; margin: 12px 0 0; }
+.tr .go-key { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.tr .go-code { font-family: var(--sans); font-size: 12.5px; font-weight: 700; color: var(--ink); flex: none; }
+.tr .go-name { font-family: var(--sans); font-size: 13px; color: var(--ink-body); line-height: 1.3; }
+
+.tr .go-track { min-width: 0; }
+/* 2px gaps let the surface through between segments instead of a border, and
+   only the bar's outer ends are rounded, so the stack still reads as one bar. */
+.tr .go-bar { display: flex; gap: 2px; height: 26px; min-width: 2px; }
+.tr .go-seg { display: flex; align-items: center; justify-content: center; min-width: 3px; background: var(--go-insufficient); }
+.tr .go-seg:first-child { border-radius: 4px 0 0 4px; }
+.tr .go-seg:last-child { border-radius: 0 4px 4px 0; }
+.tr .go-seg:only-child { border-radius: 4px; }
+.tr .go-seg-val { font-family: var(--sans); font-size: 11px; font-weight: 700; line-height: 1; padding: 0 6px; }
+
+.tr .go-seg--worked { background: var(--go-worked); }
+.tr .go-seg--worked .go-seg-val { color: var(--go-worked-ink); }
+.tr .go-seg--limited { background: var(--go-limited); }
+.tr .go-seg--limited .go-seg-val { color: var(--go-limited-ink); }
+.tr .go-seg--fell-short { background: var(--go-fell-short); }
+.tr .go-seg--fell-short .go-seg-val { color: var(--go-fell-short-ink); }
+/* Hatched, not just grey: "not enough evidence" is the absence of a finding
+   rather than a fourth verdict, and the texture is what keeps it apart from
+   "fell short" for red-blind readers, where the two hues converge. */
+.tr .go-seg--insufficient {
+  background-color: var(--go-insufficient);
+  background-image: repeating-linear-gradient(135deg, rgba(255, 255, 255, .34) 0 2px, transparent 2px 6px);
+}
+.tr .go-seg--insufficient .go-seg-val { color: var(--go-insufficient-ink); }
+
+.tr .go-n { font-family: var(--mono); font-size: 11.5px; color: var(--ink-mute); text-align: right; }
+
+.tr .go-legend { display: flex; flex-wrap: wrap; gap: 10px 20px; padding: 22px 0 0; margin-top: 18px; border-top: 1px solid var(--rule); }
+.tr .go-leg { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: .02em; color: var(--ink-mute); }
+.tr .go-leg-swatch { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+
+.tr .go-table-wrap { margin-top: 18px; }
+.tr .go-table-toggle { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-mute); cursor: pointer; }
+.tr .go-table-toggle:hover { color: var(--wine); }
+.tr .go-table-scroll { overflow-x: auto; margin-top: 14px; }
+.tr .go-table { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: 12.5px; }
+.tr .go-table-cap { text-align: left; font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--ink-mute); padding-bottom: 10px; }
+.tr .go-table th, .tr .go-table td { text-align: left; padding: 8px 14px 8px 0; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+/* Let the outcome headers wrap so the Total column fits without the table
+   needing a horizontal scroll on a normal desktop width; the container still
+   scrolls if it has to. */
+.tr .go-table thead th { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-mute); font-weight: 700; white-space: normal; vertical-align: bottom; min-width: 6.5ch; }
+.tr .go-table tbody th { font-weight: 600; color: var(--ink); }
+.tr .go-table td { color: var(--ink-body); font-variant-numeric: tabular-nums; }
+
+.tr .go-cap { font-family: var(--serif); font-style: italic; color: var(--ink-mute); font-size: 14px; margin: 18px 0 0; }
+
+@media (max-width: 640px) {
+  /* Label above its bar, and drop in-segment numbers rather than clip them —
+     the counts stay in the row total, the tooltip and the table. */
+  .tr .go-row { grid-template-columns: 1fr 3ch; }
+  .tr .go-key { grid-column: 1 / -1; }
+  .tr .go-seg-val { display: none; }
+}
 
 /* ---- Motion ----------------------------------------------------------- */
 .tr .fade { opacity: 0; transform: translateY(14px); animation: tr-rise .7s cubic-bezier(.2, .7, .2, 1) forwards; }
