@@ -473,9 +473,6 @@
 .tr .case-row-desc { font-family: var(--serif); font-size: .96rem; line-height: 1.58; color: var(--ink-body); margin: 6px 0 0; }
 .tr .case-row-meta { display: block; font-size: 11.5px; color: var(--ink-mute); margin-top: 5px; }
 .tr .case-pill { font-family: var(--sans); font-size: 9.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-mute); border: 1px solid var(--rule-strong); border-radius: 3px; padding: 2px 7px; }
-.tr .case-pill--strength { color: #2f7a4a; border-color: #7fb497; }
-.tr .case-pill--weakness { color: var(--wine); border-color: var(--wine); }
-.tr .case-pill--observation { color: var(--gold-deep); border-color: var(--gold); }
 .tr .case-pill--pending { color: var(--ink-mute); border-color: var(--rule-strong); border-style: dashed; }
 
 .tr .case-pending-note { font-family: var(--serif); font-style: italic; color: var(--ink-mute); font-size: .96rem; margin: 0; }
@@ -796,10 +793,6 @@
   .tr .go-key { grid-column: 1 / -1; }
   .tr .go-seg-val { display: none; }
 }
-
-.tr .case-codes { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 8px 0 4px; }
-.tr .case-code { font-family: var(--mono); font-size: 10.5px; letter-spacing: .02em; color: var(--ink-mute); }
-.tr .case-code b { color: var(--wine); font-weight: 700; margin-right: 3px; }
 
 /* ---- Motion ----------------------------------------------------------- */
 .tr .fade { opacity: 0; transform: translateY(14px); animation: tr-rise .7s cubic-bezier(.2, .7, .2, 1) forwards; }
