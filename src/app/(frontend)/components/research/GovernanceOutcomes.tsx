@@ -105,11 +105,34 @@ export function tallyQuestion(mechanisms, question) {
   return { domains, coded, max: domains.reduce((n, d) => Math.max(n, d.total), 0) };
 }
 
-/** Overall counts for the section header. */
+/**
+ * Overall counts for the section header, with exclusions split by REASON.
+ *
+ * The two reasons are not interchangeable, and reporting them as one number
+ * mislabels whichever is not the cause. A segment left out because it is a
+ * recommendation or an entity response is correctly excluded and needs nothing
+ * done to it. A finding left out because it carries no governance domain is an
+ * incomplete row: there is no table to put it in, and only the author can fix
+ * that. Saying "recommendations, entity responses and follow-ups" over the
+ * second case hides a coding gap behind a sentence that sounds deliberate.
+ *
+ * A row that is both — a recommendation with no domain — counts once, under
+ * its type, because its type is the reason it would be excluded anyway.
+ */
 export function tallyFindings(mechanisms) {
-  const all = Array.isArray(mechanisms) ? mechanisms : [];
+  const all = (Array.isArray(mechanisms) ? mechanisms : []).filter(
+    (m) => m && typeof m === "object",
+  );
   const counted = countable(mechanisms);
-  return { total: all.length, counted: counted.length, other: all.length - counted.length };
+  const isNarrative = (m) => !m.segmentType || m.segmentType === "narrative-finding";
+  return {
+    total: all.length,
+    counted: counted.length,
+    // Deliberately excluded: not a narrative finding.
+    otherType: all.filter((m) => !isNarrative(m)).length,
+    // Excluded because it cannot be placed: no domain to file it under.
+    noDomain: all.filter((m) => isNarrative(m) && !DOMAIN_ORDER.has(m.primaryDomain)).length,
+  };
 }
 
 /**
@@ -223,7 +246,7 @@ function QuestionTable({ mechanisms, question }) {
 }
 
 export function GovernanceOutcomes({ mechanisms }) {
-  const { counted, other } = tallyFindings(mechanisms);
+  const { counted, otherType, noDomain } = tallyFindings(mechanisms);
   if (!counted) return null;
   const tables = QUESTIONS.map((q) => <QuestionTable key={q.key} mechanisms={mechanisms} question={q} />).filter(Boolean);
 
@@ -233,7 +256,10 @@ export function GovernanceOutcomes({ mechanisms }) {
         Every coded segment is put to the same five questions and tallied by governance domain.
         {" "}
         {counted} narrative {counted === 1 ? "finding" : "findings"} are counted here
-        {other > 0 && `; ${other} further ${other === 1 ? "segment" : "segments"} — recommendations, entity responses and follow-ups — are recorded but not tallied`}.
+        {otherType > 0 &&
+          `; ${otherType} further ${otherType === 1 ? "segment" : "segments"} — recommendations, entity responses, auditor comments and follow-ups — are recorded but not tallied`}
+        {noDomain > 0 &&
+          `; ${noDomain} ${noDomain === 1 ? "finding is" : "findings are"} not yet assigned a governance domain, so ${noDomain === 1 ? "it has" : "they have"} no table to appear in`}.
         Each finding counts once, under its primary domain.
       </p>
       {tables}
