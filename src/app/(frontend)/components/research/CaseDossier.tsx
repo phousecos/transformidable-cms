@@ -240,6 +240,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
               {mechanisms.map((m: any, i: number) => {
                 const dom = DOMAINS.find((d: any) => d.code === m.primaryDomain);
                 const type = SEGMENT_TYPE_LABEL[m.segmentType];
+                const coded = QUESTIONS.some((q: any) => m[q.key]);
                 return (
                   <div className="case-row" key={i}>
                     <div className="case-row-main">
@@ -249,7 +250,15 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
                             recommendation or an entity's own response is never
                             read as a finding about the entity. */}
                         {type && m.segmentType !== "narrative-finding" && <span className="case-pill case-pill--pending">{type}</span>}
-                        {m.assessment && <span className={`case-pill case-pill--${m.assessment}`}>{ASSESSMENT[m.assessment]}</span>}
+                        {/* The legacy Strength/Weakness/Observation pill only shows on
+                            rows that carry no coded answer. Once a finding is coded,
+                            showing both puts the superseded scale beside the one that
+                            replaced it — a row reading "STRENGTH" next to "Overall A1
+                            Worked" is at best redundant and at worst contradicts
+                            itself, and a reader has no way to know which is current. */}
+                        {m.assessment && !coded && (
+                          <span className={`case-pill case-pill--${m.assessment}`}>{ASSESSMENT[m.assessment]}</span>
+                        )}
                       </div>
                       {m.description && <p className="case-row-desc">{m.description}</p>}
                       <div className="case-codes">
