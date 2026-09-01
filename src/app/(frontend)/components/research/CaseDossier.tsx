@@ -59,7 +59,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
     { id: "timeline", label: "Timeline" },
     { id: "organizations", label: "Organizations" },
   ];
-  if (outcomes.counted) toc.push({ id: "governance-outcomes", label: "Governance Outcomes" });
+  toc.push({ id: "governance-outcomes", label: "Governance Outcomes" });
   toc.push({ id: "documents", label: "Documents" });
   toc.push({ id: "audit-reports", label: "Audit Reports" });
   toc.push({ id: "news-coverage", label: "News Coverage" });
@@ -130,11 +130,21 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
           )}
         </Section>
 
-        {outcomes.counted > 0 && (
-          <Section id="governance-outcomes" label="Governance Outcomes">
+        {/* Always present, like every other section, and marked Pending when the
+            coding has not been loaded. Hiding it outright made the slot look as
+            though it did not exist, so an uncoded case read as a missing feature
+            rather than as missing data. */}
+        <Section id="governance-outcomes" label="Governance Outcomes" pending={outcomes.counted === 0}>
+          {outcomes.counted > 0 ? (
             <GovernanceOutcomes mechanisms={cf.governanceMechanisms} />
-          </Section>
-        )}
+          ) : (
+            <p className="case-pending-note">
+              {outcomes.total > 0
+                ? `${outcomes.total} governance ${outcomes.total === 1 ? "mechanism is" : "mechanisms are"} recorded, but none are coded to a codebook domain and the five questions yet, so there is nothing to tally.`
+                : "Coded findings not yet loaded for this case."}
+            </p>
+          )}
+        </Section>
 
         <Section id="documents" label="Documents" pending={documents.length === 0}>
           {documents.length > 0 ? (
