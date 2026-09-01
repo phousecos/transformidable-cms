@@ -76,11 +76,27 @@ const serverURL =
 //
 // So: every host the admin is actually served from must be listed here, and
 // the cost of omitting one is hours of misdirected debugging.
+//
+// This list must track the project's Vercel domains, NOT the domain we
+// currently consider canonical. The legacy transformidable.media domains are
+// still attached and still serving production, so the admin is reachable at
+// them; when the rename to transformidablethinking.com edited the single
+// hardcoded entry here, it silently locked out anyone still using a .media
+// URL. Retiring a domain in Vercel is what should remove it from this list.
 const csrfOrigins = Array.from(
   new Set(
     [
       serverURL,
+      // Every production domain attached to this Vercel project. These are all
+      // this app served from its own hosts, so allowing them is what the CSRF
+      // list is for — it is unrelated to keeping third-party origins out.
       'https://cms.transformidablethinking.com',
+      'https://transformidablethinking.com',
+      'https://www.transformidablethinking.com',
+      'https://cms.transformidable.media',
+      'https://transformidable.media',
+      'https://www.transformidable.media',
+      'https://transformidable-cms.vercel.app',
       // Vercel gives each deployment its own hostnames. Without these, the
       // admin hits the same silent 401 on every preview deployment.
       process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`,
