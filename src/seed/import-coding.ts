@@ -23,6 +23,8 @@
  */
 import { getPayload } from 'payload'
 import fs from 'fs'
+// Must come before payload.config, which reads process.env as it evaluates.
+import '../lib/loadEnv.ts'
 import config from '../payload.config.ts'
 import { DOMAINS } from '../lib/governanceDomains.ts'
 import { QUESTIONS, codeFromLabel, optionFor, segmentTypeFromLabel } from '../lib/governanceCodebook.ts'
@@ -173,6 +175,13 @@ for (let i = 1; i < rows.length; i++) {
 if (problems.length) {
   console.error(`[import:coding] ${problems.length} problem(s) in ${file} — nothing was written:`)
   for (const p of problems) console.error(`  • ${p}`)
+  process.exit(1)
+}
+
+if (!process.env.POSTGRES_URL && !process.env.DATABASE_URL) {
+  console.error('[import:coding] No POSTGRES_URL (or DATABASE_URL) set.')
+  console.error('  Put it in a .env file in the project root, or pass it inline:')
+  console.error("  POSTGRES_URL='postgres://…' npm run import:coding -- --case=… --file=…")
   process.exit(1)
 }
 
