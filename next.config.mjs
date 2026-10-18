@@ -37,6 +37,10 @@ const nextConfig = {
       bodySizeLimit: '4mb',
     },
   },
+  // These ship a separate build for Cloudflare's workerd runtime, which is only
+  // picked up if Next leaves them unbundled.
+  // https://opennext.js.org/cloudflare/howtos/workerd
+  serverExternalPackages: ['jose', 'pg-cloudflare'],
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],

@@ -5,6 +5,7 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
+import pg from 'pg'
 import sharp from 'sharp'
 
 import { Users } from './collections/Users.ts'
@@ -35,16 +36,67 @@ import { NewsletterIssues } from './collections/NewsletterIssues.ts'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-// On Vercel, force sslmode=no-verify so pg accepts Neon's certificate.
-// Setting ssl in the pool config doesn't work because pg's Object.assign
-// overwrites it with the sslmode parsed from the connection string.
+// True inside the Cloudflare Workers runtime (production on Cloudflare, and
+// `wrangler dev`), false under Node: Vercel, `next dev`, and tsx scripts.
+const isWorkers = typeof navigator !== 'undefined' && navigator.userAgent === 'Cloudflare-Workers'
+
+// On Workers, prefer the Hyperdrive binding when one is configured in
+// wrangler.jsonc. The import is dynamic so Node never loads the adapter.
+const hyperdrive = isWorkers
+  ? (await import('@opennextjs/cloudflare').then(({ getCloudflareContext }) =>
+      getCloudflareContext({ async: true }),
+    )).env.HYPERDRIVE
+  : undefined
+
+// Force sslmode=no-verify on remote databases so pg accepts Neon's
+// certificate. Setting ssl in the pool config doesn't work because pg's
+// Object.assign overwrites it with the sslmode parsed from the connection
+// string. Local databases are left alone, since they usually don't speak TLS,
+// and so is Hyperdrive, which handles TLS to the database itself.
 const rawConnectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL || ''
-const connectionString =
-  process.env.VERCEL && rawConnectionString
+const isLocalDatabase = /@(localhost|127\.0\.0\.1|\[::1\])[:/]/.test(rawConnectionString)
+const connectionString = hyperdrive
+  ? hyperdrive.connectionString
+  : rawConnectionString && !isLocalDatabase
     ? rawConnectionString.includes('sslmode=')
       ? rawConnectionString.replace(/sslmode=[^&]*/, 'sslmode=no-verify')
       : rawConnectionString + (rawConnectionString.includes('?') ? '&' : '?') + 'sslmode=no-verify'
     : rawConnectionString
+
+// On Workers every connection is closed straight after use (see the pool
+// options below). Closing a Cloudflare socket fails its pending read with
+// "This socket has been closed", which pg-pool re-emits as a pool 'error'
+// event; with no listener, every query would log an unhandled rejection.
+// The connection has already been released and discarded by then, so the
+// error is safe to drop.
+type PostgresAdapterArgs = Parameters<typeof postgresAdapter>[0]
+class WorkersPool extends pg.Pool {
+  constructor(...args: ConstructorParameters<typeof pg.Pool>) {
+    super(...args)
+    this.on('error', () => {})
+  }
+}
+
+// Payload's default logger (pino) expects Node; on Workers, log plain JSON
+// lines to the console, which Workers Logs indexes.
+const workersLog =
+  (level: string, fn: typeof console.log) => (objOrMsg: object | string, msg?: string) => {
+    if (typeof objOrMsg === 'string') {
+      fn(JSON.stringify({ level, msg: objOrMsg }))
+    } else {
+      fn(JSON.stringify({ level, ...objOrMsg, msg: msg ?? (objOrMsg as { msg?: string }).msg }))
+    }
+  }
+const workersLogger = {
+  level: process.env.PAYLOAD_LOG_LEVEL || 'info',
+  trace: workersLog('trace', console.debug),
+  debug: workersLog('debug', console.debug),
+  info: workersLog('info', console.log),
+  warn: workersLog('warn', console.warn),
+  error: workersLog('error', console.error),
+  fatal: workersLog('fatal', console.error),
+  silent: () => {},
+} as any // Payload doesn't export its logger type
 
 // Prefer an explicitly configured URL over Vercel's guess.
 // VERCEL_PROJECT_PRODUCTION_URL is set on every deployment and names the
@@ -77,17 +129,22 @@ const serverURL =
 // So: every host the admin is actually served from must be listed here, and
 // the cost of omitting one is hours of misdirected debugging.
 //
-// This list must track the project's Vercel domains, NOT the domain we
-// currently consider canonical. The legacy transformidable.media domains are
-// still attached and still serving production, so the admin is reachable at
-// them; when the rename to transformidablethinking.com edited the single
-// hardcoded entry here, it silently locked out anyone still using a .media
-// URL. Retiring a domain in Vercel is what should remove it from this list.
+// This list must track the domains attached to the host (Vercel today,
+// Cloudflare after the move), NOT the domain we currently consider canonical.
+// The legacy transformidable.media domains are still attached and still
+// serving production, so the admin is reachable at them; when the rename to
+// transformidablethinking.com edited the single hardcoded entry here, it
+// silently locked out anyone still using a .media URL. Retiring a domain on
+// the host is what should remove it from this list.
+//
+// Cloudflare sets no equivalent of the VERCEL_* variables below, so on Workers
+// any extra host the admin is opened at (the workers.dev URL, a preview URL)
+// must be added through PAYLOAD_CSRF_ORIGINS.
 const csrfOrigins = Array.from(
   new Set(
     [
       serverURL,
-      // Every production domain attached to this Vercel project. These are all
+      // Every production domain attached to this project. These are all
       // this app served from its own hosts, so allowing them is what the CSRF
       // list is for — it is unrelated to keeping third-party origins out.
       'https://cms.transformidablethinking.com',
@@ -194,9 +251,21 @@ export default buildConfig({
 
   globals: [SiteSettings, TransformidableFeature],
 
+  logger: isWorkers ? workersLogger : undefined,
+
   db: postgresAdapter({
+    // Cast: the adapter pins its own copy of @types/pg, which differs from ours.
+    ...(isWorkers ? { pg: { ...pg, Pool: WorkersPool } as unknown as PostgresAdapterArgs['pg'] } : {}),
     pool: {
       connectionString,
+      // Workers tear down a socket when the request that opened it ends, but
+      // this pool outlives requests. So on Workers no connection may pass
+      // between requests: maxUses closes each one after a single use, and the
+      // effectively unlimited max means a caller never queues for a
+      // connection, since a queued caller is handed one opened by whichever
+      // request released last — and loses it when that request finishes
+      // ("This socket has been closed"). Hyperdrive makes reconnecting cheap.
+      ...(isWorkers ? { maxUses: 1, max: 10_000 } : {}),
     },
     push: false,
   }),
