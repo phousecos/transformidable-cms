@@ -8,6 +8,7 @@ import { r2Storage } from '@payloadcms/storage-r2'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import pg from 'pg'
+import { isWorkers } from './lib/runtime.ts'
 
 import { Users } from './collections/Users.ts'
 import { Media } from './collections/Media.ts'
@@ -36,10 +37,6 @@ import { NewsletterIssues } from './collections/NewsletterIssues.ts'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
-
-// True inside the Cloudflare Workers runtime (production on Cloudflare, and
-// `wrangler dev`), false under Node: Vercel, `next dev`, and tsx scripts.
-const isWorkers = typeof navigator !== 'undefined' && navigator.userAgent === 'Cloudflare-Workers'
 
 // Bindings from wrangler.jsonc (R2 bucket, Hyperdrive). The import is dynamic
 // so Node never loads the adapter.

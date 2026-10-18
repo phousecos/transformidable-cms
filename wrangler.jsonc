@@ -4,7 +4,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "transformidable-cms",
-  "main": ".open-next/worker.js",
+  "main": "worker.ts",
   "compatibility_date": "2026-10-01",
   "compatibility_flags": [
     // Node.js APIs (pg, Payload) and process.env populated from vars/secrets.
@@ -31,6 +31,11 @@
       "bucket_name": "transformidable-media",
     },
   ],
+  "triggers": {
+    // Daily case-follow digest, 13:00 UTC. Each schedule must have a route in
+    // worker.ts CRON_ROUTES.
+    "crons": ["0 13 * * *"],
+  },
   "observability": {
     "enabled": true,
   },

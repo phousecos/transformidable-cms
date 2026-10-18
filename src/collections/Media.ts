@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin, isAdminOrEditor, isAdminOrEditorOrContributor } from '../access/checkRole.ts'
+import { isWorkers } from '../lib/runtime.ts'
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -24,8 +25,7 @@ export const Media: CollectionConfig = {
     // job — refusing private network addresses — is already done there by
     // the global_fetch_strictly_public flag in wrangler.jsonc, so on Workers
     // plain fetch() is as safe.
-    skipSafeFetch:
-      typeof navigator !== 'undefined' && navigator.userAgent === 'Cloudflare-Workers',
+    skipSafeFetch: isWorkers,
   },
   fields: [
     {

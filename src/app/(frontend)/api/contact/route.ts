@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { getClientIp } from '../../../../lib/apiRequestGuards.ts'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const MAX_EMAIL_LEN = 254 // RFC 5321
@@ -27,12 +28,6 @@ function checkRateLimit(ip: string): boolean {
   if (entry.count >= RATE_LIMIT_MAX) return false
   entry.count++
   return true
-}
-
-function getClientIp(req: NextRequest): string {
-  const xff = req.headers.get('x-forwarded-for')
-  if (xff) return xff.split(',')[0]!.trim()
-  return req.headers.get('x-real-ip') ?? 'unknown'
 }
 
 // eslint-disable-next-line no-control-regex

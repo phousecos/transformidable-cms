@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { getClientIp } from '../../../../lib/apiRequestGuards.ts'
 
 // Generic, identical message for every successful path. We deliberately do not
 // distinguish "new subscriber", "already subscribed", or "re-subscribed", so
@@ -31,12 +32,6 @@ function checkRateLimit(ip: string): boolean {
   if (entry.count >= RATE_LIMIT_MAX) return false
   entry.count++
   return true
-}
-
-function getClientIp(req: NextRequest): string {
-  const xff = req.headers.get('x-forwarded-for')
-  if (xff) return xff.split(',')[0]!.trim()
-  return req.headers.get('x-real-ip') ?? 'unknown'
 }
 
 export async function POST(req: NextRequest) {
