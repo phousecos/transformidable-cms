@@ -223,6 +223,17 @@ try {
       // whether a column was renamed — an interactive prompt that hangs the build.
       { table: 'case_files_governance_mechanisms', column: 'domain' },
       { table: 'case_files_governance_mechanisms', column: 'outcome' },
+      // Media lost its image sizes and focal point when sharp was dropped for
+      // Cloudflare Workers, in the same change that added the storage
+      // plugin's prefix column — an add+drop pair on one table.
+      { table: 'media', column: 'focal_x' },
+      { table: 'media', column: 'focal_y' },
+      ...['thumbnail', 'card', 'hero'].flatMap((size) =>
+        ['url', 'width', 'height', 'mime_type', 'filesize', 'filename'].map((field) => ({
+          table: 'media',
+          column: `sizes_${size}_${field}`,
+        })),
+      ),
     ]
     for (const { table, column } of staleColumns) {
       try {

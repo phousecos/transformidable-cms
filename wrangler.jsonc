@@ -23,6 +23,14 @@
       "service": "transformidable-cms",
     },
   ],
+  "r2_buckets": [
+    // Media uploads. Create once with
+    //   npx wrangler r2 bucket create transformidable-media
+    {
+      "binding": "MEDIA_BUCKET",
+      "bucket_name": "transformidable-media",
+    },
+  ],
   "observability": {
     "enabled": true,
   },

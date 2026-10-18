@@ -9,13 +9,10 @@ can merge and ship on its own.
 | Step | What | State |
 | ---- | ---- | ----- |
 | 1 | Next 16 + Payload 3.91, OpenNext adapter, host-agnostic DB/CSRF config | done |
-| 2 | Vercel Blob → R2; drop `sharp` for on-the-fly image resizing | to do |
+| 2 | Vercel Blob → R2; drop `sharp` and image sizes; Blob→R2 copy script | done |
 | 3 | Cron → Cron Trigger; test Proton SMTP; Vercel Analytics → Cloudflare | to do |
 | 4 | Podcast: YouTube embed, MP3 on R2, RSS feed | to do |
 | 5 | Dashboard setup, DNS cutover, retire Vercel | to do |
-
-**The Worker cannot be deployed until step 2 is done**: `sharp` is a native
-module and fails the Workers bundle.
 
 ## How it runs
 
@@ -26,8 +23,9 @@ Worker. Relevant files:
 - `open-next.config.ts` — adapter config (no incremental cache; pages are dynamic).
 - `cloudflare-env.d.ts` — types for bindings this app adds.
 - `src/payload.config.ts` — detects the Workers runtime (`isWorkers`) and,
-  only there: uses the Hyperdrive binding if present, opens a fresh database
-  connection per use, and logs JSON lines instead of using pino.
+  only there: stores media in R2, uses the Hyperdrive binding if present,
+  opens a fresh database connection per use, and logs JSON lines instead of
+  using pino.
 
 `npm run build` now runs `next build --webpack`. Turbopack, the Next 16
 default, emits hashed module names for Payload's externals (`drizzle-kit`)
@@ -47,6 +45,33 @@ Each query opening a new connection is only cheap behind **Hyperdrive**, which
 keeps warm connections to Neon. Without it every query pays a TLS handshake to
 the database. Set it up before going live (below).
 
+### Media storage
+
+The storage adapter is picked per environment in `payload.config.ts`:
+
+| Where | Storage |
+| ----- | ------- |
+| Cloudflare Worker | R2, through the `MEDIA_BUCKET` binding. Uploads from the admin go browser → R2 in 5 MB chunks (`clientUploads`), so large files such as podcast audio never sit in one request or in the Worker's memory. |
+| Vercel (until cutover) | Vercel Blob, as before. |
+| Anywhere else (build-time migrations, `npm run dev`) | Local disk; the storage fields are still added. |
+
+Every store keys files by filename and Payload serves them at
+`/api/media/file/<filename>`, so moving stores means copying objects. No
+database rows change.
+
+The storage plugin adds `prefix` and `_objectKey` columns to `media`.
+`alwaysInsertFields` is set in all three cases so the schema is identical: the
+build pushes the schema under Node, without the R2 binding, and would otherwise
+drop columns the Worker then queries.
+
+There is no `sharp` (a native module that cannot run on Workers), so Media no
+longer generates thumbnail/card/hero sizes and has no crop or focal point. The
+site only ever displayed the original file; the admin now shows originals as
+thumbnails. Payload still records width and height. `src/migrate.ts` drops the
+old `sizes_*` and `focal_*` columns, which also stops the schema push asking
+whether `prefix` is a renamed column. The old size files stay in Blob and are
+copied with everything else; nothing references them.
+
 ## Commands
 
 | Command | Does |
@@ -54,21 +79,35 @@ the database. Set it up before going live (below).
 | `npm run dev` | Unchanged: Next dev server on Node. |
 | `npm run preview:cf` | Builds the Worker and runs it locally in `wrangler dev`. Needs a `.dev.vars` file (gitignored) with the runtime variables below. |
 | `npm run deploy:cf` | Builds and deploys the Worker from your machine (`npx wrangler login` first). |
+| `npm run media:copy-to-r2` | Copies every Vercel Blob object to the R2 bucket under the same key. Needs `BLOB_READ_WRITE_TOKEN` and wrangler logged in. `-- --dry-run` lists what it would copy; `-- --local` writes to the local R2 used by `preview:cf`. Safe to re-run. |
 
 ## One-time Cloudflare setup (step 5)
 
 1. **Workers Paid plan** ($5/month). The Worker is about 4.4 MB gzipped; the
    free plan caps at 3 MB.
-2. **Hyperdrive**:
+2. **R2 bucket** for media:
+   ```bash
+   npx wrangler r2 bucket create transformidable-media
+   ```
+   Then copy existing files with `npm run media:copy-to-r2`. Run it again
+   right before the DNS switch to pick up anything uploaded on Vercel in
+   between (or freeze uploads for the window).
+
+   The old config noted media "serves from assets.transformidablethinking.com".
+   If that domain points at the Blob store, anything linking to it directly
+   breaks when Blob goes away. Check it, and if so connect it to the bucket
+   instead (R2 → bucket → Settings → Custom Domains). Keys are identical, so
+   the same paths keep working.
+3. **Hyperdrive**:
    ```bash
    npx wrangler hyperdrive create transformidable-db --connection-string="<POSTGRES_URL>"
    ```
    Paste the printed id into the commented `hyperdrive` block in
    `wrangler.jsonc` and uncomment it.
-3. **Workers Builds** (Worker → Settings → Build), connected to this repo:
+4. **Workers Builds** (Worker → Settings → Build), connected to this repo:
    - Build command: `npx opennextjs-cloudflare build`
    - Deploy command: `npx opennextjs-cloudflare deploy`
-4. **Variables.** Two places, because Next reads some at build time.
+5. **Variables.** Two places, because Next reads some at build time.
 
 ### Build variables and secrets (Settings → Build)
 
@@ -93,13 +132,18 @@ The build runs `src/migrate.ts` against the database and inlines every
 | `SMTP_*`, `EMAIL_FROM`, `CONTACT_NOTIFY_EMAIL` | As on Vercel; SMTP on Workers is verified in step 3. |
 | `CRON_SECRET` | As on Vercel; the cron trigger is reworked in step 3. |
 | `SYNDICATE_<BRAND>_URL` / `_SECRET` | As on Vercel; see `syndication-operations.md`. |
-| `BLOB_READ_WRITE_TOKEN` | Not needed on Cloudflare; replaced by R2 in step 2. |
+| `BLOB_READ_WRITE_TOKEN` | **Do not set** on Cloudflare. Media uses the R2 binding. |
 
 ## Known gaps
 
-- `sharp` blocks the Workers bundle (step 2).
-- Payload's "upload from URL" uses `undici`, which can't initialize on Workers
-  (it logs a WebAssembly error at startup). Normal uploads are unaffected.
-  Handled with storage in step 2.
+- `undici` (bundled by Payload and by `@vercel/blob`) logs one
+  "WebAssembly.compile(): Wasm code generation disallowed" error when the
+  Worker starts. Payload uses it in `safeFetch` when it downloads a stored
+  file, e.g. to duplicate a media item; that failed on Workers, so Media sets
+  `skipSafeFetch` there (see the comment in `Media.ts`). Blob is never active
+  on Workers. The startup log line is harmless.
+- A duplicated media item records `filesize: 0`. Payload takes the size from
+  the `Content-Length` header, and R2 responses through the Worker are
+  streamed without one. The file itself is copied intact.
 - `npm run lint` calls `next lint`, which Next 16 removed. The repo has no
   ESLint config, so it wasn't linting before either.

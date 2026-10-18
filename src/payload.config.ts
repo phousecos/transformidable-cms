@@ -3,10 +3,11 @@ import { fileURLToPath } from 'url'
 import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { cloudStoragePlugin } from '@payloadcms/plugin-cloud-storage'
+import { r2Storage } from '@payloadcms/storage-r2'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import pg from 'pg'
-import sharp from 'sharp'
 
 import { Users } from './collections/Users.ts'
 import { Media } from './collections/Media.ts'
@@ -40,13 +41,16 @@ const dirname = path.dirname(filename)
 // `wrangler dev`), false under Node: Vercel, `next dev`, and tsx scripts.
 const isWorkers = typeof navigator !== 'undefined' && navigator.userAgent === 'Cloudflare-Workers'
 
-// On Workers, prefer the Hyperdrive binding when one is configured in
-// wrangler.jsonc. The import is dynamic so Node never loads the adapter.
-const hyperdrive = isWorkers
+// Bindings from wrangler.jsonc (R2 bucket, Hyperdrive). The import is dynamic
+// so Node never loads the adapter.
+const cloudflareEnv = isWorkers
   ? (await import('@opennextjs/cloudflare').then(({ getCloudflareContext }) =>
       getCloudflareContext({ async: true }),
-    )).env.HYPERDRIVE
+    )).env
   : undefined
+
+// On Workers, prefer the Hyperdrive binding when one is configured.
+const hyperdrive = cloudflareEnv?.HYPERDRIVE
 
 // Force sslmode=no-verify on remote databases so pg accepts Neon's
 // certificate. Setting ssl in the pool config doesn't work because pg's
@@ -187,6 +191,15 @@ export default buildConfig({
   csrf: csrfOrigins,
 
   admin: {
+    // The import map is generated at build time under Node, where the R2
+    // plugin isn't active (no bucket binding), so it would leave out R2's
+    // browser-upload handler and the admin on Workers would fail to find it.
+    dependencies: {
+      '@payloadcms/storage-r2/client#R2ClientUploadHandler': {
+        type: 'function',
+        path: '@payloadcms/storage-r2/client#R2ClientUploadHandler',
+      },
+    },
     user: Users.slug,
     meta: {
       titleSuffix: '— Transformidable CMS',
@@ -279,24 +292,46 @@ export default buildConfig({
     return 'dev-only-insecure-secret'
   })(),
 
-  sharp,
+  // No sharp: it is a native module and cannot run on Workers. Uploads keep
+  // their original file; see the Media collection.
 
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
 
   plugins: [
-    // Vercel Blob Storage for media uploads
-    // Serves from assets.transformidablethinking.com in production
-    ...(process.env.BLOB_READ_WRITE_TOKEN
-      ? [
+    // Media storage. Files are keyed by filename in every store and served
+    // through Payload at /api/media/file/<filename>, so copying the objects
+    // across (npm run media:copy-to-r2) is all a move between stores needs.
+    //
+    // alwaysInsertFields is set on every branch because the storage plugin
+    // adds columns to the media table (_object_key, prefix). The schema is
+    // pushed by src/migrate.ts under Node, where the R2 binding doesn't exist;
+    // without identical fields there, that push would drop columns the Worker
+    // then queries.
+    cloudflareEnv?.MEDIA_BUCKET
+      ? // Cloudflare: R2 through the binding. clientUploads sends files from
+        // the browser in chunks, so a large upload (podcast audio) never has
+        // to fit in one request or in the Worker's memory.
+        r2Storage({
+          alwaysInsertFields: true,
+          bucket: cloudflareEnv.MEDIA_BUCKET,
+          clientUploads: true,
+          collections: { media: true },
+        })
+      : process.env.BLOB_READ_WRITE_TOKEN
+        ? // Vercel, until cutover.
           vercelBlobStorage({
-            collections: {
-              media: true,
-            },
+            alwaysInsertFields: true,
+            collections: { media: true },
             token: process.env.BLOB_READ_WRITE_TOKEN,
+          })
+        : // Neither (build-time migrations, local dev): fields only, and files
+          // stay on local disk.
+          cloudStoragePlugin({
+            alwaysInsertFields: true,
+            collections: { media: { adapter: null } },
+            enabled: false,
           }),
-        ]
-      : []),
   ],
 })
