@@ -177,6 +177,8 @@ copied with everything else; nothing references them.
 
 ## One-time Cloudflare setup (step 5)
 
+The click-by-click version, in order, is [`cloudflare-cutover.md`](./cloudflare-cutover.md).
+
 1. **Workers Paid plan** ($5/month). The Worker is about 4.4 MB gzipped; the
    free plan caps at 3 MB.
 2. **R2 bucket** for media:
@@ -200,7 +202,8 @@ copied with everything else; nothing references them.
    `wrangler.jsonc` and uncomment it.
 4. **Workers Builds** (Worker → Settings → Build), connected to this repo:
    - Build command: `npx opennextjs-cloudflare build`
-   - Deploy command: `npx opennextjs-cloudflare deploy`
+   - Deploy command: `npx opennextjs-cloudflare deploy -- --keep-vars`
+     (`--keep-vars` stops each deploy deleting variables set in the dashboard)
 5. **Web Analytics**: Analytics & Logs → Web Analytics → Add a site → the
    domain, and choose the JavaScript snippet. Copy the token from it into
    `CF_WEB_ANALYTICS_TOKEN` (below). Vercel Analytics history does not move.

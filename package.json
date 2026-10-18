@@ -10,7 +10,7 @@
     "migrate": "tsx src/migrate.ts",
     "start": "next start",
     "preview:cf": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy:cf": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "deploy:cf": "opennextjs-cloudflare build && opennextjs-cloudflare deploy -- --keep-vars",
     "lint": "next lint",
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap",
