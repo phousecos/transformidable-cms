@@ -11,7 +11,7 @@ can merge and ship on its own.
 | 1 | Next 16 + Payload 3.91, OpenNext adapter, host-agnostic DB/CSRF config | done |
 | 2 | Vercel Blob → R2; drop `sharp` and image sizes; Blob→R2 copy script | done |
 | 3 | Cron → Cron Trigger; SMTP verified on Workers; Cloudflare Web Analytics; visitor IP on Cloudflare | done |
-| 4 | Podcast: YouTube embed, MP3 on R2, RSS feed | to do |
+| 4 | Podcast: settings global, YouTube embed, MP3 audio, RSS feed | done |
 | 5 | Dashboard setup, DNS cutover, retire Vercel | to do |
 
 ## How it runs
@@ -91,6 +91,53 @@ The rate limiters on the public API routes key on the visitor's IP. On Workers
 Cloudflare sets and clients cannot override; elsewhere it keeps reading
 `x-forwarded-for`. The contact and subscribe routes had private copies of the
 old helper and now use the shared one.
+
+### Podcast
+
+| Piece | Where |
+| ----- | ----- |
+| Show details (title, author, owner email, cover art, categories, explicit) | Admin → Globals → Podcast Settings (`src/globals/PodcastSettings.ts`). Defaults live in `src/lib/podcast.ts`. |
+| Episodes | Admin → Podcast Episodes (`src/collections/PodcastEpisodes.ts`), no longer hidden. |
+| Episode list / page | `/podcast`, `/podcast/<slug>` |
+| RSS feed | `/podcast/feed.xml` (`src/app/(frontend)/podcast/feed.xml/route.ts`) |
+
+Cover art is checked on save against Apple's rules (square JPG/PNG,
+1400–3000 px), so a wrong size is caught in the admin, not by Apple.
+
+The episode page shows the YouTube video as a click-to-play thumbnail: no
+YouTube scripts or cookies load until someone presses play, and then the player
+uses `youtube-nocookie.com`. Below it is a plain audio player for the uploaded
+MP3.
+
+An episode is in the feed when it is **Published**, its publish date has
+passed, and it has audio (an uploaded file, or failing that the external audio
+URL). Each item's `<guid>` is `transformidable-podcast-<id>`; it must never
+change, or apps list the episode twice. Uploaded audio is served with byte-range
+support (`206 Partial Content`), which Apple requires.
+
+**Upload episode audio only after cutover.** On Vercel, uploads pass through a
+function capped at 4.5 MB, so a 25-minute MP3 (about 25 MB) fails there. On
+Cloudflare the admin sends it straight to R2 in 5 MB chunks.
+
+#### Publishing an episode
+
+1. Upload the episode to YouTube as usual.
+2. Admin → Podcast Episodes → Create: title, episode and season number,
+   description (shown in podcast apps), YouTube link, the MP3 (upload it from
+   the audio field), duration (e.g. `25:00`), publish date, and optionally show
+   notes, transcript and episode artwork. Set status to Published.
+3. Podcast apps pick it up the next time they check the feed (usually within
+   hours).
+
+#### Submitting the show (once, after cutover)
+
+The feed URL is `https://transformidablethinking.com/podcast/feed.xml`.
+
+- Apple Podcasts: podcastsconnect.apple.com → Add a show → RSS feed.
+- Spotify: creators.spotify.com → Add an existing show → RSS feed.
+
+Both send a verification code to the owner email in Podcast Settings. Set the
+cover art first; Apple rejects a feed without it.
 
 ### Media storage
 

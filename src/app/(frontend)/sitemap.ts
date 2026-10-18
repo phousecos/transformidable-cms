@@ -52,10 +52,11 @@ export default async function sitemap() {
 
   try {
     const payload = await getPayload({ config });
-    const [caseFiles, notes, pubs] = await Promise.all([
+    const [caseFiles, notes, pubs, episodes] = await Promise.all([
       publishedDocs(payload, "case-files"),
       publishedDocs(payload, "research-notes"),
       publishedDocs(payload, "publications"),
+      publishedDocs(payload, "podcast-episodes"),
     ]);
     const add = (docs: any[], prefix: string) => {
       for (const d of docs) {
@@ -70,6 +71,7 @@ export default async function sitemap() {
     add(caseFiles, "/publications/case-files");
     add(notes, "/publications/research-notes");
     add(pubs, "/publications");
+    add(episodes, "/podcast");
   } catch {
     // Fall back to the static routes if the CMS isn't reachable at build time.
   }

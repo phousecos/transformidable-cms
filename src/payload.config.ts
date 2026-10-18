@@ -24,14 +24,15 @@ import { Subscribers } from './collections/Subscribers.ts'
 import { CaseFollows } from './collections/CaseFollows.ts'
 import { CaseSubmissions } from './collections/CaseSubmissions.ts'
 import { ContactMessages } from './collections/ContactMessages.ts'
+import { PodcastEpisodes } from './collections/PodcastEpisodes.ts'
 import { SiteSettings } from './globals/SiteSettings.ts'
 import { TransformidableFeature } from './globals/TransformidableFeature.ts'
+import { PodcastSettings } from './globals/PodcastSettings.ts'
 
 // Legacy collections — kept so Payload can still read/write their DB tables.
 // Articles still references authors and brand-pillars via legacy fields.
 import { Authors } from './collections/Authors.ts'
 import { BrandPillars } from './collections/BrandPillars.ts'
-import { PodcastEpisodes } from './collections/PodcastEpisodes.ts'
 import { Sponsors } from './collections/Sponsors.ts'
 import { NewsletterIssues } from './collections/NewsletterIssues.ts'
 
@@ -251,15 +252,15 @@ export default buildConfig({
     CaseFollows,
     CaseSubmissions,
     ContactMessages,
+    PodcastEpisodes,
     // Legacy collections — hidden from nav, kept for data access
     { ...Authors, admin: { ...Authors.admin, hidden: true } },
     { ...BrandPillars, admin: { ...BrandPillars.admin, hidden: true } },
-    { ...PodcastEpisodes, admin: { ...PodcastEpisodes.admin, hidden: true } },
     { ...Sponsors, admin: { ...Sponsors.admin, hidden: true } },
     { ...NewsletterIssues, admin: { ...NewsletterIssues.admin, hidden: true } },
   ],
 
-  globals: [SiteSettings, TransformidableFeature],
+  globals: [SiteSettings, TransformidableFeature, PodcastSettings],
 
   logger: isWorkers ? workersLogger : undefined,
 
