@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin, isAdminOrEditor } from '../access/checkRole.ts'
 import { validateHttpUrl } from '../access/validateUrl.ts'
+import { durationSeconds, youtubeId } from '../lib/podcast.ts'
 
 export const PodcastEpisodes: CollectionConfig = {
   slug: 'podcast-episodes',
@@ -67,11 +68,40 @@ export const PodcastEpisodes: CollectionConfig = {
       },
     },
     {
+      name: 'youtubeUrl',
+      type: 'text',
+      admin: {
+        description: 'The episode on YouTube (any youtube.com or youtu.be link). Embedded on the episode page.',
+      },
+      validate: (value: string | null | undefined) =>
+        !value || youtubeId(value) ? true : 'Not a recognisable YouTube video link.',
+    },
+    {
+      name: 'audioFile',
+      type: 'upload',
+      relationTo: 'media',
+      filterOptions: { mimeType: { contains: 'audio' } },
+      admin: {
+        description:
+          'The episode audio (MP3). This is what podcast apps download from the RSS feed; an episode without audio is left out of the feed.',
+      },
+    },
+    {
+      name: 'duration',
+      type: 'text',
+      admin: {
+        description: 'Running time, e.g. 25:00 or 1:02:30. Shown in podcast apps.',
+      },
+      validate: (value: string | null | undefined) =>
+        !value || durationSeconds(value) !== null ? true : 'Use mm:ss or h:mm:ss, e.g. 25:00.',
+    },
+    {
       name: 'audioUrl',
       type: 'text',
       validate: validateHttpUrl,
       admin: {
-        description: 'Embed URL or hosted file path for the episode audio',
+        description:
+          'Only if the audio is hosted elsewhere: a direct link to the audio file. Ignored when an audio file is uploaded above.',
       },
     },
     {

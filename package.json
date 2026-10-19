@@ -6,9 +6,11 @@
   "description": "Payload CMS v3 instance for the Transformidable content ecosystem",
   "scripts": {
     "dev": "next dev",
-    "build": "tsx src/migrate.ts && npx payload generate:importmap && next build",
+    "build": "tsx src/migrate.ts && npx payload generate:importmap && next build --webpack",
     "migrate": "tsx src/migrate.ts",
     "start": "next start",
+    "preview:cf": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy:cf": "opennextjs-cloudflare build && opennextjs-cloudflare deploy -- --keep-vars",
     "lint": "next lint",
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap",
@@ -16,22 +18,26 @@
     "seed:research": "tsx src/seed/research.ts",
     "seed:articles": "tsx src/seed/articles-to-publications.ts",
     "seed:ucpath": "tsx src/seed/ucpath.ts",
-    "import:coding": "tsx src/seed/import-coding.ts"
+    "import:coding": "tsx src/seed/import-coding.ts",
+    "media:copy-to-r2": "tsx src/seed/copy-blob-to-r2.ts"
   },
   "dependencies": {
-    "@payloadcms/db-postgres": "^3.14.0",
-    "@payloadcms/email-nodemailer": "3.77.0",
-    "@payloadcms/next": "^3.14.0",
-    "@payloadcms/richtext-lexical": "^3.14.0",
-    "@payloadcms/storage-vercel-blob": "^3.14.0",
+    "@opennextjs/cloudflare": "^1.20.12",
+    "@payloadcms/db-postgres": "3.91.0",
+    "@payloadcms/email-nodemailer": "3.91.0",
+    "@payloadcms/next": "3.91.0",
+    "@payloadcms/plugin-cloud-storage": "3.91.0",
+    "@payloadcms/richtext-lexical": "3.91.0",
+    "@payloadcms/storage-r2": "3.91.0",
+    "@payloadcms/storage-vercel-blob": "3.91.0",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/blob": "2.3.1",
     "graphql": "^16.8.1",
-    "next": "15.4.11",
-    "payload": "^3.14.0",
+    "next": "16.4.2",
+    "payload": "3.91.0",
     "pg": "^8.20.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "sharp": "0.32.6",
     "slugify": "^1.6.6"
   },
   "devDependencies": {
@@ -43,11 +49,12 @@
     "@types/react-dom": "^19.0.0",
     "autoprefixer": "^10.4.27",
     "eslint": "^9.0.0",
-    "eslint-config-next": "15.4.11",
+    "eslint-config-next": "16.4.2",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.2",
     "tsx": "^4.0.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "wrangler": "^4.151.1"
   },
   "engines": {
     "node": "22.x"

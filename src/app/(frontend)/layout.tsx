@@ -7,6 +7,11 @@ import "./globals.css";
 // production domain so absolute URLs (OpenGraph, sitemap, canonicals) are right.
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://transformidablethinking.com";
 
+// Cloudflare Web Analytics site token (public; it appears in the page). Read
+// at build time for the statically rendered pages, so set it as a build
+// variable as well as a runtime one.
+const cfAnalyticsToken = process.env.CF_WEB_ANALYTICS_TOKEN;
+
 const SITE_TITLE = "Transformidable | Evidence for Better Transformation Governance";
 const SITE_DESCRIPTION =
   "Independent research on how governance, leadership, and institutional decision-making shape whether organizational transformation succeeds or fails.";
@@ -66,7 +71,15 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
           Skip to main content
         </a>
         {children}
-        <Analytics />
+        {/* Vercel's script only exists on Vercel (it 404s anywhere else). */}
+        {process.env.VERCEL && <Analytics />}
+        {cfAnalyticsToken && (
+          <Script
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={JSON.stringify({ token: cfAnalyticsToken })}
+            strategy="afterInteractive"
+          />
+        )}
       </body>
     </html>
   );

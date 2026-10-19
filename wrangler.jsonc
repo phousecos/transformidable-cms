@@ -1,0 +1,54 @@
+// Cloudflare Workers config for the OpenNext build of this app.
+// See docs/cloudflare-migration.md for the one-time dashboard setup this
+// relies on (Workers Paid plan, Hyperdrive, secrets).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "transformidable-cms",
+  "main": "worker.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": [
+    // Node.js APIs (pg, Payload) and process.env populated from vars/secrets.
+    "nodejs_compat",
+    // Lets server-side fetch() reach public URLs (syndication webhooks).
+    "global_fetch_strictly_public",
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "services": [
+    // Must match "name" above. OpenNext uses it to call back into itself.
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "transformidable-cms",
+    },
+  ],
+  "r2_buckets": [
+    // Media uploads. Create once with
+    //   npx wrangler r2 bucket create transformidable-media
+    {
+      "binding": "MEDIA_BUCKET",
+      "bucket_name": "transformidable-media",
+    },
+  ],
+  "triggers": {
+    // Daily case-follow digest, 13:00 UTC. Each schedule must have a route in
+    // worker.ts CRON_ROUTES.
+    "crons": ["0 13 * * *"],
+  },
+  "observability": {
+    "enabled": true,
+  },
+  // Hyperdrive keeps warm connections to Postgres so each request's new
+  // connection is cheap. Create it with
+  //   npx wrangler hyperdrive create transformidable-db --connection-string="<POSTGRES_URL>"
+  // then uncomment this block and paste the id it prints. Without it the app
+  // still works, connecting straight to POSTGRES_URL, but every query pays for
+  // a fresh TLS handshake to the database.
+  // "hyperdrive": [
+  //   {
+  //     "binding": "HYPERDRIVE",
+  //     "id": "<HYPERDRIVE_ID>",
+  //   },
+  // ],
+}

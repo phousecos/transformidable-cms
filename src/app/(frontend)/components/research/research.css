@@ -382,6 +382,18 @@
 .tr .detail-meta .dm b { color: var(--ink); font-weight: 600; }
 .tr .detail-cta { margin-top: 26px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
 .tr .detail-cover { display: block; width: 100%; max-height: 440px; object-fit: cover; margin-top: 30px; border: 1px solid var(--rule); }
+/* Podcast episode: video, audio, transcript */
+.tr .yt { position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; margin-top: 30px; background: #000; border: 1px solid var(--rule); overflow: hidden; }
+.tr .yt iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.tr .yt-facade { padding: 0; cursor: pointer; }
+.tr .yt-facade img { width: 100%; height: 100%; object-fit: cover; opacity: .85; transition: opacity .2s; }
+.tr .yt-facade:hover img, .tr .yt-facade:focus-visible img { opacity: 1; }
+.tr .yt-play { position: absolute; top: 50%; left: 50%; width: 72px; height: 72px; transform: translate(-50%, -50%); border-radius: 50%; background: var(--wine); color: var(--paper); display: grid; place-items: center; box-shadow: 0 6px 24px rgba(0,0,0,.35); }
+.tr .yt-play svg { width: 30px; height: 30px; margin-left: 4px; }
+.tr .episode-audio { display: block; width: 100%; margin-top: 22px; }
+.tr .episode-section { margin-top: 44px; }
+.tr .episode-section > h2 { font-family: var(--serif); font-size: 1.35rem; color: var(--ink); margin: 0 0 14px; }
+.tr .transcript { max-height: 70vh; overflow-y: auto; padding: 4px 20px 4px 0; }
 .tr .detail-video { position: relative; width: 100%; aspect-ratio: 16 / 9; margin-top: 30px; border: 1px solid var(--rule); background: #000; }
 .tr .detail-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .tr .detail-exhibit { margin-top: 34px; max-width: 560px; }

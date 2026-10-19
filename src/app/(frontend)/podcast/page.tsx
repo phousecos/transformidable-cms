@@ -1,6 +1,7 @@
 // @ts-nocheck
 import config from "@payload-config";
 import { getPayload } from "payload";
+import Link from "next/link";
 import { ResearchShell } from "../components/research/ResearchShell";
 import { Sky } from "../components/research/Sky";
 import { fullDate } from "../components/research/format";
@@ -11,11 +12,12 @@ export const metadata = {
   title: "The Governance Files",
   description:
     "The Transformidable podcast. Conversations on governance, leadership, and institutional transformation.",
+  alternates: { types: { "application/rss+xml": "/podcast/feed.xml" } },
 };
 
-const ExtArrow = () => (
+const Arrow = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
-    <path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
+    <path d="M5 12h14M13 6l6 6-6 6" />
   </svg>
 );
 
@@ -48,6 +50,9 @@ export default async function PodcastPage() {
             The Transformidable podcast. Conversations on governance, leadership, and
             institutional transformation, examined on the record.
           </p>
+          <p className="idx-intro">
+            <a className="link" href="/podcast/feed.xml">Subscribe via RSS <Arrow /></a>
+          </p>
         </div>
       </section>
 
@@ -67,7 +72,7 @@ export default async function PodcastPage() {
                   <article className="pub" key={ep.id}>
                     <span className="p-type">{label || "Episode"}</span>
                     <div>
-                      <h4>{ep.title}</h4>
+                      <Link className="p-link" href={`/podcast/${ep.slug}`}><h4>{ep.title}</h4></Link>
                       {guest && (
                         <p className="p-meta" style={{ color: "var(--gold-deep)" }}>
                           with {guest.name}{guest.role ? `, ${guest.role}` : ""}
@@ -76,11 +81,10 @@ export default async function PodcastPage() {
                       {ep.description && <p className="p-desc">{ep.description}</p>}
                       <div className="p-meta" style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
                         {ep.publishDate && <span>{fullDate(ep.publishDate)}</span>}
-                        {ep.audioUrl && (
-                          <a className="link" href={ep.audioUrl} rel="noopener" target="_blank">
-                            Listen <ExtArrow />
-                          </a>
-                        )}
+                        {ep.duration && <span>{ep.duration}</span>}
+                        <Link className="link" href={`/podcast/${ep.slug}`}>
+                          Watch &amp; listen <Arrow />
+                        </Link>
                       </div>
                     </div>
                   </article>
