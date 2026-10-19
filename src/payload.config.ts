@@ -224,6 +224,10 @@ export default buildConfig({
       ? nodemailerAdapter({
           defaultFromAddress: process.env.EMAIL_FROM || 'hello@transformidablethinking.com',
           defaultFromName: 'Transformidable',
+          // Payload otherwise waits on an SMTP handshake every time it starts,
+          // which on Workers is every cold request. Bad credentials still
+          // surface when a message is actually sent.
+          skipVerify: isWorkers,
           transportOptions: {
             host: process.env.SMTP_HOST,
             port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 587,
