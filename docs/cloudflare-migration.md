@@ -44,9 +44,17 @@ alone failed 21 of 30 parallel requests with "This socket has been closed"
 (queued requests were handed connections opened by other requests); with both
 settings, 120 of 120 succeeded.
 
-Each query opening a new connection is only cheap behind **Hyperdrive**, which
-keeps warm connections to Neon. Without it every query pays a TLS handshake to
-the database. Set it up before going live (below).
+**Hyperdrive is required.** It holds warm connections to Supabase, so each
+new connection the Worker opens is cheap. More importantly, without it the
+Worker cannot connect at all: a direct connection to Supabase's pooler drops
+during the TLS handshake, and every page fails with "cannot connect to
+Postgres … Connection terminated unexpectedly". The binding is in
+`wrangler.jsonc`.
+
+The database is Supabase. Use the **Session pooler** connection string
+(`…pooler.supabase.com:5432`) for both Hyperdrive and `POSTGRES_URL`. The
+direct connection is IPv6-only, and the transaction pooler (port 6543) breaks
+the session-level lock `migrate.ts` takes.
 
 ### Scheduled jobs
 
@@ -194,12 +202,8 @@ The click-by-click version, in order, is [`cloudflare-cutover.md`](./cloudflare-
    breaks when Blob goes away. Check it, and if so connect it to the bucket
    instead (R2 → bucket → Settings → Custom Domains). Keys are identical, so
    the same paths keep working.
-3. **Hyperdrive**:
-   ```bash
-   npx wrangler hyperdrive create transformidable-db --connection-string="<POSTGRES_URL>"
-   ```
-   Paste the printed id into the commented `hyperdrive` block in
-   `wrangler.jsonc` and uncomment it.
+3. **Hyperdrive** (required; see above): already configured as
+   `transformidable-db`, id in `wrangler.jsonc`.
 4. **Workers Builds** (Worker → Settings → Build), connected to this repo:
    - Build command: `npx opennextjs-cloudflare build`
    - Deploy command: `npx opennextjs-cloudflare deploy -- --keep-vars`
@@ -217,9 +221,11 @@ The build runs `src/migrate.ts` against the database and inlines every
 | Variable | Notes |
 | -------- | ----- |
 | `NODE_ENV` | `production`. Otherwise Payload regenerates `src/payload-types.ts` when the migration step starts it, and the code does not typecheck against the full generated types (true before this migration too), so `next build` fails. |
-| `POSTGRES_URL` | Direct Neon URL; the build runs migrations. |
+| `NPM_CONFIG_INCLUDE` | `dev`. `NODE_ENV=production` makes `npm ci` skip devDependencies, and the build needs them (Tailwind, TypeScript, tsx). |
+| `NODE_VERSION` | `22` (the build image defaults to 24). |
+| `POSTGRES_URL` | Supabase Session pooler URL; the build runs migrations from Node, outside Hyperdrive. |
 | `PAYLOAD_SECRET` | Same value as runtime. |
-| `NEXT_PUBLIC_SERVER_URL` | `https://cms.transformidablethinking.com`. **Required on Cloudflare** — Vercel had a fallback, Cloudflare has none, and a wrong value silently locks the admin out (see the CSRF notes in `payload.config.ts`). |
+| `NEXT_PUBLIC_SERVER_URL` | `https://cms.transformidablethinking.com`, including `https://`. **Required on Cloudflare** — Vercel had a fallback, Cloudflare has none, and a wrong value silently locks the admin out (see the CSRF notes in `payload.config.ts`). |
 | `NEXT_PUBLIC_SITE_URL` | `https://transformidablethinking.com` |
 | `CF_WEB_ANALYTICS_TOKEN` | From step 5. Needed here because static pages are rendered at build time. |
 

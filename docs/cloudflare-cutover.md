@@ -71,21 +71,18 @@ domain.
   - Location: Automatic
 - [ ] Leave public access **off**. The site serves files through the app.
 
-### 2.3 Database accelerator (Hyperdrive)
+### 2.3 Database connection (Hyperdrive) — required
 
-Keeps database connections warm. Without it the site works but is noticeably
-slower.
+The Worker cannot reach Supabase directly (the connection drops during the
+TLS handshake); Hyperdrive connects for it. Done: `transformidable-db`, id in
+`wrangler.jsonc`. To recreate it:
 
-- [ ] In Neon, open the project → **Connection details**. Copy the connection
-      string with **Connection pooling turned off** (the host should *not*
-      contain `-pooler`). Hyperdrive does its own pooling.
+- [ ] Supabase → project → **Connect** → **Session pooler** → copy the URI
+      (`postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres`).
+      Not "Direct connection" (IPv6-only) and not "Transaction pooler".
 - [ ] Cloudflare → **Storage & Databases → Hyperdrive → Create
-      configuration**.
-  - Name: `transformidable-db`
-  - Connection string: the Neon string from above
-- [ ] Copy the **Hyperdrive ID** it shows (a long hex string; it is not a
-      secret). Send it to Claude, or edit `wrangler.jsonc` yourself:
-      uncomment the `hyperdrive` block and replace `<HYPERDRIVE_ID>`.
+      configuration** → name `transformidable-db`, paste the URI.
+- [ ] Put the ID it shows in the `hyperdrive` block of `wrangler.jsonc`.
 
 ### 2.4 Web Analytics
 
@@ -129,10 +126,11 @@ read while the site is built. Use **Secret** for the ones marked 🔒.
 | Name | Value |
 | ---- | ----- |
 | `NODE_ENV` | `production` |
+| `NPM_CONFIG_INCLUDE` | `dev` (otherwise `NODE_ENV` makes npm skip packages the build needs) |
 | `NODE_VERSION` | `22` |
-| `POSTGRES_URL` 🔒 | from Vercel |
+| `POSTGRES_URL` 🔒 | Supabase **Session pooler** URI (see 2.3) |
 | `PAYLOAD_SECRET` 🔒 | from Vercel |
-| `NEXT_PUBLIC_SERVER_URL` | **for now:** your `workers.dev` address. Changed in Part 5. |
+| `NEXT_PUBLIC_SERVER_URL` | **for now:** your `workers.dev` address, with `https://`. Changed in Part 5. |
 | `NEXT_PUBLIC_SITE_URL` | `https://transformidablethinking.com` |
 | `CF_WEB_ANALYTICS_TOKEN` | token from 2.4 |
 
@@ -147,7 +145,7 @@ while the site runs.
 
 | Name | Type | Value |
 | ---- | ---- | ----- |
-| `POSTGRES_URL` | Secret | from Vercel (used if Hyperdrive isn't set up) |
+| `POSTGRES_URL` | Secret | Supabase Session pooler URI (Hyperdrive is used instead while it's configured) |
 | `PAYLOAD_SECRET` | Secret | from Vercel |
 | `SMTP_HOST` | Text | from Vercel (e.g. `smtp.protonmail.ch`) |
 | `SMTP_PORT` | Text | from Vercel |
