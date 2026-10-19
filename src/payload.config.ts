@@ -50,7 +50,7 @@ const cloudflareEnv = isWorkers
 // On Workers, prefer the Hyperdrive binding when one is configured.
 const hyperdrive = cloudflareEnv?.HYPERDRIVE
 
-// Force sslmode=no-verify on remote databases so pg accepts Neon's
+// Force sslmode=no-verify on remote databases so pg accepts the database's
 // certificate. Setting ssl in the pool config doesn't work because pg's
 // Object.assign overwrites it with the sslmode parsed from the connection
 // string. Local databases are left alone, since they usually don't speak TLS,

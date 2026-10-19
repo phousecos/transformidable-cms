@@ -39,16 +39,16 @@
   "observability": {
     "enabled": true,
   },
-  // Hyperdrive keeps warm connections to Postgres so each request's new
-  // connection is cheap. Create it with
-  //   npx wrangler hyperdrive create transformidable-db --connection-string="<POSTGRES_URL>"
-  // then uncomment this block and paste the id it prints. Without it the app
-  // still works, connecting straight to POSTGRES_URL, but every query pays for
-  // a fresh TLS handshake to the database.
-  // "hyperdrive": [
-  //   {
-  //     "binding": "HYPERDRIVE",
-  //     "id": "<HYPERDRIVE_ID>",
-  //   },
-  // ],
+  // Hyperdrive (transformidable-db) connects to Supabase on the Worker's
+  // behalf. It is required, not just faster: a direct connection from the
+  // Worker to Supabase's pooler drops during the TLS handshake ("Connection
+  // terminated unexpectedly"). The id is not a secret. For `wrangler dev`,
+  // set CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE to a
+  // database URL.
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "d8ca29622bc34307aa48d2ace1b56d40",
+    },
+  ],
 }
