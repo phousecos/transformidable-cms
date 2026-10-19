@@ -3,6 +3,7 @@ import config from "@payload-config";
 import { getPayload } from "payload";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { ResearchShell } from "../../../components/research/ResearchShell";
 import { caseNo, fullDate } from "../../../components/research/format";
 import { CaseDossier } from "../../../components/research/CaseDossier";
@@ -18,20 +19,22 @@ const CASE_STATUS: Record<string, string> = {
   "resolved": "Resolved",
 };
 
-async function getCaseFile(slug: string) {
+// cache(): generateMetadata and the page share one query per request.
+const getCaseFile = cache(async (slug: string) => {
   const payload = await getPayload({ config });
   try {
     const res = await payload.find({
       collection: "case-files",
       where: { slug: { equals: slug }, status: { equals: "published" } },
-      depth: 2,
+      // The dossier only reads fields of directly related docs.
+      depth: 1,
       limit: 1,
     });
     return res.docs?.[0] || null;
   } catch {
     return null;
   }
-}
+});
 
 function mediaUrl(m: any): string | null {
   return m && typeof m === "object" && typeof m.url === "string" ? m.url : null;

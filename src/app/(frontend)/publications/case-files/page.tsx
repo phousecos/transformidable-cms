@@ -22,7 +22,9 @@ export default async function CaseFilesIndex() {
       collection: "case-files",
       where: { status: { equals: "published" } },
       sort: "-publishedAt",
-      depth: 1,
+      // Only what the cards show; loading full dossiers here is slow on Workers.
+      select: { title: true, slug: true, caseNumber: true, dek: true, sector: true, method: true, readTime: true },
+      depth: 0,
       limit: 60,
     });
     docs = res.docs || [];
