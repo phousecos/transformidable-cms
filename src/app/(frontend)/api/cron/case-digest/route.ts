@@ -20,11 +20,10 @@ type FollowRecord = {
   caseFile: string | number
 }
 
-// Fired daily by Vercel Cron (see vercel.json) or, on Cloudflare, by the
-// Cron Trigger in wrangler.jsonc via worker.ts. For every Case File updated
+// Fired daily by the Cron Trigger in wrangler.jsonc, via worker.ts. For every Case File updated
 // in the last 24h, finds active followers and sends each one a single
 // digest email listing every case of theirs that changed — not one email
-// per case. Authenticated via CRON_SECRET, which both schedulers send on the
+// per case. Authenticated via CRON_SECRET, which worker.ts sends on the
 // Authorization header.
 export async function GET(req: NextRequest) {
   const secret = process.env.CRON_SECRET

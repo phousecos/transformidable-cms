@@ -18,8 +18,7 @@
     "seed:research": "tsx src/seed/research.ts",
     "seed:articles": "tsx src/seed/articles-to-publications.ts",
     "seed:ucpath": "tsx src/seed/ucpath.ts",
-    "import:coding": "tsx src/seed/import-coding.ts",
-    "media:copy-to-r2": "tsx src/seed/copy-blob-to-r2.ts"
+    "import:coding": "tsx src/seed/import-coding.ts"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.20.12",
@@ -29,9 +28,6 @@
     "@payloadcms/plugin-cloud-storage": "3.91.0",
     "@payloadcms/richtext-lexical": "3.91.0",
     "@payloadcms/storage-r2": "3.91.0",
-    "@payloadcms/storage-vercel-blob": "3.91.0",
-    "@vercel/analytics": "^2.0.1",
-    "@vercel/blob": "2.3.1",
     "graphql": "^16.8.1",
     "hls.js": "^1.7.3",
     "next": "16.4.2",

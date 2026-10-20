@@ -9,7 +9,7 @@ export const MAX_EMAIL_LEN = 254 // RFC 5321
 
 // The visitor's IP, from whichever header the host sets and a client can't
 // forge. On Cloudflare that is cf-connecting-ip. It is only trusted there:
-// on Vercel a client could send it themselves to dodge the rate limits.
+// anywhere else a client could send it themselves to dodge the rate limits.
 // Without a match every visitor would be 'unknown' and share one limit.
 export function getClientIp(req: NextRequest): string {
   if (isWorkers) {

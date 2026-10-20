@@ -31,8 +31,7 @@ const nextConfig = {
     // Case File dossier (long overview plus a full timeline, documents, audits,
     // and coverage) crosses 1 MB of form state at roughly 370 KB of content.
     //
-    // 4 MB, not more: Vercel caps serverless function request bodies at 4.5 MB,
-    // so a higher value here would not actually be deliverable in production.
+    // 4 MB leaves headroom for the largest dossiers; Workers accept far more.
     serverActions: {
       bodySizeLimit: '4mb',
     },

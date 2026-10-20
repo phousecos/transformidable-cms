@@ -12,7 +12,7 @@ can merge and ship on its own.
 | 2 | Vercel Blob → R2; drop `sharp` and image sizes; Blob→R2 copy script | done |
 | 3 | Cron → Cron Trigger; SMTP verified on Workers; Cloudflare Web Analytics; visitor IP on Cloudflare | done |
 | 4 | Podcast: settings global, YouTube embed, MP3 audio, RSS feed | done |
-| 5 | Dashboard setup, DNS cutover, retire Vercel | to do |
+| 5 | Dashboard setup, DNS cutover, retire Vercel | done; Vercel-only code removed |
 
 ## How it runs
 
@@ -88,9 +88,8 @@ is unreachable from Workers, as it was from Vercel.
 
 ### Analytics
 
-`layout.tsx` renders Vercel Analytics only when `VERCEL` is set (it 404s
-anywhere else), and the Cloudflare Web Analytics beacon when
-`CF_WEB_ANALYTICS_TOKEN` is set. Both can be on during the overlap.
+`layout.tsx` renders the Cloudflare Web Analytics beacon when
+`CF_WEB_ANALYTICS_TOKEN` is set.
 
 ### Visitor IP
 
@@ -154,7 +153,6 @@ The storage adapter is picked per environment in `payload.config.ts`:
 | Where | Storage |
 | ----- | ------- |
 | Cloudflare Worker | R2, through the `MEDIA_BUCKET` binding. Uploads from the admin go browser → R2 in 5 MB chunks (`clientUploads`), so large files such as podcast audio never sit in one request or in the Worker's memory. |
-| Vercel (until cutover) | Vercel Blob, as before. |
 | Anywhere else (build-time migrations, `npm run dev`) | Local disk; the storage fields are still added. |
 
 Every store keys files by filename and Payload serves them at
@@ -181,7 +179,6 @@ copied with everything else; nothing references them.
 | `npm run dev` | Unchanged: Next dev server on Node. |
 | `npm run preview:cf` | Builds the Worker and runs it locally in `wrangler dev`. Needs a `.dev.vars` file (gitignored) with the runtime variables below. |
 | `npm run deploy:cf` | Builds and deploys the Worker from your machine (`npx wrangler login` first). |
-| `npm run media:copy-to-r2` | Copies every Vercel Blob object to the R2 bucket under the same key. Needs `BLOB_READ_WRITE_TOKEN` and wrangler logged in. `-- --dry-run` lists what it would copy; `-- --local` writes to the local R2 used by `preview:cf`. Safe to re-run. |
 
 ## One-time Cloudflare setup (step 5)
 
@@ -193,9 +190,8 @@ The click-by-click version, in order, is [`cloudflare-cutover.md`](./cloudflare-
    ```bash
    npx wrangler r2 bucket create transformidable-media
    ```
-   Then copy existing files with `npm run media:copy-to-r2`. Run it again
-   right before the DNS switch to pick up anything uploaded on Vercel in
-   between (or freeze uploads for the window).
+   Existing files were copied from Vercel Blob at cutover; the copy script
+   was removed afterwards (it is in the git history).
 
    The old config noted media "serves from assets.transformidablethinking.com".
    If that domain points at the Blob store, anything linking to it directly
@@ -245,16 +241,15 @@ The build runs `src/migrate.ts` against the database and inlines every
 | `CRON_SECRET` | Same value as on Vercel. The digest refuses to run without it. |
 | `CF_WEB_ANALYTICS_TOKEN` | Same as the build variable (dynamic pages read it at runtime). |
 | `SYNDICATE_<BRAND>_URL` / `_SECRET` | As on Vercel; see `syndication-operations.md`. |
-| `BLOB_READ_WRITE_TOKEN` | **Do not set** on Cloudflare. Media uses the R2 binding. |
 
 ## Known gaps
 
-- `undici` (bundled by Payload and by `@vercel/blob`) logs one
+- `undici` (bundled by Payload) may log one
   "WebAssembly.compile(): Wasm code generation disallowed" error when the
   Worker starts. Payload uses it in `safeFetch` when it downloads a stored
   file, e.g. to duplicate a media item; that failed on Workers, so Media sets
-  `skipSafeFetch` there (see the comment in `Media.ts`). Blob is never active
-  on Workers. The startup log line is harmless.
+  `skipSafeFetch` there (see the comment in `Media.ts`). The startup log line
+  is harmless.
 - A duplicated media item records `filesize: 0`. Payload takes the size from
   the `Content-Length` header, and R2 responses through the Worker are
   streamed without one. The file itself is copied intact.

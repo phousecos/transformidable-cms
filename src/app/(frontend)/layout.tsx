@@ -1,6 +1,5 @@
 import React from "react";
 import Script from "next/script";
-import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 // Canonical public site URL. Set NEXT_PUBLIC_SITE_URL in the environment to the
@@ -71,8 +70,6 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
           Skip to main content
         </a>
         {children}
-        {/* Vercel's script only exists on Vercel (it 404s anywhere else). */}
-        {process.env.VERCEL && <Analytics />}
         {cfAnalyticsToken && (
           <Script
             src="https://static.cloudflareinsights.com/beacon.min.js"
