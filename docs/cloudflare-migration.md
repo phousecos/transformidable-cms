@@ -203,11 +203,16 @@ The click-by-click version, in order, is [`cloudflare-cutover.md`](./cloudflare-
    instead (R2 → bucket → Settings → Custom Domains). Keys are identical, so
    the same paths keep working.
 3. **Hyperdrive** (required; see above): already configured as
-   `transformidable-db`, id in `wrangler.jsonc`.
+   `transformidable-db`, id in `wrangler.jsonc`. Its origin port must be
+   5432; on 6543 database requests hang. The `localConnectionString` in
+   `wrangler.jsonc` is a placeholder the deploy step needs; production
+   never uses it.
 4. **Workers Builds** (Worker → Settings → Build), connected to this repo:
    - Build command: `npx opennextjs-cloudflare build`
    - Deploy command: `npx opennextjs-cloudflare deploy -- --keep-vars`
      (`--keep-vars` stops each deploy deleting variables set in the dashboard)
+   - Branch control: turn off builds for non-production branches. They
+     would run migrations against the production database.
 5. **Web Analytics**: Analytics & Logs → Web Analytics → Add a site → the
    domain, and choose the JavaScript snippet. Copy the token from it into
    `CF_WEB_ANALYTICS_TOKEN` (below). Vercel Analytics history does not move.
