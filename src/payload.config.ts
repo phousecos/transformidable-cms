@@ -24,6 +24,7 @@ import { CaseFollows } from './collections/CaseFollows.ts'
 import { CaseSubmissions } from './collections/CaseSubmissions.ts'
 import { ContactMessages } from './collections/ContactMessages.ts'
 import { PodcastEpisodes } from './collections/PodcastEpisodes.ts'
+import { Documents } from './collections/Documents.ts'
 import { SiteSettings } from './globals/SiteSettings.ts'
 import { TransformidableFeature } from './globals/TransformidableFeature.ts'
 import { PodcastSettings } from './globals/PodcastSettings.ts'
@@ -240,6 +241,7 @@ export default buildConfig({
     CaseSubmissions,
     ContactMessages,
     PodcastEpisodes,
+    Documents,
     // Legacy collections — hidden from nav, kept for data access
     { ...Authors, admin: { ...Authors.admin, hidden: true } },
     { ...BrandPillars, admin: { ...BrandPillars.admin, hidden: true } },
@@ -285,8 +287,9 @@ export default buildConfig({
   },
 
   plugins: [
-    // Media storage. Files are keyed by filename in every store and served
-    // through Payload at /api/media/file/<filename>.
+    // Media and document storage. Files are keyed by filename in every store
+    // and served through Payload at /api/<collection>/file/<filename>;
+    // documents sit under their own documents/ prefix in the bucket.
     //
     // alwaysInsertFields is set on every branch because the storage plugin
     // adds columns to the media table (_object_key, prefix). The schema is
@@ -301,13 +304,16 @@ export default buildConfig({
           alwaysInsertFields: true,
           bucket: cloudflareEnv.MEDIA_BUCKET,
           clientUploads: true,
-          collections: { media: true },
+          collections: { media: true, documents: { prefix: 'documents' } },
         })
       : // Under Node (build-time migrations, local dev): fields only, and
         // files stay on local disk.
         cloudStoragePlugin({
           alwaysInsertFields: true,
-          collections: { media: { adapter: null } },
+          collections: {
+            media: { adapter: null },
+            documents: { adapter: null, prefix: 'documents' },
+          },
           enabled: false,
         }),
   ],

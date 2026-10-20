@@ -80,6 +80,12 @@ try {
     // Podcast Episodes versions
     { table: '_podcast_episodes_v_version_syndicate_to', column: 'value', validValues: ['jerribland', 'agentpmo', 'prept', 'lumynr', 'vettersgroup'] },
     { table: '_podcast_episodes_v', column: 'version_status', validValues: ['draft', 'review', 'scheduled', 'published'] },
+    // Documents
+    { table: 'documents_brand', column: 'value', validValues: ['jlynne', 'transformidable', 'jerribland'] },
+    { table: 'documents_service_areas', column: 'value', validValues: ['ai', 'erp-core', 'general-technology', 'mergers-acquisitions', 'fractional-cio', 'leadership-transitions', 'transformations'] },
+    { table: 'documents', column: 'sector', validValues: ['general', 'highered-nonprofit', 'credit-unions'] },
+    { table: 'documents', column: 'document_type', validValues: ['overview', 'checklist', 'guide', 'brief', 'framework', 'template', 'worksheet', 'report'] },
+    { table: 'documents', column: 'status', validValues: ['draft', 'published'] },
     // Newsletter Issues
     { table: 'newsletter_issues', column: 'status', validValues: ['draft', 'scheduled', 'published'] },
     // Users
