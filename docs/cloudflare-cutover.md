@@ -188,6 +188,9 @@ create or change here is live data.
 
 ### 4.1 Copy existing media to R2
 
+> Done at cutover. The copy workflow and script have since been removed; they
+> are in the git history if ever needed again.
+
 GitHub copies the files; nothing is installed on your computer.
 
 **One-time setup: three repository secrets.** GitHub → the repo →
@@ -354,7 +357,7 @@ video.
   Both email a verification code to the owner email in Podcast Settings.
 - [ ] Delete the three repository secrets from 4.1 and the Cloudflare API
       token (My Profile → API Tokens).
-- [ ] After a week with no problems: ask Claude to remove the Vercel-only code
-      (`vercel.json`, the Blob plugin, Vercel Analytics). Then delete the
-      Vercel project and **downgrade Vercel Pro**. That is where the savings
+- [x] Remove the Vercel-only code (`vercel.json`, the Blob plugin, Vercel
+      Analytics, the media copy script and its workflow). Done.
+- [ ] Delete the Vercel project and **downgrade Vercel Pro**. That is where the savings
       start.

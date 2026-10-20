@@ -16,9 +16,8 @@ const CRON_ROUTES: Record<string, string> = {
 export default {
   fetch: handler.fetch,
 
-  // Runs the cron's route through the app itself, with the same bearer token
-  // Vercel Cron used to send, so the route is unchanged and still refuses
-  // requests from anyone without CRON_SECRET. Throwing marks the run as
+  // Runs the cron's route through the app itself with CRON_SECRET as a bearer
+  // token, so the route still refuses requests from anyone without it. Throwing marks the run as
   // failed in the Cron Events log.
   async scheduled(controller: { cron: string }, env: Env, ctx: Ctx) {
     const path = CRON_ROUTES[controller.cron]

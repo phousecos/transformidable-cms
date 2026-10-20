@@ -5,7 +5,6 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { cloudStoragePlugin } from '@payloadcms/plugin-cloud-storage'
 import { r2Storage } from '@payloadcms/storage-r2'
-import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import pg from 'pg'
 import { isWorkers } from './lib/runtime.ts'
@@ -100,19 +99,11 @@ const workersLogger = {
   silent: () => {},
 } as any // Payload doesn't export its logger type
 
-// Prefer an explicitly configured URL over Vercel's guess.
-// VERCEL_PROJECT_PRODUCTION_URL is set on every deployment and names the
-// project's *primary* production domain. This project serves both the public
-// site and the admin, so that primary domain is not necessarily the host the
-// admin is browsed at — and letting it win meant NEXT_PUBLIC_SERVER_URL could
-// never take effect in production, however it was set. serverURL feeds the
-// CSRF allowlist below (Payload appends it during config sanitization), so
-// pointing it at the wrong host silently locks the admin out of its own API.
-const serverURL =
-  process.env.NEXT_PUBLIC_SERVER_URL ||
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : '')
+// The admin's own address (https://cms.transformidablethinking.com). serverURL
+// feeds the CSRF allowlist below (Payload appends it during config
+// sanitization), so pointing it at the wrong host silently locks the admin out
+// of its own API.
+const serverURL = process.env.NEXT_PUBLIC_SERVER_URL || ''
 
 // Origins allowed to carry the admin session cookie on API requests.
 //
@@ -131,16 +122,15 @@ const serverURL =
 // So: every host the admin is actually served from must be listed here, and
 // the cost of omitting one is hours of misdirected debugging.
 //
-// This list must track the domains attached to the host (Vercel today,
-// Cloudflare after the move), NOT the domain we currently consider canonical.
+// This list must track the domains attached to the Worker, NOT the domain we
+// currently consider canonical.
 // The legacy transformidable.media domains are still attached and still
 // serving production, so the admin is reachable at them; when the rename to
 // transformidablethinking.com edited the single hardcoded entry here, it
 // silently locked out anyone still using a .media URL. Retiring a domain on
 // the host is what should remove it from this list.
 //
-// Cloudflare sets no equivalent of the VERCEL_* variables below, so on Workers
-// any extra host the admin is opened at (the workers.dev URL, a preview URL)
+// Any extra host the admin is opened at (the workers.dev URL, a preview URL)
 // must be added through PAYLOAD_CSRF_ORIGINS.
 const csrfOrigins = Array.from(
   new Set(
@@ -155,13 +145,6 @@ const csrfOrigins = Array.from(
       'https://cms.transformidable.media',
       'https://transformidable.media',
       'https://www.transformidable.media',
-      'https://transformidable-cms.vercel.app',
-      // Vercel gives each deployment its own hostnames. Without these, the
-      // admin hits the same silent 401 on every preview deployment.
-      process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`,
-      process.env.VERCEL_BRANCH_URL && `https://${process.env.VERCEL_BRANCH_URL}`,
-      process.env.VERCEL_PROJECT_PRODUCTION_URL &&
-        `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`,
       // Escape hatch: comma-separated extra origins. Lets a domain change be
       // fixed with an env var instead of a code change and a redeploy.
       ...(process.env.PAYLOAD_CSRF_ORIGINS?.split(',').map((origin) => origin.trim()) ?? []),
@@ -303,8 +286,7 @@ export default buildConfig({
 
   plugins: [
     // Media storage. Files are keyed by filename in every store and served
-    // through Payload at /api/media/file/<filename>, so copying the objects
-    // across (npm run media:copy-to-r2) is all a move between stores needs.
+    // through Payload at /api/media/file/<filename>.
     //
     // alwaysInsertFields is set on every branch because the storage plugin
     // adds columns to the media table (_object_key, prefix). The schema is
@@ -321,19 +303,12 @@ export default buildConfig({
           clientUploads: true,
           collections: { media: true },
         })
-      : process.env.BLOB_READ_WRITE_TOKEN
-        ? // Vercel, until cutover.
-          vercelBlobStorage({
-            alwaysInsertFields: true,
-            collections: { media: true },
-            token: process.env.BLOB_READ_WRITE_TOKEN,
-          })
-        : // Neither (build-time migrations, local dev): fields only, and files
-          // stay on local disk.
-          cloudStoragePlugin({
-            alwaysInsertFields: true,
-            collections: { media: { adapter: null } },
-            enabled: false,
-          }),
+      : // Under Node (build-time migrations, local dev): fields only, and
+        // files stay on local disk.
+        cloudStoragePlugin({
+          alwaysInsertFields: true,
+          collections: { media: { adapter: null } },
+          enabled: false,
+        }),
   ],
 })
