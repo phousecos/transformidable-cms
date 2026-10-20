@@ -49,6 +49,18 @@ const nextConfig = {
     }
     return webpackConfig
   },
+  // cms.transformidablethinking.com is the admin's address: send anything
+  // that isn't the admin, its API, or a static file to the admin login.
+  async redirects() {
+    return [
+      {
+        source: '/:path((?!admin|api|_next)(?!.*\\.\\w+$).*)',
+        has: [{ type: 'host', value: 'cms\\..*' }],
+        destination: '/admin',
+        permanent: false,
+      },
+    ]
+  },
   async headers() {
     return [
       {
