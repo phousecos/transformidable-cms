@@ -15,18 +15,7 @@ export const Media: CollectionConfig = {
     delete: isAdmin,
   },
   upload: {
-    // PDFs and Office files back the brand sites' downloads (see Documents).
-    mimeTypes: [
-      'image/*',
-      'audio/*',
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-powerpoint',
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    ],
+    mimeTypes: ['image/*', 'audio/*', 'application/pdf'],
     // No imageSizes, crop, or focal point: all three need sharp, which can't
     // run on Cloudflare Workers. The site only ever used the original file.
     crop: false,

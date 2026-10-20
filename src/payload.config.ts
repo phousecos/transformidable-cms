@@ -287,8 +287,9 @@ export default buildConfig({
   },
 
   plugins: [
-    // Media storage. Files are keyed by filename in every store and served
-    // through Payload at /api/media/file/<filename>.
+    // Media and document storage. Files are keyed by filename in every store
+    // and served through Payload at /api/<collection>/file/<filename>;
+    // documents sit under their own documents/ prefix in the bucket.
     //
     // alwaysInsertFields is set on every branch because the storage plugin
     // adds columns to the media table (_object_key, prefix). The schema is
@@ -303,13 +304,16 @@ export default buildConfig({
           alwaysInsertFields: true,
           bucket: cloudflareEnv.MEDIA_BUCKET,
           clientUploads: true,
-          collections: { media: true },
+          collections: { media: true, documents: { prefix: 'documents' } },
         })
       : // Under Node (build-time migrations, local dev): fields only, and
         // files stay on local disk.
         cloudStoragePlugin({
           alwaysInsertFields: true,
-          collections: { media: { adapter: null } },
+          collections: {
+            media: { adapter: null },
+            documents: { adapter: null, prefix: 'documents' },
+          },
           enabled: false,
         }),
   ],

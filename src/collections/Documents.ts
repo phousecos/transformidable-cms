@@ -1,9 +1,11 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin, isAdminOrEditor } from '../access/checkRole.ts'
+import { isWorkers } from '../lib/runtime.ts'
 
 // Downloadable documents (checklists, guides, overviews) that the brand sites
-// list for visitors. The file itself lives in Media; this collection carries
-// what a downloads page needs to show and filter it. Each brand site pulls
+// list for visitors. Each record is the file itself plus what a downloads page
+// needs to show and filter it, so documents stay out of the Media library.
+// Files are stored under their own documents/ prefix in R2. Each brand site pulls
 // only the documents tagged with its brand, e.g. jlynne.co asks for
 // brand = jlynne and status = published.
 //
@@ -54,7 +56,7 @@ export const Documents: CollectionConfig = {
   slug: 'documents',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'brand', 'serviceAreas', 'sector', 'status', 'updatedAt'],
+    defaultColumns: ['title', 'filename', 'brand', 'serviceAreas', 'sector', 'status'],
     description:
       'Downloadable documents for the brand sites. Each site lists the published documents tagged with its brand.',
   },
@@ -69,6 +71,21 @@ export const Documents: CollectionConfig = {
     update: isAdminOrEditor,
     delete: isAdmin,
   },
+  upload: {
+    mimeTypes: [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+    ],
+    // Same reasons as Media: no sharp on Workers, and safeFetch needs Node.
+    crop: false,
+    focalPoint: false,
+    skipSafeFetch: isWorkers,
+  },
   fields: [
     {
       name: 'title',
@@ -80,15 +97,6 @@ export const Documents: CollectionConfig = {
       type: 'textarea',
       admin: {
         description: 'One or two sentences shown on the download card.',
-      },
-    },
-    {
-      name: 'file',
-      type: 'upload',
-      relationTo: 'media',
-      required: true,
-      admin: {
-        description: 'The file visitors download (PDF, Word, Excel or PowerPoint).',
       },
     },
     {
