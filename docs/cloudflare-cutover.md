@@ -62,7 +62,9 @@ domain.
 ### 2.1 Workers Paid plan ($5/month)
 
 - [ ] **Workers & Pages → Plans** (or **Compute → Workers → Plans**) → choose
-      **Paid**. The app is too big for the free plan.
+      **Paid**. The app is too big for the free plan, and the free plan's
+      10 ms CPU limit per request fails case file pages with error 1102
+      ("Worker exceeded CPU time limit"). The Paid plan allows 30 seconds.
 
 ### 2.2 Media bucket (R2)
 
@@ -82,6 +84,10 @@ TLS handshake); Hyperdrive connects for it. Done: `transformidable-db`, id in
       Not "Direct connection" (IPv6-only) and not "Transaction pooler".
 - [ ] Cloudflare → **Storage & Databases → Hyperdrive → Create
       configuration** → name `transformidable-db`, paste the URI.
+- [ ] Check **Hyperdrive → transformidable-db → Settings**: the port must be
+      **5432**. With 6543 (the transaction pooler) pages that read the
+      database spin forever and Hyperdrive's Metrics tab shows errors. Fix
+      it there with the pencil icon; no rebuild is needed.
 - [ ] Put the ID it shows in the `hyperdrive` block of `wrangler.jsonc`.
 
 ### 2.4 Web Analytics
@@ -108,6 +114,10 @@ TLS handshake); Hyperdrive connects for it. Done: `transformidable-db`, id in
 | Root directory | `/` (leave blank) |
 | Build command | `npx opennextjs-cloudflare build` |
 | Deploy command | `npx opennextjs-cloudflare deploy -- --keep-vars` |
+
+- [ ] After creating it: **Settings → Build → Branch control** → turn off
+      **Builds for non-production branches**. Preview builds would run
+      database migrations against the production database.
 
 If it starts building straight away, let the first build fail. The variables
 come next, then you retry.
