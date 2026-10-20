@@ -5,14 +5,14 @@ import { useState } from "react";
 // Click-to-play YouTube embed. Until clicked it is only a thumbnail, so
 // YouTube's player scripts and cookies load for viewers who actually watch.
 // The player itself uses youtube-nocookie.com (YouTube's privacy mode).
-export function YouTubeEmbed({ id, title }: { id: string; title: string }) {
+export function YouTubeEmbed({ id, title, start = 0 }: { id: string; title: string; start?: number }) {
   const [playing, setPlaying] = useState(false);
 
   if (playing) {
     return (
       <div className="yt">
         <iframe
-          src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`}
+          src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0${start ? `&start=${start}` : ""}`}
           title={title}
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
           allowFullScreen

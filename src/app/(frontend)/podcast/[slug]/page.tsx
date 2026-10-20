@@ -1,30 +1,35 @@
 // @ts-nocheck
 import config from "@payload-config";
 import { getPayload } from "payload";
+import { getStreamHost } from "../../components/research/streamHost";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { ResearchShell } from "../../components/research/ResearchShell";
 import { YouTubeEmbed } from "../../components/research/YouTubeEmbed";
+import { StreamPlayer } from "../../components/research/StreamPlayer";
+import { SeekLink } from "../../components/research/SeekLink";
 import { fullDate } from "../../components/research/format";
 import { renderLexical } from "../../components/research/lexical";
-import { youtubeId } from "../../../../lib/podcast";
+import { chapterList, clock, durationSeconds, streamVideo, youtubeId } from "../../../../lib/podcast";
 
 export const dynamic = "force-dynamic";
 
-async function getEpisode(slug: string) {
+// cache(): generateMetadata and the page share one query per request.
+const getEpisode = cache(async (slug: string) => {
   const payload = await getPayload({ config });
   try {
     const res = await payload.find({
       collection: "podcast-episodes",
       where: { slug: { equals: slug }, status: { equals: "published" } },
-      depth: 2,
+      depth: 1,
       limit: 1,
     });
     return res.docs?.[0] || null;
   } catch {
     return null;
   }
-}
+});
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -37,12 +42,23 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function PodcastEpisodePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function PodcastEpisodePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ t?: string }>;
+}) {
   const { slug } = await params;
-  const ep = await getEpisode(slug);
+  const { t } = await searchParams;
+  const [ep, streamHost] = await Promise.all([getEpisode(slug), getStreamHost()]);
   if (!ep) notFound();
 
-  const videoId = youtubeId(ep.youtubeUrl);
+  // The website plays the Stream copy when there is one; YouTube otherwise.
+  const stream = streamVideo(ep.streamVideo, streamHost);
+  const videoId = stream ? null : youtubeId(ep.youtubeUrl);
+  const chapters = chapterList(ep.chapters);
+  const startAt = durationSeconds(t) ?? 0;
   const audioFile = ep.audioFile && typeof ep.audioFile === "object" ? ep.audioFile : null;
   const audioSrc = audioFile?.url || ep.audioUrl || null;
   const guest = ep.guest && typeof ep.guest === "object" ? ep.guest : null;
@@ -74,7 +90,29 @@ export default async function PodcastEpisodePage({ params }: { params: Promise<{
             </div>
           )}
 
-          {videoId && <YouTubeEmbed id={videoId} title={ep.title} />}
+          {stream && (
+            <StreamPlayer
+              src={stream.hls}
+              poster={stream.poster}
+              title={ep.title}
+              chapters={chapters}
+              duration={durationSeconds(ep.duration) ?? 0}
+              startAt={startAt}
+            />
+          )}
+          {videoId && <YouTubeEmbed id={videoId} title={ep.title} start={startAt} />}
+          {chapters.length > 0 && (
+            <ol className="sp-chapters" aria-label="Chapters">
+              {chapters.map((c) => (
+                <li key={c.start}>
+                  <SeekLink href={`/podcast/${ep.slug}?t=${c.start}`} seconds={c.start}>
+                    <span className="sp-chapters-time">{clock(c.start)}</span>
+                    <span className="sp-chapters-t">{c.title}</span>
+                  </SeekLink>
+                </li>
+              ))}
+            </ol>
+          )}
           {audioSrc && (
             // Audio-only listeners; preload="none" so the page doesn't start
             // downloading a large file nobody asked for.

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import config from "@payload-config";
 import { getPayload } from "payload";
+import { getStreamHost } from "../../../components/research/streamHost";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
@@ -49,7 +50,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CaseFileDetail({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const cf = await getCaseFile(slug);
+  const [cf, streamHost] = await Promise.all([getCaseFile(slug), getStreamHost()]);
   if (!cf) notFound();
 
   const cover = mediaUrl(cf.featuredImage);
@@ -96,7 +97,7 @@ export default async function CaseFileDetail({ params }: { params: Promise<{ slu
           )}
         </div>
 
-        <CaseDossier caseFile={cf} />
+        <CaseDossier caseFile={cf} streamHost={streamHost} />
 
         <div className="detail-wrap">
           <div className="case-engage">

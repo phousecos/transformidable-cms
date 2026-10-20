@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin, isAdminOrEditor } from '../access/checkRole.ts'
 import { validateHttpUrl } from '../access/validateUrl.ts'
-import { durationSeconds, youtubeId } from '../lib/podcast.ts'
+import { CASE_SECTIONS, durationSeconds, youtubeId } from '../lib/podcast.ts'
 
 export const PodcastEpisodes: CollectionConfig = {
   slug: 'podcast-episodes',
@@ -75,6 +75,50 @@ export const PodcastEpisodes: CollectionConfig = {
       },
       validate: (value: string | null | undefined) =>
         !value || youtubeId(value) ? true : 'Not a recognisable YouTube video link.',
+    },
+    {
+      name: 'streamVideo',
+      type: 'text',
+      label: 'Cloudflare Stream video',
+      admin: {
+        description:
+          'The video ID from Cloudflare Stream (32 letters and numbers), or the video\'s HLS link. Played on the website in place of YouTube.',
+      },
+      validate: (value: string | null | undefined) =>
+        !value || /\b[a-f0-9]{32}\b/.test(value) ? true : 'Paste the 32-character video ID from Cloudflare Stream.',
+    },
+    {
+      name: 'chapters',
+      type: 'array',
+      labels: { singular: 'Chapter', plural: 'Chapters' },
+      admin: {
+        description:
+          'Marked on the video\'s progress bar and listed under it. Tie a chapter to a case file section to show a "Discussed in the episode" link there.',
+        initCollapsed: true,
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'start',
+              type: 'text',
+              required: true,
+              admin: { width: '20%', description: 'e.g. 6:05' },
+              validate: (value: string | null | undefined) =>
+                durationSeconds(value) !== null ? true : 'Use mm:ss or h:mm:ss, e.g. 6:05.',
+            },
+            { name: 'title', type: 'text', required: true, admin: { width: '45%' } },
+            {
+              name: 'caseSection',
+              type: 'select',
+              label: 'Case file section',
+              options: CASE_SECTIONS,
+              admin: { width: '35%' },
+            },
+          ],
+        },
+      ],
     },
     {
       name: 'audioFile',

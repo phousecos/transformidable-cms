@@ -188,7 +188,31 @@ create or change here is live data.
 
 ### 4.1 Copy existing media to R2
 
-Run from a computer with the repo checked out and Node 22 installed:
+GitHub copies the files; nothing is installed on your computer.
+
+**One-time setup: three repository secrets.** GitHub → the repo →
+**Settings → Secrets and variables → Actions → New repository secret**, one
+for each:
+
+| Name | Where to get it |
+| ---- | --------------- |
+| `BLOB_READ_WRITE_TOKEN` | Vercel → project → **Storage** → the Blob store → copy `BLOB_READ_WRITE_TOKEN` |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare (Transformidable account) → **My Profile → API Tokens → Create Token → Custom token**. Permission: **Account → Workers R2 Storage → Edit**, for the Transformidable account only. Copy the token it shows once. |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare → **Workers & Pages** → **Account ID** on the right |
+
+**Run it.** GitHub → **Actions → Copy media to R2 → Run workflow**:
+
+- [ ] First with **Only list what would be copied** ticked (the default).
+      Open the run: it lists every file and ends with `Would copy N
+      object(s)`. This checks the Vercel token.
+- [ ] Then again with the box **unticked**. It ends with `Copied N
+      object(s)`. If any failed, run it again; it is safe to repeat.
+
+After the move (Part 6), delete the three secrets and the Cloudflare token.
+
+<details><summary>Running it from a computer instead</summary>
+
+With the repo checked out and Node 22 installed:
 
 ```bash
 git pull
@@ -199,8 +223,7 @@ npm run media:copy-to-r2 -- --dry-run    # lists what it would copy
 npm run media:copy-to-r2                 # copies it
 ```
 
-It ends with `Copied N object(s)`. If any fail, run it again; it's safe to
-repeat.
+</details>
 
 ### 4.2 Check the site
 
@@ -228,7 +251,8 @@ records and Cloudflare activating the new ones.
 ### 5.1 Freeze and final media copy
 
 - [ ] Stop uploading in the admin (on either site) until this part is done.
-- [ ] Run `npm run media:copy-to-r2` once more to pick up recent uploads.
+- [ ] Run **Actions → Copy media to R2** once more (box unticked) to pick up
+      recent uploads.
 
 ### 5.2 Point the build at the real domain
 
@@ -300,12 +324,36 @@ still there and uses the same database.
       set the duration, status **Published**.
 - [ ] Open `https://transformidablethinking.com/podcast/feed.xml` and check
       the episode is listed.
+
+**Website video (Cloudflare Stream).** The site plays its own copy of each
+episode from Stream; YouTube is only used for an episode with no Stream
+video.
+
+- [ ] Cloudflare → **Stream** → subscribe (billed by minutes stored and
+      minutes watched; see the plans on that page).
+- [ ] **Stream → Upload** the episode's video file (MP4 or MOV). When it
+      finishes processing, open the video: copy its **Video ID** (32 letters
+      and numbers) and, from its HLS link, the address that looks like
+      `customer-xxxx.cloudflarestream.com`.
+- [ ] Optional: in the video's **Captions** tab, generate English captions.
+      The player shows a **CC** button once a video has them.
+- [ ] Admin → **Podcast Settings** → **Cloudflare Stream address**: paste the
+      `customer-xxxx.cloudflarestream.com` address (once, for all episodes).
+- [ ] Admin → Podcast Episodes → the episode → **Cloudflare Stream video**:
+      paste the Video ID.
+- [ ] Same episode → **Chapters**: add each chapter's start time (e.g.
+      `6:05`) and title. Pick a **Case file section** to show a "Discussed in
+      the episode at 6:05" link in that section of the linked case file.
+- [ ] Check the episode page and the case file: the video plays, chapters
+      jump, and the "Discussed" links start the video at the right moment.
 - [ ] Submit the feed URL once:
   - Apple: podcastsconnect.apple.com → **+** → New Show → **Add a show with an
     RSS feed**
   - Spotify: creators.spotify.com → **Add an existing show** → paste the feed
     URL
   Both email a verification code to the owner email in Podcast Settings.
+- [ ] Delete the three repository secrets from 4.1 and the Cloudflare API
+      token (My Profile → API Tokens).
 - [ ] After a week with no problems: ask Claude to remove the Vercel-only code
       (`vercel.json`, the Blob plugin, Vercel Analytics). Then delete the
       Vercel project and **downgrade Vercel Pro**. That is where the savings

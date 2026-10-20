@@ -1,6 +1,6 @@
 import type { GlobalConfig } from 'payload'
 import { isAdminOrEditor } from '../access/checkRole.ts'
-import { COVER_ART_MAX, COVER_ART_MIN, PODCAST_CATEGORIES, PODCAST_DEFAULTS } from '../lib/podcast.ts'
+import { COVER_ART_MAX, COVER_ART_MIN, PODCAST_CATEGORIES, PODCAST_DEFAULTS, isStreamHost } from '../lib/podcast.ts'
 
 // Show-level details for the podcast RSS feed (/podcast/feed.xml), which is
 // what Apple Podcasts, Spotify and other apps read.
@@ -95,6 +95,17 @@ export const PodcastSettings: GlobalConfig = {
       admin: {
         description: 'Mark the show as containing explicit content.',
       },
+    },
+    {
+      name: 'streamHost',
+      type: 'text',
+      label: 'Cloudflare Stream address',
+      admin: {
+        description:
+          'Your Stream account\'s video address, e.g. customer-abc123.cloudflarestream.com. Cloudflare shows it in any video\'s HLS or embed link.',
+      },
+      validate: (value: string | null | undefined) =>
+        !value || isStreamHost(value) ? true : 'Looks like customer-xxxx.cloudflarestream.com (no https:// or slashes).',
     },
   ],
 }
