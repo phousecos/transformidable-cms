@@ -24,6 +24,7 @@ import { CaseFollows } from './collections/CaseFollows.ts'
 import { CaseSubmissions } from './collections/CaseSubmissions.ts'
 import { ContactMessages } from './collections/ContactMessages.ts'
 import { PodcastEpisodes } from './collections/PodcastEpisodes.ts'
+import { Documents } from './collections/Documents.ts'
 import { SiteSettings } from './globals/SiteSettings.ts'
 import { TransformidableFeature } from './globals/TransformidableFeature.ts'
 import { PodcastSettings } from './globals/PodcastSettings.ts'
@@ -240,6 +241,7 @@ export default buildConfig({
     CaseSubmissions,
     ContactMessages,
     PodcastEpisodes,
+    Documents,
     // Legacy collections — hidden from nav, kept for data access
     { ...Authors, admin: { ...Authors.admin, hidden: true } },
     { ...BrandPillars, admin: { ...BrandPillars.admin, hidden: true } },
