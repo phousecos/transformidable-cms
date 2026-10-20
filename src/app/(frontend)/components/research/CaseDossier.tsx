@@ -5,6 +5,9 @@ import { renderLexical } from "./lexical";
 import { GovernanceOutcomes, tallyFindings } from "./GovernanceOutcomes";
 import { QUESTIONS, optionFor } from "../../../../lib/governanceCodebook";
 import { DOMAINS } from "../../../../lib/governanceDomains";
+import { chapterList, clock, durationSeconds, streamVideo } from "../../../../lib/podcast";
+import { StreamPlayer } from "./StreamPlayer";
+import { SeekLink } from "./SeekLink";
 
 const ASSESSMENT: Record<string, string> = { strength: "Strength", weakness: "Weakness", observation: "Observation" };
 const SEGMENT_TYPE_LABEL: Record<string, string> = {
@@ -27,16 +30,23 @@ const ExtLink = ({ href, children }: any) => (
   </a>
 );
 
-function Section({ id, label, pending, children }: any) {
+// moments: the episode chapters tied to case sections, keyed by section id.
+function Section({ id, label, pending, children, moments }: any) {
   return (
     <section className="case-section" id={id}>
       <h2 className="case-h">{label}{pending && <span className="case-pill case-pill--pending">Pending</span>}</h2>
       {children}
+      {moments?.[id]?.map((m: any) => (
+        <SeekLink key={m.start} className="case-moment" href={m.href} seconds={m.start}>
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+          Discussed in the episode at {clock(m.start)}
+        </SeekLink>
+      ))}
     </section>
   );
 }
 
-export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
+export function CaseDossier({ caseFile: cf, streamHost }: { caseFile: any; streamHost?: string | null }) {
   const overviewHtml = renderLexical(cf.overview);
   const timeline = has(cf.timeline) ? cf.timeline : [];
   const orgs = has(cf.organizations) ? cf.organizations : [];
@@ -50,6 +60,13 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
   const related = (Array.isArray(cf.relatedCases) ? cf.relatedCases : []).filter((r: any) => r && typeof r === "object");
   const pod = cf.podcastEpisode && typeof cf.podcastEpisode === "object" ? cf.podcastEpisode : null;
   const aiSummary = typeof cf.aiSummary === "string" ? cf.aiSummary.trim() : "";
+  const podStream = pod ? streamVideo(pod.streamVideo, streamHost) : null;
+  const podChapters = pod ? chapterList(pod.chapters) : [];
+  const moments: Record<string, { start: number; href: string }[]> = {};
+  for (const c of podChapters) {
+    if (!c.section) continue;
+    (moments[c.section] ||= []).push({ start: c.start, href: `/podcast/${pod.slug}?t=${c.start}` });
+  }
 
   // Core dossier sections (mirroring the CMS admin tabs) always appear, showing
   // a "Pending" status when the case doesn't have that content yet. Genuinely
@@ -78,7 +95,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
       </nav>
 
       <div className="case-content">
-        <Section id="overview" label="Overview" pending={!overviewHtml}>
+        <Section moments={moments} id="overview" label="Overview" pending={!overviewHtml}>
           {overviewHtml ? (
             <div className="prose" style={{ marginTop: 0 }} dangerouslySetInnerHTML={{ __html: overviewHtml }} />
           ) : (
@@ -86,7 +103,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
           )}
         </Section>
 
-        <Section id="timeline" label="Timeline" pending={timeline.length === 0}>
+        <Section moments={moments} id="timeline" label="Timeline" pending={timeline.length === 0}>
           {timeline.length > 0 ? (
             <>
               {cf.timelineLabel && <p className="case-cap">{cf.timelineLabel}</p>}
@@ -112,7 +129,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
           )}
         </Section>
 
-        <Section id="organizations" label="Organizations" pending={orgs.length === 0}>
+        <Section moments={moments} id="organizations" label="Organizations" pending={orgs.length === 0}>
           {orgs.length > 0 ? (
             <div className="case-rows">
               {orgs.map((o: any, i: number) => (
@@ -134,7 +151,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
             coding has not been loaded. Hiding it outright made the slot look as
             though it did not exist, so an uncoded case read as a missing feature
             rather than as missing data. */}
-        <Section id="governance-outcomes" label="Governance Outcomes" pending={outcomes.counted === 0}>
+        <Section moments={moments} id="governance-outcomes" label="Governance Outcomes" pending={outcomes.counted === 0}>
           {outcomes.counted > 0 ? (
             <GovernanceOutcomes mechanisms={cf.governanceMechanisms} />
           ) : (
@@ -146,7 +163,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
           )}
         </Section>
 
-        <Section id="documents" label="Documents" pending={documents.length === 0}>
+        <Section moments={moments} id="documents" label="Documents" pending={documents.length === 0}>
           {documents.length > 0 ? (
             <div className="case-rows">
               {documents.map((d: any, i: number) => {
@@ -170,7 +187,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
           )}
         </Section>
 
-        <Section id="audit-reports" label="Audit Reports" pending={audits.length === 0}>
+        <Section moments={moments} id="audit-reports" label="Audit Reports" pending={audits.length === 0}>
           {audits.length > 0 ? (
             <div className="case-rows">
               {audits.map((a: any, i: number) => {
@@ -194,7 +211,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
           )}
         </Section>
 
-        <Section id="news-coverage" label="News Coverage" pending={news.length === 0}>
+        <Section moments={moments} id="news-coverage" label="News Coverage" pending={news.length === 0}>
           {news.length > 0 ? (
             <div className="case-rows">
               {news.map((n: any, i: number) => (
@@ -216,7 +233,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
         </Section>
 
         {notes.length > 0 && (
-          <Section id="research-notes" label="Research Notes">
+          <Section moments={moments} id="research-notes" label="Research Notes">
             <div className="case-rows">
               {notes.map((nt: any) => (
                 <Link className="case-row" href={`/publications/research-notes/${nt.slug}`} key={nt.id}>
@@ -234,7 +251,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
           </Section>
         )}
 
-        <Section id="governance-mechanisms" label="Governance Mechanisms" pending={mechanisms.length === 0}>
+        <Section moments={moments} id="governance-mechanisms" label="Governance Mechanisms" pending={mechanisms.length === 0}>
           {mechanisms.length > 0 ? (
             <div className="case-rows">
               {mechanisms.map((m: any, i: number) => {
@@ -275,21 +292,39 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
         </Section>
 
         {pod && (
-          <Section id="podcast" label="Podcast Episode">
-            <Link className="case-podcast" href="/podcast">
-              <span className="case-podcast-play">
-                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
-              </span>
-              <span>
-                <span className="case-podcast-t">{pod.title}</span>
-                {pod.episodeNumber != null && <span className="case-row-meta">Episode {pod.episodeNumber}</span>}
-              </span>
-            </Link>
+          <Section moments={moments} id="podcast" label="Podcast Episode">
+            {podStream ? (
+              <>
+                <StreamPlayer
+                  src={podStream.hls}
+                  poster={podStream.poster}
+                  title={pod.title}
+                  chapters={podChapters}
+                  duration={durationSeconds(pod.duration) ?? 0}
+                  collapsible
+                />
+                <p style={{ marginTop: 14 }}>
+                  <Link className="link" href={`/podcast/${pod.slug}`}>Episode page, chapters and show notes
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                  </Link>
+                </p>
+              </>
+            ) : (
+              <Link className="case-podcast" href={`/podcast/${pod.slug}`}>
+                <span className="case-podcast-play">
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+                </span>
+                <span>
+                  <span className="case-podcast-t">{pod.title}</span>
+                  {pod.episodeNumber != null && <span className="case-row-meta">Episode {pod.episodeNumber}</span>}
+                </span>
+              </Link>
+            )}
           </Section>
         )}
 
         {aiSummary && (
-          <Section id="ai-summary" label="AI Summary">
+          <Section moments={moments} id="ai-summary" label="AI Summary">
             <div className="case-ai">
               <span className="case-ai-badge">AI-generated</span>
               {aiSummary.split(/\n{2,}/).map((para: string, i: number) => <p key={i}>{para}</p>)}
@@ -297,7 +332,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
           </Section>
         )}
 
-        <Section id="lessons-learned" label="Lessons Learned" pending={lessons.length === 0}>
+        <Section moments={moments} id="lessons-learned" label="Lessons Learned" pending={lessons.length === 0}>
           {lessons.length > 0 ? (
             <ol className="case-lessons">
               {lessons.map((l: any, i: number) => (
@@ -313,7 +348,7 @@ export function CaseDossier({ caseFile: cf }: { caseFile: any }) {
         </Section>
 
         {related.length > 0 && (
-          <Section id="related" label="Related Cases">
+          <Section moments={moments} id="related" label="Related Cases">
             <div className="case-related">
               {related.map((r: any) => (
                 <Link className="case-related-card" href={`/publications/case-files/${r.slug}`} key={r.id}>

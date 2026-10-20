@@ -300,6 +300,28 @@ still there and uses the same database.
       set the duration, status **Published**.
 - [ ] Open `https://transformidablethinking.com/podcast/feed.xml` and check
       the episode is listed.
+
+**Website video (Cloudflare Stream).** The site plays its own copy of each
+episode from Stream; YouTube is only used for an episode with no Stream
+video.
+
+- [ ] Cloudflare → **Stream** → subscribe (billed by minutes stored and
+      minutes watched; see the plans on that page).
+- [ ] **Stream → Upload** the episode's video file (MP4 or MOV). When it
+      finishes processing, open the video: copy its **Video ID** (32 letters
+      and numbers) and, from its HLS link, the address that looks like
+      `customer-xxxx.cloudflarestream.com`.
+- [ ] Optional: in the video's **Captions** tab, generate English captions.
+      The player shows a **CC** button once a video has them.
+- [ ] Admin → **Podcast Settings** → **Cloudflare Stream address**: paste the
+      `customer-xxxx.cloudflarestream.com` address (once, for all episodes).
+- [ ] Admin → Podcast Episodes → the episode → **Cloudflare Stream video**:
+      paste the Video ID.
+- [ ] Same episode → **Chapters**: add each chapter's start time (e.g.
+      `6:05`) and title. Pick a **Case file section** to show a "Discussed in
+      the episode at 6:05" link in that section of the linked case file.
+- [ ] Check the episode page and the case file: the video plays, chapters
+      jump, and the "Discussed" links start the video at the right moment.
 - [ ] Submit the feed URL once:
   - Apple: podcastsconnect.apple.com → **+** → New Show → **Add a show with an
     RSS feed**

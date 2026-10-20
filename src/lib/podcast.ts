@@ -68,3 +68,74 @@ export function durationSeconds(value: string | null | undefined): number | null
     .split(':')
     .reduce((total, part) => total * 60 + Number(part), 0)
 }
+
+// Case file sections an episode chapter can point at, by their anchor id on
+// the case file page. A chapter tied to a section shows a "Discussed in the
+// episode at …" link there.
+export const CASE_SECTIONS = [
+  { label: 'Overview', value: 'overview' },
+  { label: 'Timeline', value: 'timeline' },
+  { label: 'Organizations', value: 'organizations' },
+  { label: 'Governance Outcomes', value: 'governance-outcomes' },
+  { label: 'Documents', value: 'documents' },
+  { label: 'Audit Reports', value: 'audit-reports' },
+  { label: 'News Coverage', value: 'news-coverage' },
+  { label: 'Research Notes', value: 'research-notes' },
+  { label: 'Governance Mechanisms', value: 'governance-mechanisms' },
+  { label: 'AI Summary', value: 'ai-summary' },
+  { label: 'Lessons Learned', value: 'lessons-learned' },
+]
+
+const STREAM_HOST = /^customer-[a-z0-9]+\.cloudflarestream\.com$/
+
+export function isStreamHost(value: string | null | undefined): boolean {
+  return !!value && STREAM_HOST.test(value.trim())
+}
+
+// A Cloudflare Stream video from what an editor pastes: the 32-character
+// video ID, or any Stream link containing it. A link on the account's own
+// customer-….cloudflarestream.com host also supplies the host; otherwise the
+// one saved in Podcast Settings is used.
+export function streamVideo(
+  value: string | null | undefined,
+  defaultHost?: string | null,
+): { hls: string; poster: string } | null {
+  const uid = value?.match(/\b([a-f0-9]{32})\b/)?.[1]
+  if (!uid) return null
+  let host = isStreamHost(defaultHost) ? defaultHost!.trim() : null
+  try {
+    const linked = new URL(value!.trim()).hostname
+    if (STREAM_HOST.test(linked)) host = linked
+  } catch {
+    // Not a link, just the ID.
+  }
+  if (!host) return null
+  return {
+    hls: `https://${host}/${uid}/manifest/video.m3u8`,
+    poster: `https://${host}/${uid}/thumbnails/thumbnail.jpg?height=720`,
+  }
+}
+
+export type Chapter = { title: string; start: number; section: string | null }
+
+// An episode's chapters with start times in seconds, in playing order.
+export function chapterList(chapters: unknown): Chapter[] {
+  if (!Array.isArray(chapters)) return []
+  return chapters
+    .map((c) => ({
+      title: String(c?.title ?? '').trim(),
+      start: durationSeconds(c?.start) as number,
+      section: c?.caseSection || null,
+    }))
+    .filter((c) => c.title && c.start !== null)
+    .sort((a, b) => a.start - b.start)
+}
+
+// Seconds → "6:05" or "1:02:03".
+export function clock(seconds: number): string {
+  const s = Math.max(0, Math.floor(seconds || 0))
+  const h = Math.floor(s / 3600)
+  const m = Math.floor((s % 3600) / 60)
+  const ss = String(s % 60).padStart(2, '0')
+  return h ? `${h}:${String(m).padStart(2, '0')}:${ss}` : `${m}:${ss}`
+}

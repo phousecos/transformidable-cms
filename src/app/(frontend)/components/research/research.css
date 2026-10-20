@@ -821,3 +821,74 @@
   .tr *, .tr *::before, .tr *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
   .tr .fade { opacity: 1; transform: none; }
 }
+
+/* ── Episode video player (StreamPlayer) ───────────────────────────────
+   Controls sit in their own bar under the picture. The bar sets its own
+   colours (not --wine, which turns pale pink in dark mode) so its text
+   stays readable in both themes. */
+.tr .sp { --sp-bar: #750427; --sp-on: #f0dce2; --sp-accent: #c9a227; margin-top: 26px; border: 1px solid var(--rule-strong); background: var(--paper); box-shadow: var(--shadow); }
+@media (prefers-color-scheme: dark) { .tr .sp { --sp-bar: #4a0518; } }
+:root[data-theme="dark"] .tr .sp { --sp-bar: #4a0518; }
+:root[data-theme="light"] .tr .sp { --sp-bar: #750427; }
+.tr .sp-head { display: flex; justify-content: space-between; gap: 12px; padding: 9px 14px; border-bottom: 1px solid var(--rule); font-family: var(--sans); font-size: 10.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-mute); }
+.tr .sp-stage { position: relative; aspect-ratio: 16 / 9; background: #000; }
+.tr .sp-stage video { position: absolute; inset: 0; width: 100%; height: 100%; background: #000; }
+.tr .sp-big { position: absolute; top: 50%; left: 50%; width: 76px; height: 76px; transform: translate(-50%, -50%); border-radius: 50%; border: 0; background: var(--sp-bar); color: #f7f3ea; display: grid; place-items: center; cursor: pointer; box-shadow: 0 6px 24px rgba(0,0,0,.35); }
+.tr .sp-big svg { width: 30px; height: 30px; margin-left: 4px; }
+.tr .sp-error { position: absolute; left: 0; right: 0; bottom: 0; margin: 0; padding: 10px 14px; background: rgba(10,4,6,.85); color: #f0dce2; font-family: var(--sans); font-size: 13px; }
+.tr .sp-bar { background: var(--sp-bar); color: var(--sp-on); padding: 10px 12px 4px; font-family: var(--sans); }
+.tr .sp-track { display: flex; align-items: center; gap: 10px; font-size: 12px; font-variant-numeric: tabular-nums; }
+.tr .sp-seek { position: relative; flex: 1; height: 24px; display: flex; align-items: center; }
+.tr .sp-seek input { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; margin: 0; border-radius: 3px; cursor: pointer; background: linear-gradient(to right, var(--sp-accent) var(--pct, 0%), rgba(255,255,255,.38) var(--pct, 0%), rgba(255,255,255,.38) var(--buf, 0%), rgba(255,255,255,.2) var(--buf, 0%)); }
+.tr .sp-seek input::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #f7f3ea; border: 3px solid var(--sp-accent); box-sizing: border-box; }
+.tr .sp-seek input::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #f7f3ea; border: 3px solid var(--sp-accent); box-sizing: border-box; }
+.tr .sp-tick { position: absolute; top: 50%; width: 2px; height: 12px; margin: -6px 0 0 -1px; background: var(--sp-bar); pointer-events: none; }
+.tr .sp-row { display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
+.tr .sp-btn { width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; color: inherit; display: grid; place-items: center; cursor: pointer; }
+.tr .sp-btn:hover { background: rgba(255,255,255,.1); }
+.tr .sp-btn svg { width: 22px; height: 22px; }
+.tr .sp-play { background: var(--sp-accent); color: #1a1210; margin-right: 6px; }
+.tr .sp-play:hover { background: #d8b53f; }
+.tr .sp-play svg { width: 18px; height: 18px; }
+.tr .sp-vol { width: 68px; accent-color: var(--sp-on); }
+.tr .sp-chapter { flex: 0 1 auto; min-width: 0; margin-left: 12px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tr .sp-chapter em { font-family: var(--serif); }
+.tr .sp-spacer { flex: 1 1 0; }
+.tr .sp-pill { height: 32px; min-width: 44px; padding: 0 10px; margin: 0 2px; border: 1px solid rgba(240,220,226,.5); border-radius: 2px; background: none; color: inherit; font: 700 12px var(--sans); cursor: pointer; }
+.tr .sp-pill[aria-pressed="true"] { background: var(--sp-on); color: var(--sp-bar); }
+.tr .sp-btn:focus-visible, .tr .sp-pill:focus-visible, .tr .sp-big:focus-visible, .tr .sp-bar input:focus-visible { outline: 2px solid var(--sp-accent); outline-offset: 2px; }
+.tr .sp--full { display: flex; flex-direction: column; background: #000; border: 0; }
+.tr .sp--full .sp-head { display: none; }
+.tr .sp--full .sp-stage { flex: 1; aspect-ratio: auto; }
+.tr .sp--full .sp-stage video { object-fit: contain; }
+@media (max-width: 640px) {
+  .tr .sp-head, .tr .sp-mute, .tr .sp-vol, .tr .sp-pipbtn { display: none; }
+  .tr .sp-bar { padding: 8px 8px 4px; }
+  .tr .sp-row { gap: 0; flex-wrap: nowrap; }
+  .tr .sp-pill { margin: 0 3px; padding: 0 8px; }
+  .tr .sp-chapter { order: -1; flex: 1 0 100%; margin: 2px 0 4px 4px; }
+  .tr .sp-row:has(.sp-chapter) { flex-wrap: wrap; }
+}
+
+/* Closed card on a case file; opens into the player in place. */
+.tr .sp-card { display: flex; gap: 16px; align-items: center; background: var(--paper-2); border: 1px solid var(--rule); padding: 16px; }
+.tr .sp-card-thumb { flex: none; width: 160px; aspect-ratio: 16 / 9; background: #14090c; overflow: hidden; }
+.tr .sp-card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tr .sp-card-body { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.tr .sp-card-t { font-family: var(--serif); font-size: 1.12rem; line-height: 1.25; color: var(--ink); }
+.tr .sp-card-go { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 0; background: #750427; color: #f7f3ea; font: 700 13px var(--sans); cursor: pointer; }
+.tr .sp-card-go:hover { background: #5f0620; }
+.tr .sp-card-go svg { width: 14px; height: 14px; }
+@media (max-width: 480px) { .tr .sp-card { flex-direction: column; align-items: stretch; } .tr .sp-card-thumb { width: 100%; } }
+
+/* Chapter list under the player on the episode page. */
+.tr .sp-chapters { list-style: none; margin: 18px 0 0; padding: 0; border-top: 1px solid var(--rule); }
+.tr .sp-chapters a { display: flex; align-items: baseline; gap: 14px; min-height: 44px; padding: 11px 4px; border-bottom: 1px solid var(--rule); color: var(--ink); text-decoration: none; box-sizing: border-box; }
+.tr .sp-chapters a:hover .sp-chapters-t { color: var(--wine); }
+.tr .sp-chapters-time { flex: none; width: 52px; font-family: var(--sans); font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--ink-mute); }
+.tr .sp-chapters-t { font-family: var(--serif); font-size: 1.05rem; }
+
+/* "Discussed in the episode at 6:05" under a case file section. */
+.tr .case-moment { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 16px; padding: 0 14px; border: 1px solid var(--rule-strong); color: var(--wine); font-family: var(--sans); font-size: 13px; font-weight: 600; text-decoration: none; box-sizing: border-box; }
+.tr .case-moment:hover { border-color: var(--wine); }
+.tr .case-moment svg { width: 13px; height: 13px; }
