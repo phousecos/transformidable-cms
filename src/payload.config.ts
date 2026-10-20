@@ -283,6 +283,13 @@ export default buildConfig({
   // their original file; see the Media collection.
 
   typescript: {
+    // Off: outside production, Payload otherwise starts `generate:types` in the
+    // background whenever it boots (dev, the build's migrate step, scripts)
+    // and quietly replaces the placeholder payload-types.ts. The code doesn't
+    // type-check against the generated types yet, so a generated file that
+    // gets committed — or lands mid-build — fails `next build`. Run
+    // `npm run generate:types` by hand when the types are wanted.
+    autoGenerate: false,
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
 
