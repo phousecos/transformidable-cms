@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { ResearchShell } from "../research/ResearchShell";
 import { Constellation } from "../research/Constellation";
-import { AcademyNav } from "./AcademyNav";
 import { AcademyInquiryForm } from "./AcademyInquiryForm";
 import { ROUTES } from "../../academy/content";
 import "./academy.css";
@@ -11,11 +10,10 @@ export const Arrow = ({ s = 13 }: { s?: number }) => (
   <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
 );
 
-// Every Academy page: the shared site chrome plus the Academy's own menu.
+// Every Academy page: the shared site chrome around the Academy's own surface.
 export function AcademyShell({ children }) {
   return (
     <ResearchShell>
-      <AcademyNav />
       <div className="ac">{children}</div>
     </ResearchShell>
   );
