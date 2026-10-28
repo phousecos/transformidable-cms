@@ -20,30 +20,38 @@ const NAV = [
     ],
   },
   {
+    label: "Academy", href: "/academy", children: [
+      { no: "02.1", name: "Transformidable Academy", desc: "Executive education in governance", href: "/academy" },
+      { no: "02.2", name: "Foundation Certificate in AI Governance", desc: "Three courses for boards and executives", href: "/academy/foundation-certificate" },
+      { no: "02.3", name: "Private Cohorts", desc: "Bring the program to your leadership team", href: "/academy#cohorts" },
+      { no: "02.4", name: "Register Interest", desc: "Hear first when dates are announced", href: "/academy#register-individual" },
+    ],
+  },
+  {
     label: "Publications", href: "/publications", children: [
-      { no: "02.1", name: "Case Files", desc: "Anatomies of real governance decisions", href: "/publications/case-files" },
-      { no: "02.2", name: "Articles", desc: "Shorter, argued pieces", href: "/publications?type=article" },
-      { no: "02.3", name: "White Papers", desc: "Peer-reviewed depth", href: "/publications?type=white-paper" },
-      { no: "02.4", name: "Research Notes", desc: "Working findings, in progress", href: "/publications/research-notes" },
-      { no: "02.5", name: "Annual Reports", desc: "The state of governance, yearly", href: "/publications?type=annual-report" },
+      { no: "03.1", name: "Case Files", desc: "Anatomies of real governance decisions", href: "/publications/case-files" },
+      { no: "03.2", name: "Articles", desc: "Shorter, argued pieces", href: "/publications?type=article" },
+      { no: "03.3", name: "White Papers", desc: "Peer-reviewed depth", href: "/publications?type=white-paper" },
+      { no: "03.4", name: "Research Notes", desc: "Working findings, in progress", href: "/publications/research-notes" },
+      { no: "03.5", name: "Annual Reports", desc: "The state of governance, yearly", href: "/publications?type=annual-report" },
     ],
   },
   {
     // Episodic media you watch or listen to.
     label: "Briefings", href: "/podcast", children: [
-      { no: "03.1", name: "The Governance Files", desc: "The podcast: governance decisions on the record", href: "/podcast" },
-      { no: "03.2", name: "Transformidable Briefing", desc: "Mixed-media briefings: video and articles", href: "/publications?type=transformidable-brief" },
-      { no: "03.3", name: "Webinar Archive", desc: "Past webinars and recordings", href: "/briefings/webinars" },
-      { no: "03.4", name: "Live Sessions", desc: "Upcoming and live briefings", href: "/briefings/live" },
+      { no: "04.1", name: "The Governance Files", desc: "The podcast: governance decisions on the record", href: "/podcast" },
+      { no: "04.2", name: "Transformidable Briefing", desc: "Mixed-media briefings: video and articles", href: "/publications?type=transformidable-brief" },
+      { no: "04.3", name: "Webinar Archive", desc: "Past webinars and recordings", href: "/briefings/webinars" },
+      { no: "04.4", name: "Live Sessions", desc: "Upcoming and live briefings", href: "/briefings/live" },
     ],
   },
   {
     label: "Tools", href: "/tools/governance-codebook", children: [
-      { no: "04.1", name: "Governance Codebook", desc: "A structured governance reference", href: "/tools/governance-codebook" },
-      { no: "04.2", name: "Governance Watch", desc: "Monitoring governance signals", href: "/tools/governance-watch" },
-      { no: "04.3", name: "Assessment Tools", desc: "Assess your own governance", href: "/tools/assessments" },
-      { no: "04.4", name: "Benchmarks", desc: "How your sector compares", href: "/tools/benchmarks" },
-      { no: "04.5", name: "Risk Models", desc: "Anticipate governance risk", href: "/tools/risk-models" },
+      { no: "05.1", name: "Governance Codebook", desc: "A structured governance reference", href: "/tools/governance-codebook" },
+      { no: "05.2", name: "Governance Watch", desc: "Monitoring governance signals", href: "/tools/governance-watch" },
+      { no: "05.3", name: "Assessment Tools", desc: "Assess your own governance", href: "/tools/assessments" },
+      { no: "05.4", name: "Benchmarks", desc: "How your sector compares", href: "/tools/benchmarks" },
+      { no: "05.5", name: "Risk Models", desc: "Anticipate governance risk", href: "/tools/risk-models" },
     ],
   },
   { label: "Events", href: "/#events" },

@@ -29,6 +29,14 @@ export function ResearchFooter() {
           <Link href="/research/projects">Research Projects</Link>
         </div>
         <div className="fcol">
+          <h5>Academy</h5>
+          <Link href="/academy">Transformidable Academy</Link>
+          <Link href="/academy/foundation-certificate">AI Governance Certificate</Link>
+          <Link href="/academy#cohorts">Private Cohorts</Link>
+          <Link href="/academy#faq">FAQ</Link>
+          <Link href="/academy#register-individual">Register Interest</Link>
+        </div>
+        <div className="fcol">
           <h5>Publications</h5>
           <Link href="/publications/case-files">Case Files</Link>
           <Link href="/publications?type=article">Articles</Link>

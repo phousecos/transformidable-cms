@@ -16,7 +16,7 @@ import { Constellation } from "./Constellation";
  * via z-index.
  */
 
-// Eight distinct star fields — one per main page. Each varies by *region*
+// Distinct star fields — one per main page. Each varies by *region*
 // (spread), density (count), seed, and the position of its signature anchor
 // star, so no two read as the same constellation. `variant` also selects the
 // ombré via a CSS class (.tr-sky--<variant>) defined in research.css.
@@ -39,6 +39,8 @@ export const SKY_VARIANTS = {
   events:       { seed: 53, count: 20, region: { x0: 0.4,  x1: 1, y0: 0.28, y1: 1    }, focal: { x: 72, y: 62 } },
   // Tools — far right, upper-full, dense.
   tools:        { seed: 83, count: 30, region: { x0: 0.54, x1: 1, y0: 0,    y1: 0.82 }, focal: { x: 78, y: 40 } },
+  // Academy — right, mid band, medium.
+  academy:      { seed: 97, count: 26, region: { x0: 0.5,  x1: 1, y0: 0.1,  y1: 0.9  }, focal: { x: 82, y: 48 } },
   default:      { seed: 7,  count: 34, region: { x0: 0.38, x1: 1, y0: 0,    y1: 1    }, focal: { x: 74, y: 30 } },
 };
 
