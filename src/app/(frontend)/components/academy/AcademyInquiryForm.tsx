@@ -24,9 +24,7 @@ const EMPTY = {
   company_website: "",
 };
 
-// Links can open a specific form: /academy#register-organization or
-// /academy#register-individual.
-const HASH_TYPES = { "#register-organization": "organization", "#register-individual": "individual" };
+const PROGRAM_VALUES = ACADEMY_PROGRAMS.map((o) => o.value);
 
 function Select({ id, label, value, onChange, options, optional = true }) {
   return (
@@ -44,34 +42,18 @@ function Select({ id, label, value, onChange, options, optional = true }) {
   );
 }
 
-// Two forms in one: organizations asking about a private cohort, and
+// One form per audience: organizations asking about a private cohort, and
 // individuals joining the interest list. Organizational buyers need sizing and
-// timing questions that would only get in an individual's way.
-export function AcademyInquiryForm({ source, defaultType = "organization" }) {
-  const [type, setType] = useState(defaultType);
+// timing questions that would only get in an individual's way. A course page
+// links here with ?program=<value> so the course it came from is preselected.
+export function AcademyInquiryForm({ source, type }: { source: string; type: "organization" | "individual" }) {
   const [fields, setFields] = useState(EMPTY);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [feedback, setFeedback] = useState("");
 
   useEffect(() => {
-    const fromHash = () => {
-      const t = HASH_TYPES[window.location.hash];
-      if (t) setType(t);
-    };
-    // A link to the hash already in the URL fires no hashchange, so clicks on
-    // those links are watched too.
-    const fromClick = (e) => {
-      const a = e.target.closest?.('a[href*="#register-"]');
-      const t = a && HASH_TYPES[`#${a.getAttribute("href").split("#")[1]}`];
-      if (t) setType(t);
-    };
-    fromHash();
-    window.addEventListener("hashchange", fromHash);
-    document.addEventListener("click", fromClick);
-    return () => {
-      window.removeEventListener("hashchange", fromHash);
-      document.removeEventListener("click", fromClick);
-    };
+    const program = new URLSearchParams(window.location.search).get("program");
+    if (program && PROGRAM_VALUES.includes(program)) setFields((f) => ({ ...f, program }));
   }, []);
 
   const set = (key) => (e) => setFields((f) => ({ ...f, [key]: e.target.value }));
@@ -117,25 +99,6 @@ export function AcademyInquiryForm({ source, defaultType = "organization" }) {
 
   return (
     <div className="ac-form-card">
-      <div className="case-form-toggle" role="group" aria-label="I am inquiring as">
-        <button
-          type="button"
-          className={`case-form-toggle-btn${isOrg ? " is-active" : ""}`}
-          aria-pressed={isOrg}
-          onClick={() => setType("organization")}
-        >
-          For an organization
-        </button>
-        <button
-          type="button"
-          className={`case-form-toggle-btn${!isOrg ? " is-active" : ""}`}
-          aria-pressed={!isOrg}
-          onClick={() => setType("individual")}
-        >
-          For myself
-        </button>
-      </div>
-
       <h3 className="ac-form-h">{isOrg ? "Request a private cohort discussion" : "Join the interest list"}</h3>
       <p className="ac-form-sub">
         {isOrg
@@ -211,10 +174,12 @@ export function AcademyInquiryForm({ source, defaultType = "organization" }) {
           {status === "error" && feedback}
         </div>
 
-        <button type="submit" className="btn ac-submit" disabled={status === "loading"} aria-busy={status === "loading"}>
+        <button type="submit" className="case-form-btn ac-submit" disabled={status === "loading"} aria-busy={status === "loading"}>
           {status === "loading" ? "Sending…" : isOrg ? "Request a discussion" : "Register interest"}
         </button>
-        <p className="ac-form-note">Registering interest is not enrollment and carries no financial commitment.</p>
+        <p className="ac-form-note">
+          {isOrg ? "An inquiry carries no commitment." : "Joining the interest list is not enrollment and carries no financial commitment."}
+        </p>
       </form>
     </div>
   );

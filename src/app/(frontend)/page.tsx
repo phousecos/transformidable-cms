@@ -39,7 +39,7 @@ const DIVISIONS = [
     href: "/academy",
     purpose: "Executive education, governance workshops, cohort programs, and future certificates.",
     primary: { label: "Explore Programs", href: "/academy" },
-    secondary: { label: "Inquire About a Cohort", href: "/academy#register-organization" },
+    secondary: { label: "Inquire About a Cohort", href: "/academy/organizations" },
   },
   {
     no: "03",
@@ -173,7 +173,7 @@ export default async function HomePage() {
               <span className="hm-feat-label">Academy &middot; In development</span>
               <span className="hm-feat-title">Foundation Certificate in AI Governance</span>
               <span className="hm-feat-desc">A three-course executive education program for boards, executives, and public-sector leaders. Interest registration is open.</span>
-              <span className="hm-feat-go">Register interest <Arrow s={12} /></span>
+              <span className="hm-feat-go">View the program <Arrow s={12} /></span>
             </Link>
 
             <Link className="hm-feat" href="/publishing">
