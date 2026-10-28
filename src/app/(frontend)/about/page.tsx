@@ -2,13 +2,14 @@
 import Link from "next/link";
 import { ResearchShell } from "../components/research/ResearchShell";
 import { Sky } from "../components/research/Sky";
+import { ADVISORY_URL } from "../components/site";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "About",
   description:
-    "A research and advisory practice studying how governance, leadership, and institutional decision-making shape organizational resilience.",
+    "Transformidable advances the leadership and governance of organizational transformation through research, education, publishing, and media.",
 };
 
 export default function AboutPage() {
@@ -20,7 +21,8 @@ export default function AboutPage() {
           <p className="kicker">About</p>
           <h1 className="idx-title">Governance decides whether transformation holds.</h1>
           <p className="idx-intro">
-            Transformidable is a research and advisory practice. We study how governance, leadership,
+            Transformidable advances the leadership and governance of organizational transformation
+            through research, education, publishing, and media. We study how governance, leadership,
             and institutional decision-making shape the success, resilience, and public trust of
             organizations navigating complex change.
           </p>
@@ -43,11 +45,28 @@ export default function AboutPage() {
               and that the legal system can rely on when a transformation is contested.
             </p>
             <p>
-              The work is deliberately independent. It is not opinion, and it is not a sales pitch for a
-              methodology. It is a standing body of evidence about the decisions that decide whether
-              transformation holds.
+              The work is deliberately independent. It is not opinion, and it is not commissioned
+              advisory material. It is a standing body of evidence about the decisions that decide
+              whether transformation holds.
             </p>
           </div>
+
+          <section className="case-section" id="divisions">
+            <h2 className="case-h">Four divisions, one intellectual identity</h2>
+            <div className="prose" style={{ marginTop: 0 }}>
+              <p>
+                Transformidable works through four equal divisions. Each has its own audience and purpose,
+                and none is the parent of another. What they share is a commitment to stronger leadership
+                and governance.
+              </p>
+              <ul>
+                <li><Link href="/research">Research</Link>: Case Files, the governance codebook, evidence-based findings, and the research agenda.</li>
+                <li><Link href="/academy">Academy</Link>: executive education, governance workshops, cohort programs, and future certificates.</li>
+                <li><Link href="/publishing">Publishing</Link>: The Transformidable Leader, its companion workbook, future books, and substantive publications.</li>
+                <li><Link href="/media">Media</Link>: The Governance Files podcast, the Transformidable Briefing, interviews, and events.</li>
+              </ul>
+            </div>
+          </section>
 
           <section className="case-section" id="agenda">
             <h2 className="case-h">The research agenda</h2>
@@ -85,8 +104,22 @@ export default function AboutPage() {
             </div>
           </section>
 
+          {/* DRAFT wording, pending approval. Matches the footer statement. */}
+          <section className="case-section" id="independence">
+            <h2 className="case-h">Independence and affiliation</h2>
+            <div className="prose" style={{ marginTop: 0 }}>
+              <p>
+                Governance advisory and consulting services are provided separately by{" "}
+                <a href={ADVISORY_URL} rel="noopener">J.&nbsp;Lynne &amp; Co.</a>, an independently positioned
+                advisory firm affiliated with Transformidable. Transformidable research is conducted
+                independently: its findings are not commissioned on behalf of advisory clients and are not
+                sales material for advisory services.
+              </p>
+            </div>
+          </section>
+
           <div className="detail-foot" style={{ display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap" }}>
-            <Link className="btn" href="/#briefing">
+            <Link className="btn" href="#briefing">
               Subscribe to the Brief
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
             </Link>

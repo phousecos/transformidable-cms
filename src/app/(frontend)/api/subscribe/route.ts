@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 })
   }
 
-  const { email, name, source } = body as Record<string, unknown>
+  const { email, name, source, list } = body as Record<string, unknown>
 
   if (
     typeof email !== 'string' ||
@@ -84,6 +84,7 @@ export async function POST(req: NextRequest) {
       : 'website'
 
   const normalizedEmail = email.toLowerCase().trim()
+  const cleanList = list === 'book' ? 'book' : 'brief'
 
   try {
     const payload = await getPayload({ config })
@@ -96,11 +97,21 @@ export async function POST(req: NextRequest) {
 
     if (existing.docs.length > 0) {
       const sub = existing.docs[0] as Record<string, unknown>
-      if (sub.status === 'unsubscribed') {
+      // Subscribers from before lists existed have none; they joined the Brief.
+      // Someone coming back after unsubscribing starts over with just the
+      // list they asked for now.
+      const currentLists =
+        sub.status === 'unsubscribed'
+          ? []
+          : Array.isArray(sub.lists) && sub.lists.length
+            ? (sub.lists as string[])
+            : ['brief']
+      const lists = currentLists.includes(cleanList) ? currentLists : [...currentLists, cleanList]
+      if (sub.status === 'unsubscribed' || lists.length !== (sub.lists as string[] | undefined)?.length) {
         await payload.update({
           collection: 'subscribers',
           id: sub.id as number,
-          data: { status: 'active' },
+          data: { status: 'active', lists },
         })
       }
       return NextResponse.json({ message: SUCCESS_MESSAGE })
@@ -112,6 +123,7 @@ export async function POST(req: NextRequest) {
         email: normalizedEmail,
         name: cleanName,
         source: cleanSource,
+        lists: [cleanList],
         status: 'active',
       },
     })

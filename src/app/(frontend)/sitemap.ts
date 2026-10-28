@@ -10,6 +10,9 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://transformidablethin
 // the structure is discoverable; drop any you'd rather keep out of the index).
 const STATIC_PATHS = [
   "",
+  "/research",
+  "/publishing",
+  "/media",
   "/publications",
   "/publications/case-files",
   "/publications/research-notes",
@@ -17,6 +20,12 @@ const STATIC_PATHS = [
   "/about",
   "/academy",
   "/academy/foundation-certificate",
+  "/academy/courses/ai-explained",
+  "/academy/courses/governing-ai-adoption",
+  "/academy/courses/building-ai-governance",
+  "/academy/organizations",
+  "/academy/individuals",
+  "/academy/faq",
   "/research/agenda",
   "/research/datasets",
   "/research/projects",

@@ -3,15 +3,18 @@ import config from "@payload-config";
 import { getPayload } from "payload";
 import Link from "next/link";
 import { ResearchShell } from "./components/research/ResearchShell";
-import { PublicationsList, CaseFilesFeature, HeroLatest } from "./components/research/ResearchSections";
 import { Sky } from "./components/research/Sky";
+import { caseNo, fullDate } from "./components/research/format";
+import "./components/home/home.css";
 
 export const dynamic = "force-dynamic";
 
+const DESCRIPTION =
+  "Transformidable brings together research, executive education, publishing, and media to examine how change is led, how decisions are governed, and what enables organizations to deliver lasting outcomes.";
+
 export const metadata = {
-  title: { absolute: "Transformidable | Evidence for Better Transformation Governance" },
-  description:
-    "Independent research on how governance, leadership, and institutional decision-making shape whether organizational transformation succeeds or fails.",
+  title: { absolute: "Transformidable | Leadership and governance for consequential transformation" },
+  description: DESCRIPTION,
   alternates: { canonical: "/" },
 };
 
@@ -19,281 +22,215 @@ const Arrow = ({ s = 14 }: { s?: number }) => (
   <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
 );
 
-// Sort helper: featured docs first, then newest by publishedAt.
-function featuredFirst(docs: any[]) {
-  return [...docs].sort((a, b) => {
-    if (!!a.featured !== !!b.featured) return a.featured ? -1 : 1;
-    const da = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
-    const db = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
-    return db - da;
-  });
-}
+// The four divisions, given equal weight: same card, same order everywhere.
+// None is the parent of another.
+const DIVISIONS = [
+  {
+    no: "01",
+    name: "Research",
+    href: "/research",
+    purpose: "Case Files, the governance codebook, evidence-based findings, and the research agenda.",
+    primary: { label: "Explore Case Files", href: "/publications/case-files" },
+    secondary: { label: "Follow Research Updates", href: "#briefing" },
+  },
+  {
+    no: "02",
+    name: "Academy",
+    href: "/academy",
+    purpose: "Executive education, governance workshops, cohort programs, and future certificates.",
+    primary: { label: "Explore Programs", href: "/academy" },
+    secondary: { label: "Inquire About a Cohort", href: "/academy/organizations" },
+  },
+  {
+    no: "03",
+    name: "Publishing",
+    href: "/publishing",
+    purpose: "The Transformidable Leader, its companion workbook, future books, and substantive publications.",
+    primary: { label: "Discover The Transformidable Leader", href: "/publishing" },
+    secondary: { label: "Join Book Updates", href: "/publishing#book-updates" },
+  },
+  {
+    no: "04",
+    name: "Media",
+    href: "/media",
+    purpose: "The Governance Files podcast, the Transformidable Briefing, interviews, and events.",
+    primary: { label: "Listen to The Governance Files", href: "/podcast" },
+    secondary: { label: "Attend a Briefing", href: "/briefings/live" },
+  },
+];
 
-async function fetchCollection(payload: any, collection: string, limit: number) {
+async function latest(payload: any, collection: string, sort: string) {
   try {
     const res = await payload.find({
       collection,
       where: { status: { equals: "published" } },
-      sort: "-publishedAt",
-      depth: 1,
-      limit,
+      sort,
+      depth: 0,
+      limit: 1,
     });
-    return featuredFirst(res.docs || []);
+    return res.docs?.[0] || null;
   } catch {
     // Collection may not be migrated yet in a fresh environment.
-    return [];
+    return null;
+  }
+}
+
+async function currentCaseFile(payload: any) {
+  try {
+    const res = await payload.find({
+      collection: "case-files",
+      where: { status: { equals: "published" }, featured: { equals: true } },
+      sort: "-publishedAt",
+      depth: 0,
+      limit: 1,
+    });
+    return res.docs?.[0] || (await latest(payload, "case-files", "-publishedAt"));
+  } catch {
+    return null;
   }
 }
 
 export default async function HomePage() {
   const payload = await getPayload({ config });
-  const [publications, caseFiles] = await Promise.all([
-    fetchCollection(payload, "publications", 4),
-    fetchCollection(payload, "case-files", 4),
+  const [caseFile, episode] = await Promise.all([
+    currentCaseFile(payload),
+    latest(payload, "podcast-episodes", "-publishDate"),
   ]);
 
   return (
     <ResearchShell>
-        {/* HERO */}
-        <section className="hero tr-onsky">
-          <Sky variant="research" />
-          <div className="wrap hero-in">
-            <div className="hero-tags fade">
-              <span>Governance, leadership &amp; institutional resilience</span>
-              <span className="dot" aria-hidden="true"></span>
-              <span>A research &amp; advisory practice</span>
-            </div>
-
-            <h1 className="hero-head fade d1">
-              Advancing the science and practice of organizational <span className="em">transformation.</span>
-            </h1>
-
-            <div className="hero-grid">
-              <div className="fade d2">
-                <p className="lead" style={{ maxWidth: "52ch" }}>
-                  We research how governance, leadership, and institutional decision-making shape
-                  organizational resilience. We publish evidence, advise leaders, develop analytical
-                  tools, and provide expert analysis that helps organizations, and the legal
-                  system, understand why complex transformations succeed or fail.
-                </p>
-                <div className="hero-cta" style={{ marginTop: 26 }}>
-                  <Link className="btn" href="/#research">Read the research agenda <Arrow /></Link>
-                  <Link className="link" href="/#briefing">Subscribe to the Brief</Link>
-                </div>
-              </div>
-
-              {caseFiles[0] || publications[0] ? (
-                <HeroLatest caseFile={caseFiles[0]} publication={publications[0]} />
-              ) : (
-                <aside className="define-card fade d3">
-                  <p className="figlabel">The word</p>
-                  <div className="pron2">
-                    <span className="word2">Transformidable</span>
-                    <span className="pos2">adjective</span>
-                    <span className="phon2">/trans&bull;form&bull;i&bull;da&bull;ble/</span>
-                  </div>
-                  <p className="meaning2">
-                    <span className="q">&ldquo;</span>Capable of sustained transformation through effective
-                    governance, leadership, and institutional resilience.<span className="q">&rdquo;</span>
-                  </p>
-                </aside>
-              )}
-            </div>
+      <section className="hero tr-onsky">
+        <Sky variant="home" />
+        <div className="wrap hero-in">
+          <div className="hero-tags fade">
+            <span>Research</span><span className="dot" aria-hidden="true"></span>
+            <span>Academy</span><span className="dot" aria-hidden="true"></span>
+            <span>Publishing</span><span className="dot" aria-hidden="true"></span>
+            <span>Media</span>
           </div>
-        </section>
-
-        {/* MODES OF WORK */}
-        <div className="modes">
-          <div className="wrap modes-in">
-            <div className="mode">
-              <span className="diamond" aria-hidden="true"></span>
-              <h3>Publish evidence</h3>
-              <p>Case files, white papers, and reports that put governance findings on the record.</p>
-            </div>
-            <div className="mode">
-              <span className="diamond" aria-hidden="true"></span>
-              <h3>Advise leaders</h3>
-              <p>Direct counsel to boards and executives carrying transformation of their own.</p>
-            </div>
-            <div className="mode">
-              <span className="diamond" aria-hidden="true"></span>
-              <h3>Develop tools</h3>
-              <p>Analytics and benchmarks that turn the research into instruments you can run.</p>
-            </div>
-            <div className="mode">
-              <span className="diamond" aria-hidden="true"></span>
-              <h3>Provide expert analysis</h3>
-              <p>Independent analysis for organizations and the legal system when transformations are contested.</p>
-            </div>
+          <h1 className="hero-head fade d1">
+            Leadership and governance for consequential <span className="em">transformation.</span>
+          </h1>
+          <p className="lead hm-lead fade d2" style={{ maxWidth: "60ch" }}>{DESCRIPTION}</p>
+          <div className="hero-cta fade d2" style={{ marginTop: 28 }}>
+            <a className="btn" href="#divisions">Explore Transformidable <Arrow /></a>
+            <a className="link" href="#briefing">Follow our work <Arrow s={13} /></a>
           </div>
         </div>
+      </section>
 
-        {/* RESEARCH AGENDA */}
-        <section className="agenda" id="research">
-          <div className="wrap">
-            <div className="sec-head">
-              <div>
-                <p className="kicker">The agenda</p>
-                <h2 className="h">Five questions the research sets out to answer.</h2>
-              </div>
-              <Link className="link" href="/research/agenda">All research <Arrow s={13} /></Link>
-            </div>
-            <div className="inquiries">
-              <div className="inquiry">
-                <span className="qno">Governance</span>
-                <h3>How do governance decisions influence organizational outcomes?</h3>
-                <p>Tracing outcomes back to the decisions, and the decision rights, that produced them.</p>
-              </div>
-              <div className="inquiry">
-                <span className="qno">Leadership</span>
-                <h3>What leadership behaviors enable successful transformation?</h3>
-                <p>The observable behaviors that move change from announced to sustained.</p>
-              </div>
-              <div className="inquiry">
-                <span className="qno">Institutions</span>
-                <h3>Why do some organizations become resilient while others fail?</h3>
-                <p>What resilient organizations build before the stress event ever arrives.</p>
-              </div>
-              <div className="inquiry">
-                <span className="qno">Technology</span>
-                <h3>How is technology actually governed, independent of outcome?</h3>
-                <p>Oversight for systems that outpace the structures meant to govern them.</p>
-              </div>
-              <div className="inquiry">
-                <span className="qno">Evidence</span>
-                <h3>What does the public record reveal about governance and outcomes?</h3>
-                <p>Reading litigation, audits, and public records for the decisions that shaped what happened next.</p>
-              </div>
-              <Link className="inquiry call" href="/research/agenda">
-                <p className="ck">The research agenda, in full. Five threads, one body of evidence.</p>
-                <span className="link" style={{ color: "var(--wine)" }}>Explore the agenda <Arrow s={13} /></span>
-              </Link>
+      <section className="hm-divisions" id="divisions" aria-labelledby="hm-div-h">
+        <div className="wrap">
+          <div className="sec-head">
+            <div>
+              <p className="kicker">Four divisions</p>
+              <h2 className="h" id="hm-div-h">One commitment to stronger leadership and governance.</h2>
             </div>
           </div>
-        </section>
-
-        {/* CONTENTS INDEX */}
-        <section id="publications">
-          <div className="wrap">
-            <div className="sec-head">
-              <div>
-                <p className="kicker">Contents</p>
-                <h2 className="h">The work, in five parts.</h2>
-              </div>
-              <p className="figlabel" style={{ alignSelf: "flex-end" }}>Est. 2026</p>
-            </div>
-
-            {[
-              { no: "01", name: "Research", href: "/research/agenda", desc: "The evidence base. Primary study of governance in the field.", kids: ["Research Agenda", "Datasets", "Research Projects"] },
-              { no: "02", name: "Publications", href: "/publications", desc: "What the research becomes. Argued, edited, and on the record.", kids: ["Case Files", "Articles", "White Papers", "Research Notes", "Annual Reports"] },
-              { no: "03", name: "Briefings", href: "/podcast", desc: "The research, in conversation. Watch and listen.", kids: ["The Governance Files", "Transformidable Briefing", "Webinar Archive", "Live Sessions"] },
-              { no: "04", name: "Tools", href: "/tools/governance-codebook", desc: "The research, turned outward. Instruments you can run on yourself.", kids: ["Governance Codebook", "Governance Watch", "Benchmarks", "Risk Models"] },
-              { no: "05", name: "Events", href: "/#events", desc: "Where the findings are argued in the room. Roundtables and briefings.", kids: ["Roundtables", "Briefings"] },
-              { no: "06", name: "About", href: "/about", desc: "Who does the work, how it is funded, and the standards it is held to.", kids: ["Mission", "People", "Standards"] },
-            ].map((row) => (
-              <Link className="contents-row" href={row.href} key={row.no}>
-                <span className="c-no">{row.no}</span>
-                <div className="c-main">
-                  <span className="c-name">{row.name}<span className="c-arrow"><Arrow s={24} /></span></span>
-                  <p className="c-desc">{row.desc}</p>
+          <div className="hm-grid">
+            {DIVISIONS.map((d) => (
+              <article className="hm-div" key={d.name}>
+                <span className="hm-no">{d.no}</span>
+                <h3><Link href={d.href}>{d.name}</Link></h3>
+                <p>{d.purpose}</p>
+                <div className="hm-actions">
+                  <Link className="hm-primary" href={d.primary.href}>{d.primary.label} <Arrow s={12} /></Link>
+                  <Link className="hm-secondary" href={d.secondary.href}>{d.secondary.label}</Link>
                 </div>
-                <div className="c-children">
-                  {row.kids.map((k) => <span className="chip" key={k}>{k}</span>)}
-                </div>
-              </Link>
+              </article>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* CASE FILES (data) */}
-        <section className="casefile rule-band">
-          <CaseFilesFeature caseFiles={caseFiles} />
-        </section>
-
-        {/* BENCHMARKS / ANALYTICS — not built yet: shown as Coming Soon */}
-        <section id="tools" className="rule-band is-coming-soon">
-          <div className="wrap">
-            <div className="sec-head">
-              <div>
-                <p className="kicker">Tools &middot; Governance Analytics</p>
-                <h2 className="h">Turn the research into a number you can track.</h2>
-                <span className="soon-badge">Coming soon</span>
-              </div>
-            </div>
-            <div className="bench-grid">
-              <div className="bench-copy">
-                <h3>The Governance Resilience Index</h3>
-                <p className="body">
-                  A standing benchmark built from the case files, scoring how well a sector&rsquo;s
-                  governance is set up to carry transformation without breaking. Run it on your own
-                  organization, then see where you sit against your peers.
-                </p>
-                <span className="btn btn--disabled" aria-disabled="true">Coming soon</span>
-              </div>
-              <div className="stamp-wrap">
-                <span className="stamp" aria-hidden="true">Coming Soon</span>
-                <div className="chart-card">
-                  <div className="cc-head">
-                    <div>
-                      <div className="cc-title">Resilience Index, all sectors</div>
-                      <div className="figlabel" style={{ marginTop: 4 }}>Rolling, indexed to 100 at launch</div>
-                    </div>
-                    <div className="cc-now">
-                      <div className="n">68<span className="up">&nbsp;&uarr;6</span></div>
-                      <div className="l">Q3 2026</div>
-                    </div>
-                  </div>
-                  <div className="chart-wrap">
-                    <svg viewBox="0 0 520 180" role="img" aria-label="Governance Resilience Index rising from 52 to 68 over eight quarters">
-                      <line x1="0" y1="20" x2="520" y2="20" stroke="var(--rule)" strokeWidth="1" />
-                      <line x1="0" y1="70" x2="520" y2="70" stroke="var(--rule)" strokeWidth="1" />
-                      <line x1="0" y1="120" x2="520" y2="120" stroke="var(--rule)" strokeWidth="1" />
-                      <line x1="0" y1="170" x2="520" y2="170" stroke="var(--rule-strong)" strokeWidth="1" />
-                      <path d="M0,120 L74,112 L148,116 L222,96 L296,84 L370,70 L444,58 L520,44 L520,170 L0,170 Z" fill="var(--wine)" fillOpacity="0.10" />
-                      <path d="M0,120 L74,112 L148,116 L222,96 L296,84 L370,70 L444,58 L520,44" fill="none" stroke="var(--wine)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                      <circle cx="520" cy="44" r="5" fill="var(--gold)" stroke="var(--paper)" strokeWidth="2" />
-                    </svg>
-                  </div>
-                  <div className="bench-table">
-                    {[["Credit unions", 74], ["Community banks", 61], ["Public agencies", 48], ["Healthcare systems", 43]].map(([s, v], i, arr) => (
-                      <div className="bt-row" key={s} style={i === arr.length - 1 ? { borderBottom: 0 } : undefined}>
-                        <span className="s">{s}</span>
-                        <span className="bt-bar"><span style={{ width: `${v}%` }} /></span>
-                        <span className="bt-val">{v}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <p className="figlabel" style={{ marginTop: 12 }}>Figure 1 &middot; Illustrative index values, pending first release.</p>
-              </div>
+      <section className="rule-band hm-featured" aria-labelledby="hm-feat-h">
+        <div className="wrap">
+          <div className="sec-head">
+            <div>
+              <p className="kicker">Featured work</p>
+              <h2 className="h" id="hm-feat-h">What is current across Transformidable.</h2>
             </div>
           </div>
-        </section>
+          <div className="hm-grid">
+            <Link className="hm-feat" href={caseFile ? `/publications/case-files/${caseFile.slug}` : "/publications/case-files"}>
+              <span className="hm-feat-label">Research &middot; Current Case File</span>
+              {caseFile ? (
+                <>
+                  {caseFile.caseNumber && <span className="hm-feat-meta">{caseNo(caseFile.caseNumber)}</span>}
+                  <span className="hm-feat-title">{caseFile.title}</span>
+                  {caseFile.dek && <span className="hm-feat-desc">{caseFile.dek}</span>}
+                </>
+              ) : (
+                <>
+                  <span className="hm-feat-title">Case Files</span>
+                  <span className="hm-feat-desc">Anatomies of real governance decisions, traced from decision to outcome.</span>
+                </>
+              )}
+              <span className="hm-feat-go">Read the case <Arrow s={12} /></span>
+            </Link>
 
-        {/* PUBLICATIONS (data) + EVENTS (static) */}
-        <section className="rule-band" style={{ background: "var(--paper-2)" }}>
-          <div className="wrap">
-            <div className="split">
-              <PublicationsList publications={publications} />
+            <Link className="hm-feat" href="/academy/foundation-certificate">
+              <span className="hm-feat-label">Academy &middot; In development</span>
+              <span className="hm-feat-title">Foundation Certificate in AI Governance</span>
+              <span className="hm-feat-desc">A three-course executive education program for boards, executives, and public-sector leaders. Interest registration is open.</span>
+              <span className="hm-feat-go">View the program <Arrow s={12} /></span>
+            </Link>
 
-              <aside className="events-side" id="events">
-                <p className="kicker">Upcoming events</p>
-                <div className="event">
-                  <div className="e-date"><span className="m">Oct 16, 2026</span><span className="tag">Roundtable</span></div>
-                  <h4>Governance &amp; the Digital Board</h4>
-                  <p>A working session on how boards oversee transformation they cannot personally see.</p>
-                  <Link className="link" href="/#briefing">Request a seat <Arrow s={13} /></Link>
-                </div>
-                <div className="event">
-                  <div className="e-date"><span className="m">Nov 2026</span><span className="tag">Briefing</span></div>
-                  <h4>Reading the Resilience Index</h4>
-                  <p>A live walkthrough of the Q3 benchmark and what moved. Online.</p>
-                  <Link className="link" href="/#briefing">Get notified <Arrow s={13} /></Link>
-                </div>
-              </aside>
-            </div>
+            <Link className="hm-feat" href="/publishing">
+              <span className="hm-feat-label">Publishing &middot; Forthcoming</span>
+              <span className="hm-feat-title">The Transformidable Leader</span>
+              <span className="hm-feat-desc">The forthcoming book from Transformidable, with a companion workbook.</span>
+              <span className="hm-feat-go">Discover the book <Arrow s={12} /></span>
+            </Link>
+
+            <Link className="hm-feat" href={episode ? `/podcast/${episode.slug}` : "/podcast"}>
+              <span className="hm-feat-label">Media &middot; {episode ? "Latest episode" : "The podcast"}</span>
+              <span className="hm-feat-title">{episode ? episode.title : "The Governance Files"}</span>
+              <span className="hm-feat-desc">
+                {episode
+                  ? [episode.episodeNumber && `Episode ${episode.episodeNumber}`, episode.publishDate && fullDate(episode.publishDate)].filter(Boolean).join(" · ")
+                  : "Governance decisions, examined on the record."}
+              </span>
+              <span className="hm-feat-go">Listen <Arrow s={12} /></span>
+            </Link>
           </div>
-        </section>
+        </div>
+      </section>
+
+      <section className="rule-band hm-approach" aria-labelledby="hm-approach-h">
+        <div className="wrap hm-approach-in">
+          <div>
+            <p className="kicker">Our approach</p>
+            <h2 className="hm-h2" id="hm-approach-h">Understand consequential change. Decide better. Act with conviction.</h2>
+          </div>
+          <div>
+            <p className="body">
+              Transformidable advances the leadership and governance of organizational transformation through
+              research, education, publishing, and media. We equip leaders and governing bodies to understand
+              consequential change, make better decisions, and act with clarity and conviction.
+            </p>
+            <p className="body">
+              Each division has its own audience and purpose. Research builds the evidence. The Academy turns it into
+              executive education. Publishing carries the ideas further, and Media brings them into conversation.
+              What they share is one intellectual identity and a commitment to stronger leadership and governance.
+            </p>
+            <p style={{ marginTop: 22 }}><Link className="link" href="/about">About Transformidable <Arrow s={13} /></Link></p>
+          </div>
+        </div>
+      </section>
+
+      <section className="rule-band hm-connect" aria-label="Stay connected">
+        <div className="wrap hm-connect-in">
+          <div>
+            <p className="kicker">Stay connected</p>
+            <p className="hm-connect-t">Follow the research, the programs, and the conversation.</p>
+          </div>
+          <div className="hm-connect-cta">
+            <a className="btn" href="#briefing">Subscribe to the Brief <Arrow /></a>
+            <Link className="link" href="/contact">Contact us <Arrow s={13} /></Link>
+          </div>
+        </div>
+      </section>
     </ResearchShell>
   );
 }

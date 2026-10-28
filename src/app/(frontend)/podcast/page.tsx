@@ -44,7 +44,7 @@ export default async function PodcastPage() {
       <section className="idx-hero tr-onsky">
         <Sky variant="podcast" />
         <div className="wrap idx-hero-in">
-          <p className="kicker">Briefings &middot; Podcast</p>
+          <p className="kicker">Media &middot; Podcast</p>
           <h1 className="idx-title">The Governance Files</h1>
           <p className="idx-intro">
             The Transformidable podcast. Conversations on governance, leadership, and
