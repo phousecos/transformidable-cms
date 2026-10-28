@@ -1,7 +1,7 @@
 // @ts-nocheck
 import Link from "next/link";
 import { AcademyFaq, AcademyHero, AcademyRoutes, AcademyShell, Arrow } from "../components/academy/AcademySections";
-import { LegacyAcademyAnchors } from "../components/academy/AcademyNav";
+import { LegacyAcademyAnchors } from "../components/academy/LegacyAcademyAnchors";
 import { AUDIENCES, CERTIFICATE, COURSES, PROGRAM_STATUS, courseHref, faqIn } from "./content";
 
 const DESCRIPTION =

@@ -1,8 +1,8 @@
 /* ==========================================================================
    TRANSFORMIDABLE ACADEMY
    Layered on research.css, inside the same .tr scope. The Academy keeps the
-   shared header and footer but has its own feel: a section menu, a light
-   banner instead of the research side's dark sky, and course-catalog layouts
+   shared header and footer but has its own feel: a light banner instead
+   of the research side's dark sky, and course-catalog layouts
    on the blueprint palette (oxblood, taupe, parchment, cream). Gold still
    means "act here", and each page uses it once.
    ========================================================================== */
@@ -34,18 +34,6 @@
 .tr .ac .kicker { color: var(--ac-oxblood); }
 .tr .ac-muted { color: var(--ac-taupe); }
 .tr .ac-inline { color: var(--ac-oxblood); text-decoration: underline; text-underline-offset: 3px; }
-
-/* ---- Section menu ----------------------------------------------------- */
-.tr .ac-subnav { background: var(--ac-parchment); border-bottom: 1px solid var(--rule); position: sticky; top: 74px; z-index: 30; }
-.tr .ac-subnav-in { display: flex; align-items: center; gap: 8px 28px; min-height: 50px; }
-.tr .ac-subnav-brand { flex: none; font-family: var(--serif); font-weight: 600; font-size: 15px; color: var(--ac-ink); display: none; }
-@media (min-width: 900px) { .tr .ac-subnav-brand { display: inline; } }
-.tr .ac-subnav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin-inline: -8px; }
-.tr .ac-subnav-links::-webkit-scrollbar { display: none; }
-@media (min-width: 900px) { .tr .ac-subnav-links { margin-left: auto; } }
-.tr .ac-subnav-links a { flex: none; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ac-taupe); padding: 16px 8px 14px; border-bottom: 2px solid transparent; white-space: nowrap; }
-.tr .ac-subnav-links a:hover { color: var(--ac-ink); }
-.tr .ac-subnav-links a.is-active { color: var(--ac-oxblood); border-bottom-color: var(--ac-oxblood); }
 
 /* ---- Light banner ----------------------------------------------------- */
 .tr .ac-hero { position: relative; overflow: hidden; background: linear-gradient(100deg, var(--ac-cream) 0%, var(--ac-cream) 45%, var(--ac-parchment) 100%); border-bottom: 1px solid var(--rule); }
@@ -156,8 +144,8 @@
 /* ---- Register + form -------------------------------------------------- */
 .tr .ac-register { display: grid; gap: clamp(30px, 5vw, 60px); grid-template-columns: 1fr; align-items: start; }
 @media (min-width: 960px) { .tr .ac-register { grid-template-columns: 1fr 1.25fr; } }
-/* Clear the sticky masthead and Academy menu when jumping to an anchor. */
-.tr .ac [id] { scroll-margin-top: 130px; }
+/* Clear the sticky masthead when jumping to an anchor. */
+.tr .ac [id] { scroll-margin-top: 90px; }
 .tr .ac-form-card { background: var(--paper); border: 1px solid var(--rule); border-top: 3px solid var(--ac-oxblood); padding: clamp(22px, 4vw, 34px); }
 .tr .ac-form-h { font-family: var(--serif); font-size: 1.3rem; color: var(--ink); margin: 0 0 6px; }
 .tr .ac-form-sub { font-family: var(--serif); color: var(--ink-body); margin: 0 0 8px; line-height: 1.55; }
