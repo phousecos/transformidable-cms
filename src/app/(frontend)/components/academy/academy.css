@@ -1,0 +1,159 @@
+/* ==========================================================================
+   TRANSFORMIDABLE ACADEMY
+   Layered on research.css, inside the same .tr scope. Adds the brand
+   blueprint's palette (oxblood, taupe, parchment, cream) alongside the site's
+   wine and gold: cream and parchment are the Academy's section surfaces,
+   oxblood and taupe its structural accents, and gold still means "act here".
+   ========================================================================== */
+
+.tr {
+  --ac-oxblood: #6b1429;
+  --ac-taupe: #6e5d53;
+  --ac-parchment: #e7dfd2;
+  --ac-cream: #f7f3eb;
+  --ac-ink: #1a1714;
+}
+@media (prefers-color-scheme: dark) {
+  .tr {
+    --ac-oxblood: #d98fa4;
+    --ac-taupe: #b8a79b;
+    --ac-parchment: #241a17;
+    --ac-cream: #1e1513;
+    --ac-ink: #f4ece1;
+  }
+}
+:root[data-theme="dark"] .tr {
+  --ac-oxblood: #d98fa4; --ac-taupe: #b8a79b; --ac-parchment: #241a17; --ac-cream: #1e1513; --ac-ink: #f4ece1;
+}
+:root[data-theme="light"] .tr {
+  --ac-oxblood: #6b1429; --ac-taupe: #6e5d53; --ac-parchment: #e7dfd2; --ac-cream: #f7f3eb; --ac-ink: #1a1714;
+}
+
+/* ---- Sky variant: oxblood fading through warm taupe ------------------- */
+.tr .tr-sky--academy .tr-sky-glow { background:
+  radial-gradient(92% 132% at 4% 62%, rgba(201,162,39,.15), transparent 62%),
+  linear-gradient(90deg, #4a0c1d 0%, #3d0a18 28%, #2c1714 56%, #18100d 80%, #0c0908 100%); }
+
+/* ---- Hero additions --------------------------------------------------- */
+.tr .ac-hero-sub { font-family: var(--serif); font-weight: 600; font-size: clamp(1.1rem, 2vw, 1.35rem); color: #f7f2e6; margin: 18px 0 0; max-width: 46ch; }
+.tr .ac-hero-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; margin-top: 30px; }
+.tr .ac-facts { display: grid; gap: 1px; grid-template-columns: 1fr; margin: 36px 0 0; max-width: 860px; background: rgba(244, 237, 216, .16); border: 1px solid rgba(244, 237, 216, .16); }
+@media (min-width: 720px) { .tr .ac-facts { grid-template-columns: repeat(3, 1fr); } }
+.tr .ac-facts div { background: rgba(18, 9, 12, .55); padding: 16px 18px; }
+.tr .ac-facts dt { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: #e8c451; margin: 0 0 6px; }
+.tr .ac-facts dd { margin: 0; font-family: var(--serif); font-size: .98rem; line-height: 1.45; color: #f7f2e6; }
+
+/* ---- Section surfaces ------------------------------------------------- */
+.tr .ac-band--cream { background: var(--ac-cream); }
+.tr .ac-band--parchment { background: var(--ac-parchment); }
+.tr .ac-band { border-top: 1px solid var(--rule); }
+.tr .ac-band .kicker { color: var(--ac-oxblood); }
+.tr .ac-h2 { font-family: var(--serif); font-size: clamp(1.55rem, 3.2vw, 2.3rem); line-height: 1.12; letter-spacing: -.01em; color: var(--ink); margin: 12px 0 18px; max-width: 24ch; text-wrap: balance; }
+.tr .ac-h3 { font-family: var(--serif); font-size: clamp(1.2rem, 2.2vw, 1.45rem); line-height: 1.2; color: var(--ink); margin: 0 0 10px; text-wrap: balance; }
+.tr .ac-muted { color: var(--ac-taupe); }
+.tr .ac-inline { color: var(--ac-oxblood); text-decoration: underline; text-underline-offset: 3px; }
+.tr .ac-intro { display: grid; gap: clamp(28px, 5vw, 64px); grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 900px) { .tr .ac-intro { grid-template-columns: 1fr 1fr; } }
+.tr .ac-intro .body + .body { margin-top: 16px; }
+
+/* Three short statements (Understand / Govern / Build). */
+.tr .ac-pillars { display: grid; grid-template-columns: 1fr; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+@media (min-width: 720px) { .tr .ac-pillars { grid-template-columns: repeat(3, 1fr); } }
+.tr .ac-pillar { padding: 26px clamp(18px, 3vw, 28px); }
+.tr .ac-pillar + .ac-pillar { border-top: 1px solid var(--rule); }
+@media (min-width: 720px) { .tr .ac-pillar + .ac-pillar { border-top: 0; border-left: 1px solid var(--rule); } }
+.tr .ac-pillar .diamond { width: 8px; height: 8px; background: var(--gold); transform: rotate(45deg); }
+.tr .ac-pillar h3 { font-family: var(--serif); font-size: 1.2rem; color: var(--ink); margin: 14px 0 6px; }
+.tr .ac-pillar p { font-size: 13px; line-height: 1.55; color: var(--ac-taupe); margin: 0; }
+
+/* ---- Status badge ----------------------------------------------------- */
+.tr .ac-status { display: inline-flex; align-items: center; gap: 8px; font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ac-oxblood); border: 1px solid currentColor; border-radius: 999px; padding: 5px 12px; }
+.tr .ac-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+
+/* ---- Course cards ----------------------------------------------------- */
+.tr .ac-courses { display: grid; gap: 16px; grid-template-columns: 1fr; margin-top: 30px; }
+@media (min-width: 900px) { .tr .ac-courses { grid-template-columns: repeat(3, 1fr); } }
+.tr .ac-course { background: var(--paper); border: 1px solid var(--rule); border-top: 3px solid var(--ac-oxblood); padding: 26px 24px 28px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+.tr .ac-course .ac-no { font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--gold-deep); }
+.tr .ac-course h3 { font-family: var(--serif); font-size: 1.3rem; line-height: 1.2; color: var(--ink); margin: 12px 0 6px; text-wrap: balance; }
+.tr .ac-course .ac-tag { font-family: var(--serif); font-style: italic; color: var(--ac-taupe); margin: 0 0 12px; }
+.tr .ac-course p { font-family: var(--serif); font-size: .96rem; line-height: 1.6; color: var(--ink-body); margin: 0; }
+.tr .ac-course .ac-format { margin-top: auto; padding-top: 16px; font-family: var(--sans); font-size: 12px; line-height: 1.5; color: var(--ac-taupe); }
+.tr .ac-course .ac-format b { color: var(--ink); font-weight: 700; }
+.tr .ac-after { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; margin-top: 30px; }
+
+/* ---- Audiences -------------------------------------------------------- */
+.tr .ac-audiences { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+.tr .ac-audiences li { font-family: var(--serif); font-size: 1.04rem; line-height: 1.5; color: var(--ink); padding: 14px 0 14px 26px; border-bottom: 1px solid var(--rule); position: relative; }
+.tr .ac-audiences li:first-child { border-top: 1px solid var(--rule); }
+.tr .ac-audiences li::before { content: ""; position: absolute; left: 4px; top: 1.3em; width: 7px; height: 7px; background: var(--ac-oxblood); transform: rotate(45deg); }
+.tr .ac-callout { margin-top: 22px; border-left: 3px solid var(--gold); padding: 4px 0 4px 16px; font-family: var(--serif); font-style: italic; color: var(--ink-body); }
+
+/* ---- Two ways to participate ------------------------------------------ */
+.tr .ac-paths { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .tr .ac-paths { grid-template-columns: 1fr 1fr; } }
+.tr .ac-path { background: var(--paper); border: 1px solid var(--rule); padding: 30px 28px; display: flex; flex-direction: column; gap: 12px; }
+.tr .ac-path.is-primary { border-top: 3px solid var(--gold); }
+.tr .ac-path.is-secondary { border-top: 3px solid var(--ac-taupe); }
+.tr .ac-path p { font-family: var(--serif); font-size: 1rem; line-height: 1.6; color: var(--ink-body); margin: 0; }
+.tr .ac-path ul { margin: 0; padding-left: 18px; font-family: var(--serif); color: var(--ink-body); line-height: 1.6; }
+.tr .ac-path .btn, .tr .ac-path .link { align-self: flex-start; margin-top: auto; }
+
+/* ---- Six disciplines -------------------------------------------------- */
+.tr .ac-disciplines { list-style: none; padding: 0; margin: 24px 0 0; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.tr .ac-discipline { background: var(--paper); border: 1px solid var(--rule); border-left: 3px solid var(--ac-oxblood); padding: 14px 16px; }
+.tr .ac-discipline .code { display: block; font-family: var(--sans); font-weight: 800; font-size: 13px; letter-spacing: .14em; color: var(--ac-oxblood); }
+.tr .ac-discipline .desc { display: block; margin-top: 6px; font-family: var(--serif); font-size: .92rem; line-height: 1.45; color: var(--ink-body); }
+
+/* ---- Certificate page: outcomes and course detail --------------------- */
+.tr .ac-outcomes { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .tr .ac-outcomes { grid-template-columns: 1fr 1fr; } }
+.tr .ac-outcomes li { font-family: var(--serif); font-size: 1rem; line-height: 1.55; color: var(--ink-body); padding: 16px 18px 16px 46px; background: var(--paper); border: 1px solid var(--rule); position: relative; }
+.tr .ac-outcomes li::before { content: ""; position: absolute; left: 18px; top: 20px; width: 12px; height: 7px; border-left: 2px solid var(--ac-oxblood); border-bottom: 2px solid var(--ac-oxblood); transform: rotate(-45deg); }
+.tr .ac-pathway { display: grid; gap: 0; margin-top: 10px; }
+.tr .ac-step { display: grid; gap: 14px 40px; grid-template-columns: 1fr; padding: 34px 0; border-top: 1px solid var(--rule); scroll-margin-top: 100px; }
+@media (min-width: 900px) { .tr .ac-step { grid-template-columns: 240px 1fr; } }
+.tr .ac-step:last-child { border-bottom: 1px solid var(--rule); }
+.tr .ac-step-label .ac-no { font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--gold-deep); }
+.tr .ac-step-label .ac-tag { font-family: var(--serif); font-style: italic; color: var(--ac-taupe); margin: 8px 0 0; }
+.tr .ac-step .body + .body { margin-top: 12px; }
+.tr .ac-step .ac-disciplines { grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 620px) { .tr .ac-step .ac-disciplines { grid-template-columns: repeat(3, 1fr); } }
+.tr .ac-step .ac-format { margin-top: 16px; font-size: 12.5px; line-height: 1.5; color: var(--ac-taupe); }
+.tr .ac-step .ac-format b { color: var(--ink); }
+.tr .ac-two { display: grid; gap: clamp(28px, 5vw, 56px); grid-template-columns: 1fr; }
+@media (min-width: 900px) { .tr .ac-two { grid-template-columns: 1fr 1fr; } }
+.tr .ac-note { font-family: var(--serif); font-style: italic; font-size: .95rem; color: var(--ac-taupe); margin-top: 14px; }
+
+/* ---- FAQ -------------------------------------------------------------- */
+.tr .ac-faq-wrap { max-width: 900px; }
+.tr .ac-faq { border-top: 1px solid var(--rule); }
+.tr .ac-faq-item { border-bottom: 1px solid var(--rule); }
+.tr .ac-faq-item summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; gap: 20px; padding: 20px 0; font-family: var(--serif); font-size: clamp(1.02rem, 1.8vw, 1.15rem); line-height: 1.35; color: var(--ink); }
+.tr .ac-faq-item summary::-webkit-details-marker { display: none; }
+.tr .ac-faq-item summary::after { content: "+"; flex: none; font-family: var(--sans); font-size: 20px; line-height: 1; color: var(--ac-oxblood); transition: transform .18s ease; }
+.tr .ac-faq-item[open] summary::after { transform: rotate(45deg); }
+.tr .ac-faq-item summary:hover { color: var(--ac-oxblood); }
+.tr .ac-faq-item p { font-family: var(--serif); font-size: 1rem; line-height: 1.7; color: var(--ink-body); margin: 0 0 22px; max-width: 68ch; }
+.tr .ac-faq-more { margin-top: 26px; font-family: var(--serif); color: var(--ink-body); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+/* ---- Register + form -------------------------------------------------- */
+.tr .ac-anchor { display: block; position: relative; top: -100px; height: 0; }
+.tr .ac-register { display: grid; gap: clamp(30px, 5vw, 60px); grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 960px) { .tr .ac-register { grid-template-columns: 1fr 1.25fr; } }
+.tr .ac-register-paths { margin: 26px 0 0; display: grid; gap: 16px; }
+.tr .ac-register-paths dt { font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--ac-oxblood); }
+.tr .ac-register-paths dd { margin: 4px 0 0; font-family: var(--serif); color: var(--ink-body); line-height: 1.55; }
+.tr .ac-form-card { background: var(--paper); border: 1px solid var(--rule); border-top: 3px solid var(--gold); padding: clamp(22px, 4vw, 34px); box-shadow: var(--shadow); }
+.tr .ac-form-h { font-family: var(--serif); font-size: 1.35rem; color: var(--ink); margin: 18px 0 6px; }
+.tr .ac-form-sub { font-family: var(--serif); color: var(--ink-body); margin: 0 0 20px; line-height: 1.55; }
+.tr .ac-form-grid { display: grid; gap: 0 16px; grid-template-columns: 1fr; }
+@media (min-width: 620px) { .tr .ac-form-grid { grid-template-columns: 1fr 1fr; } }
+.tr .ac-form-grid > div { display: flex; flex-direction: column; }
+.tr .ac-form-grid .case-form-label:first-child { margin-top: 14px; }
+.tr .ac-select { appearance: none; -webkit-appearance: none; padding-right: 34px; background-image: linear-gradient(45deg, transparent 50%, var(--ink-mute) 50%), linear-gradient(135deg, var(--ink-mute) 50%, transparent 50%); background-position: calc(100% - 18px) 55%, calc(100% - 13px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+.tr .ac-submit { margin-top: 18px; align-self: flex-start; }
+.tr .ac-submit:disabled { opacity: .6; cursor: default; transform: none; }
+.tr .ac-form-note { font-size: 12px; color: var(--ac-taupe); margin: 12px 0 0; }
+.tr .ac-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.tr .ac-form-card .case-form-success + .link { margin-top: 16px; background: none; border-top: 0; border-left: 0; border-right: 0; padding-left: 0; }

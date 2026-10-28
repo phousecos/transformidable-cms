@@ -86,6 +86,14 @@ try {
     { table: 'documents', column: 'sector', validValues: ['general', 'highered-nonprofit', 'credit-unions'] },
     { table: 'documents', column: 'document_type', validValues: ['overview', 'checklist', 'guide', 'brief', 'framework', 'template', 'worksheet', 'report'] },
     { table: 'documents', column: 'status', validValues: ['draft', 'published'] },
+    // Academy Inquiries
+    { table: 'academy_inquiries', column: 'type', validValues: ['organization', 'individual'] },
+    { table: 'academy_inquiries', column: 'sector', validValues: ['local-government', 'higher-education', 'financial-services', 'nonprofit', 'healthcare', 'corporate', 'other'] },
+    { table: 'academy_inquiries', column: 'program', validValues: ['foundation-certificate', 'course-1', 'course-2', 'course-3', 'executive-briefing', 'not-sure'] },
+    { table: 'academy_inquiries', column: 'participants', validValues: ['1-9', '10-24', '25-49', '50-plus', 'not-sure'] },
+    { table: 'academy_inquiries', column: 'delivery', validValues: ['in-person', 'virtual', 'hybrid', 'no-preference'] },
+    { table: 'academy_inquiries', column: 'timeframe', validValues: ['0-3-months', '3-6-months', '6-12-months', 'exploring'] },
+    { table: 'academy_inquiries', column: 'status', validValues: ['new', 'contacted', 'qualified', 'closed'] },
     // Newsletter Issues
     { table: 'newsletter_issues', column: 'status', validValues: ['draft', 'scheduled', 'published'] },
     // Users

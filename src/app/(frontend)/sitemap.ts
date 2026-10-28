@@ -15,6 +15,8 @@ const STATIC_PATHS = [
   "/publications/research-notes",
   "/podcast",
   "/about",
+  "/academy",
+  "/academy/foundation-certificate",
   "/research/agenda",
   "/research/datasets",
   "/research/projects",

@@ -23,6 +23,7 @@ import { Subscribers } from './collections/Subscribers.ts'
 import { CaseFollows } from './collections/CaseFollows.ts'
 import { CaseSubmissions } from './collections/CaseSubmissions.ts'
 import { ContactMessages } from './collections/ContactMessages.ts'
+import { AcademyInquiries } from './collections/AcademyInquiries.ts'
 import { PodcastEpisodes } from './collections/PodcastEpisodes.ts'
 import { Documents } from './collections/Documents.ts'
 import { SiteSettings } from './globals/SiteSettings.ts'
@@ -240,6 +241,7 @@ export default buildConfig({
     CaseFollows,
     CaseSubmissions,
     ContactMessages,
+    AcademyInquiries,
     PodcastEpisodes,
     Documents,
     // Legacy collections — hidden from nav, kept for data access
