@@ -1,215 +1,226 @@
-// Copy shared by the Academy pages: the courses, the governance disciplines,
-// the two audiences, and the FAQ. Kept in one place so the course pages, the
-// audience pages, the certificate page, and their structured data never
-// disagree.
+// Copy shared by the Academy pages: the three programs, the audiences, and
+// the FAQ. Kept in one place so the program pages, the Academy front door,
+// the audience pages, and their structured data never disagree.
 //
-// Facts not yet decided (price, first cohort dates, credit for continuing
-// education) are written so they stay true until they are decided. Each one
-// is marked PENDING; replace the wording when the fact is settled.
+// The Academy leads with organizational buyers. Each program stands on its
+// own: none is a prerequisite for another, and they are marketed
+// independently while the certificate pathway is developed.
+//
+// Facts not yet decided (pricing) are written so they stay true until they
+// are decided, and marked PENDING.
 
-export const PROGRAM_STATUS = "In development. Interest registration is open for future cohorts.";
-
-export const CERTIFICATE = {
-  name: "Foundation Certificate in AI Governance",
-  href: "/academy/foundation-certificate",
-  summary:
-    "A three-course executive education program that moves from understanding AI, to exercising oversight, to building the structures that make governance work.",
-};
-
-// `program` is the matching Academy Inquiries option, so a course page can
-// preselect its course on either inquiry form.
-export const COURSES = [
+// `program` is the matching Academy Inquiries option, so a program page can
+// preselect itself on the inquiry form. `stage` places it in the
+// Understand / Govern / Implement sequence.
+export const PROGRAMS = [
   {
-    slug: "ai-explained",
+    slug: "ai-governance-for-boards-and-councils",
     program: "course-1",
-    no: "Course 1",
-    title: "AI Explained for Executive Decision-Makers",
-    tagline: "Understanding the machinery",
-    summary:
-      "Understand artificial intelligence, large language models, AI agents, data use, and the capabilities and limitations that matter to organizational leaders.",
-    detail: [
-      "A foundational introduction to artificial intelligence, generative AI, large language models, AI agents, and the role of data.",
-      "Participants explore how these technologies work, what they can and cannot reliably do, and the questions executives should ask about their organizational use.",
+    featured: true,
+    eyebrow: "Executive briefing · 90 minutes",
+    stage: { name: "Understand", format: "90-minute executive briefing", line: "Build shared awareness and oversight literacy." },
+    title: "AI Governance for Boards & Councils",
+    subtitle: "Understanding the Decisions You're Responsible For",
+    intro: [
+      "Artificial intelligence is becoming part of how public institutions operate, deliver services, manage information, and make decisions. Yet many governing bodies are being asked to oversee AI initiatives without a common understanding of the technology, its risks, or the questions they should be asking.",
+      "This executive briefing is designed for city councils, county commissions, university boards, and other governing bodies responsible for organizational oversight.",
+      "Participants do not need technical expertise. The focus is on governance, accountability, and informed decision-making.",
     ],
-    format: "Approximately 35 minutes of recorded instruction, with an optional facilitated executive briefing.",
-    delivery: "Recorded, with an optional live briefing",
-    outcomes: [
-      "Explain essential AI concepts and distinguish AI assistants, language models, and agents.",
-      "Recognize organizational AI use, limitations, and material governance concerns.",
+    explore: [
+      "What today's AI capabilities mean for public institutions.",
+      "The distinction between management responsibilities and governing-body oversight.",
+      "Risks involving privacy, security, accuracy, fairness, procurement, and public trust.",
+      "Questions governing bodies should ask before approving or expanding AI initiatives.",
+      "What effective AI governance reporting and accountability can look like.",
     ],
+    takeaway:
+      "Participants leave with a shared vocabulary, a practical set of oversight questions, and an AI Governance Oversight Checklist to support future discussions and decisions.",
+    tools: ["AI Governance Oversight Checklist"],
+    attend: "City councils, county commissions, boards of trustees, governing committees, and executive leadership teams.",
+    delivery: ["90-minute facilitated briefing, available virtually or in person for private organizational groups."],
+    facts: { format: "90-minute facilitated briefing", delivery: "Virtual or in person" },
+    closing: {
+      headline: "Bring AI governance into your next board or council discussion.",
+      line: "Contact Transformidable Academy to discuss a private briefing for your organization.",
+      form: "Discuss a private briefing",
+      button: "Discuss a private briefing",
+    },
+    individuals: false,
   },
   {
     slug: "governing-ai-adoption",
     program: "course-2",
-    no: "Course 2",
+    featured: false,
+    eyebrow: "Facilitated workshop · 4 hours",
+    stage: { name: "Govern", format: "4-hour workshop", line: "Clarify decisions, accountability, and oversight." },
     title: "Governing AI Adoption",
-    tagline: "Exercising executive oversight",
-    summary:
-      "Learn to exercise executive oversight using six practical governance disciplines: SEE, DECIDE, OWN, ESCALATE, EVIDENCE, and RESPOND.",
-    detail: [
-      "A four-hour interactive workshop introducing the six disciplines of the Transformidable Governance Method.",
-      "Participants apply these disciplines to an evolving organizational AI adoption scenario and identify priorities for strengthening executive oversight.",
+    subtitle: "From AI Awareness to Effective Organizational Oversight",
+    intro: [
+      "Understanding artificial intelligence is only the beginning. As organizations introduce AI into their operations, leaders must determine who has authority to make decisions, how risks are evaluated, what evidence supports deployment, and when concerns require escalation.",
+      "This interactive workshop helps governing bodies and executive teams translate AI awareness into practical governance expectations.",
+      "Using realistic organizational scenarios and the Transformidable approach to governance, participants examine the decisions, responsibilities, and oversight mechanisms needed to govern AI adoption.",
     ],
-    format: "Four hours in person, or two live virtual sessions.",
-    delivery: "In person or live virtual",
-    outcomes: [
-      "Evaluate AI-related decisions and the evidence supporting them.",
-      "Establish appropriate accountability and escalation expectations.",
+    explore: [
+      "Establishing AI decision rights and accountability.",
+      "Evaluating proposed AI uses against organizational objectives and risk.",
+      "Distinguishing operational management from governance oversight.",
+      "Identifying information leaders need before authorizing AI initiatives.",
+      "Designing escalation, monitoring, and reporting expectations.",
+      "Developing priorities for the next 90 days.",
     ],
+    takeaway:
+      "Participants develop a preliminary AI Governance Oversight Scorecard and a 90-Day Governance Action Plan identifying practical next steps for their organization.",
+    tools: ["AI Governance Oversight Scorecard", "90-Day Governance Action Plan"],
+    attend:
+      "Governing boards, councils, executive teams, CIOs, AI program sponsors, and leaders responsible for organizational risk and accountability.",
+    delivery: [
+      "Four-hour facilitated workshop, delivered as a half-day session or two virtual sessions.",
+      "The workshop can be adapted to the organization's sector, existing AI activities, and governance responsibilities.",
+    ],
+    facts: { format: "Four-hour facilitated workshop", delivery: "Half-day session or two virtual sessions" },
+    closing: {
+      headline: "Move beyond AI awareness. Establish the questions, responsibilities, and evidence needed for effective oversight.",
+      line: "Contact Transformidable Academy to arrange a private workshop.",
+      form: "Arrange a private workshop",
+      button: "Arrange a private workshop",
+    },
+    individuals: false,
   },
   {
     slug: "building-ai-governance",
     program: "course-3",
-    no: "Course 3",
+    featured: false,
+    eyebrow: "Applied learning program · Approximately 7 hours",
+    stage: { name: "Implement", format: "7-hour applied program", line: "Develop an actionable governance approach." },
     title: "Building AI Governance in Practice",
-    tagline: "Turning expectations into operating mechanisms",
-    summary:
-      "Translate governance expectations into operating structures, decision rights, accountability mechanisms, reporting requirements, and improvement processes.",
-    detail: [
-      "An applied workshop focused on making governance operational: governance structures, decision rights, accountability, escalation pathways, oversight reporting, and continuous improvement.",
-      "The course culminates in the development of an AI Governance Action Brief.",
+    subtitle: "Turning Governance Principles into an Actionable Organizational Approach",
+    intro: [
+      "Effective AI governance requires more than a policy statement or a technology committee. It requires clear authority, defined accountability, reliable information, and the ability to respond when circumstances change.",
+      "This applied program helps organizational leaders develop a practical approach to governing AI initiatives, from initial evaluation through ongoing oversight.",
+      "Participants work through governance scenarios and apply structured decision-making tools to their own organizational context.",
     ],
-    format: "Approximately seven instructional hours, in person or across multiple virtual sessions.",
-    delivery: "In person or across virtual sessions",
-    outcomes: [
-      "Identify essential governance structures, reporting mechanisms, and intervention processes.",
-      "Develop a practical action brief for improving AI governance.",
+    explore: [
+      "Defining AI governance roles and decision-making authority.",
+      "Establishing requirements for evaluating proposed AI uses.",
+      "Assigning accountability across leadership, technology, legal, risk, and operational functions.",
+      "Designing escalation and exception-management processes.",
+      "Identifying evidence needed to support governance decisions.",
+      "Establishing oversight measures, reporting expectations, and review cycles.",
+      "Developing an actionable governance implementation roadmap.",
     ],
+    takeaway:
+      "Participants complete an AI Governance Action Brief outlining governance priorities, decision rights, oversight expectations, and recommended next steps for their organization.",
+    tools: ["AI Governance Action Brief"],
+    attend:
+      "Executive leaders, governance and risk professionals, AI program sponsors, CIOs, and organizational teams responsible for establishing or strengthening AI governance.",
+    delivery: ["Approximately seven hours of facilitated instruction and applied exercises, available as a private organizational program."],
+    note: "This course is being developed as part of the Transformidable Academy AI Governance Foundation learning pathway.",
+    facts: { format: "About seven hours of instruction and applied exercises", delivery: "Private organizational program" },
+    closing: {
+      headline: "Translate governance principles into a practical plan for your organization.",
+      line: "Register your interest in an upcoming program or discuss a private organizational cohort.",
+      form: "Discuss a private organizational cohort",
+      button: "Discuss a private program",
+    },
+    individuals: true,
   },
 ];
 
-export const courseHref = (slug: string) => `/academy/courses/${slug}`;
+export const FEATURED = PROGRAMS.find((p) => p.featured);
+export const programHref = (slug: string) => `/academy/courses/${slug}`;
 
-export const DISCIPLINES = [
-  { code: "SEE", desc: "Recognize what is happening and what matters." },
-  { code: "DECIDE", desc: "Exercise appropriate decision authority." },
-  { code: "OWN", desc: "Establish and maintain accountability." },
-  { code: "ESCALATE", desc: "Bring consequential issues to the appropriate level." },
-  { code: "EVIDENCE", desc: "Measure performance and substantiate claims." },
-  { code: "RESPOND", desc: "Intervene, correct course, and improve." },
+// What every program shares, in the order the copy leads with it.
+export const PROMISES = [
+  {
+    title: "For decision-makers",
+    text: "Designed for the people who oversee and answer for AI decisions, not technical specialists. No technical expertise is needed.",
+  },
+  {
+    title: "Practical governance tools",
+    text: "Participants leave with tools they can use: an oversight checklist, a scorecard and 90-day action plan, or a governance action brief.",
+  },
+  {
+    title: "Private sessions",
+    text: "Organizations can arrange a private session for their entire leadership team or governing body, virtually or in person.",
+  },
 ];
 
-export const OUTCOMES = COURSES.flatMap((c) => c.outcomes);
-
-export const AUDIENCES = [
-  "City councils, municipal executives, and public-sector leadership teams",
-  "University presidents, trustees, and higher education executives",
-  "Bank boards, CEOs, and financial services leaders",
-  "Nonprofit boards and executive directors",
-  "Organizational leaders responsible for major technology decisions",
+export const PRIMARY_AUDIENCES = [
+  "City councils",
+  "County commissions",
+  "University governing boards",
+  "Executive leadership teams",
 ];
+export const OTHER_AUDIENCES = "Other governing bodies, including nonprofit and financial institution boards.";
 
-// The two ways to take the courses. Each route has its own page and form.
-export const ROUTES = {
-  organization: {
-    label: "For organizations",
-    title: "Learn together as a board or leadership team",
-    summary:
-      "Private cohorts bring your governing body or executive team through the program together, with facilitated discussion and scenarios drawn from your sector. Virtual or in person.",
-    href: "/academy/organizations",
-    cta: "Private cohorts",
-  },
-  individual: {
-    label: "For individuals",
-    title: "Take the program on your own",
-    summary:
-      "Future open-enrollment cohorts will let executives and professionals take the courses independently and work toward the certificate.",
-    href: "/academy/individuals",
-    cta: "Open enrollment",
-  },
-};
-
-type FaqGroup = "general" | "organizations" | "individuals" | "certificate";
+type FaqGroup = "general" | "organizations" | "individuals";
 
 export const FAQ_GROUPS: { key: FaqGroup; title: string }[] = [
-  { key: "general", title: "About the Academy" },
-  { key: "certificate", title: "The certificate" },
+  { key: "general", title: "About the programs" },
   { key: "organizations", title: "For organizations" },
   { key: "individuals", title: "For individuals" },
 ];
 
 export const FAQ: { q: string; a: string; group: FaqGroup }[] = [
   {
-    q: "Who is Transformidable Academy for?",
-    a: "Executives, governing boards, and organizational leaders who are asked to authorize, oversee, or take accountability for consequential technology decisions. That includes city councils and municipal executives, university presidents and trustees, bank boards and financial services leaders, nonprofit boards and executive directors, and the leadership teams around them.",
+    q: "Who are the programs for?",
+    a: "City councils, county commissions, university governing boards, and executive leadership teams, along with other governing bodies, including nonprofit and financial institution boards, that oversee decisions about artificial intelligence.",
     group: "general",
   },
   {
-    q: "Do I need a technical background in AI?",
-    a: "No. The Foundation Certificate assumes no technical AI background. Course 1 explains the technology in terms leaders need for oversight, and the rest of the program focuses on governance: decisions, accountability, escalation, evidence, and response.",
+    q: "Do participants need a technical background?",
+    a: "No. The programs are designed for decision-makers rather than technical specialists. The focus is on governance, accountability, and informed decision-making.",
     group: "general",
   },
   {
-    q: "Is it delivered online or in person?",
-    a: "Both. Courses 2 and 3 can be delivered in person or across live virtual sessions, and Course 1 is recorded with an optional facilitated briefing.",
+    q: "Do we have to start with the briefing?",
+    a: "No. Each program stands on its own, and none is a prerequisite for another. A council may want only the briefing; an executive team may be ready for the half-day workshop; an organization building an AI governance program may need the applied course.",
+    group: "general",
+  },
+  {
+    q: "What do participants leave with?",
+    a: "Practical governance tools. The briefing provides an AI Governance Oversight Checklist; the workshop, a preliminary AI Governance Oversight Scorecard and a 90-Day Governance Action Plan; the applied program, an AI Governance Action Brief for your organization.",
+    group: "general",
+  },
+  {
+    q: "Are the programs delivered online or in person?",
+    a: "The briefing is available virtually or in person. The workshop runs as a half-day session or two virtual sessions. The applied program is arranged as a private program with each organization.",
     group: "general",
   },
   {
     q: "How does the Academy relate to Transformidable research?",
-    a: "The Academy draws on Transformidable's governance research and on the practical disciplines of the Transformidable Governance Method. The research examines how governance decisions shape technology-enabled transformation; the Academy turns those lessons into executive education.",
+    a: "The Academy draws on Transformidable's governance research, which examines how governance decisions shape technology-enabled transformation, and turns those lessons into executive education.",
     group: "general",
   },
   {
-    q: "What does the Foundation Certificate cover?",
-    a: "Three courses: AI Explained for Executive Decision-Makers, Governing AI Adoption, and Building AI Governance in Practice. Together they move from understanding the technology, to exercising oversight with six governance disciplines, to building the structures that make governance work day to day.",
-    group: "certificate",
-  },
-  {
-    q: "How much time does the program take?",
-    a: "As currently planned: about 35 minutes of recorded instruction for Course 1, a four-hour workshop for Course 2, and about seven instructional hours for Course 3, plus learning assessments and an applied capstone.",
-    group: "certificate",
-  },
-  {
-    q: "What does it take to earn the certificate?",
-    a: "Completing all three courses, the learning assessments, and an applied governance capstone, which takes the form of an AI Governance Action Brief.",
-    group: "certificate",
-  },
-  {
-    q: "Is the certificate an accredited professional certification?",
-    a: "No. The Foundation Certificate is a Transformidable Academy executive education credential, not an independently accredited professional certification. Final assessment requirements and certificate issuance procedures will be published before enrollment opens.",
-    group: "certificate",
-  },
-  {
-    q: "Can you deliver the program for our board or leadership team?",
-    a: "Yes. Private cohorts bring a governing body or executive team through the program together, with facilitated discussion, sector-relevant scenarios, and an organizational governance action-planning exercise. Delivery can be virtual or in person.",
+    q: "Can you hold a session for our whole council or board?",
+    a: "Yes. Organizations can arrange a private session for their entire leadership team or governing body, virtually or in person.",
     group: "organizations",
   },
   {
-    q: "Can the program reflect our sector?",
-    a: "Yes. Private cohorts can use scenarios drawn from your sector, whether that is local government, higher education, financial services, or the nonprofit world, so the discussion stays close to the decisions your leaders actually face.",
+    q: "Can a program be adapted to our organization?",
+    a: "Yes. The workshop can be adapted to your sector, your existing AI activities, and your governance responsibilities, and the applied program works directly with your own organizational context.",
     group: "organizations",
   },
   {
-    q: "Can we start with a single course or a briefing?",
-    a: "The certificate is designed as a three-course pathway. If a single session fits your needs better, such as an AI briefing for your board based on Course 1, tell us in your inquiry and we will discuss what fits.",
+    q: "Which program should we start with?",
+    a: "The briefing suits a governing body that wants a common understanding and the right oversight questions. The workshop suits leaders ready to set decision rights and oversight expectations. The applied program suits an organization building its AI governance approach. We can help you choose.",
     group: "organizations",
-  },
-  {
-    // PENDING: replace with published cohort pricing once it is set.
-    q: "How is a private cohort priced?",
-    a: "Private cohort pricing depends on group size, delivery format, and how much the program is tailored to your sector, so we prepare it after an initial conversation. An inquiry carries no commitment.",
-    group: "organizations",
-  },
-  {
-    // PENDING: replace with the first open-enrollment dates once they are set.
-    q: "When does open enrollment start?",
-    a: "The program is in development and dates have not yet been announced. Join the interest list and you will be among the first to hear about scheduling and enrollment.",
-    group: "individuals",
   },
   {
     // PENDING: replace with published pricing once it is set.
-    q: "How much does it cost?",
-    a: "Pricing for open-enrollment cohorts will be published before enrollment opens.",
-    group: "individuals",
+    q: "How is a private session priced?",
+    a: "Pricing depends on the program, group size, delivery format, and how much it is adapted to your organization, so we prepare it after an initial conversation. An inquiry carries no commitment.",
+    group: "organizations",
   },
   {
-    q: "Can I earn the certificate as an individual?",
-    a: "Yes. Open-enrollment certificate cohorts are planned so that executives and professionals can complete the program independently of their organization.",
+    q: "Can individuals take part?",
+    a: "The programs are currently offered as private sessions for organizations. If you would like to take part as an individual, join the interest list and we will let you know when an open program is scheduled.",
     group: "individuals",
   },
   {
     q: "Does joining the interest list commit me to anything?",
-    a: "No. Joining the interest list is not enrollment and carries no financial commitment. You will simply hear about program announcements, dates, and enrollment.",
+    a: "No. Joining the interest list is not enrollment and carries no financial commitment.",
     group: "individuals",
   },
 ];

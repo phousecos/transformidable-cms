@@ -6,6 +6,7 @@ import {
   ACADEMY_DELIVERY,
   ACADEMY_PARTICIPANTS,
   ACADEMY_PROGRAMS,
+  ACADEMY_PROGRAM_CHOICES,
   ACADEMY_SECTORS,
   ACADEMY_TIMEFRAMES,
   optionValues,
@@ -88,7 +89,7 @@ export async function POST(req: NextRequest) {
   }
 
   const sector = option(f.sector, optionValues(ACADEMY_SECTORS))
-  const program = option(f.program, optionValues(ACADEMY_PROGRAMS))
+  const program = option(f.program, optionValues(ACADEMY_PROGRAM_CHOICES))
   const delivery = option(f.delivery, optionValues(ACADEMY_DELIVERY))
   // Cohort sizing and timing only apply to organizations.
   const participants = type === 'organization' ? option(f.participants, optionValues(ACADEMY_PARTICIPANTS)) : undefined

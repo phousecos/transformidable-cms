@@ -32,7 +32,6 @@
 
 .tr .ac { background: var(--ac-cream); }
 .tr .ac .kicker { color: var(--ac-oxblood); }
-.tr .ac-muted { color: var(--ac-taupe); }
 .tr .ac-inline { color: var(--ac-oxblood); text-decoration: underline; text-underline-offset: 3px; }
 
 /* ---- Light banner ----------------------------------------------------- */
@@ -51,23 +50,14 @@
 /* ---- Section surfaces ------------------------------------------------- */
 .tr .ac-band { border-top: 1px solid var(--rule); background: var(--ac-cream); }
 .tr .ac-band--parchment { background: var(--ac-parchment); }
-.tr .ac-band--paper { background: var(--paper); }
 .tr .ac-h2 { font-family: var(--serif); font-size: clamp(1.5rem, 3vw, 2.15rem); line-height: 1.14; letter-spacing: -.01em; color: var(--ink); margin: 12px 0 22px; max-width: 26ch; text-wrap: balance; }
 .tr .ac-h3 { font-family: var(--serif); font-size: clamp(1.15rem, 2vw, 1.35rem); line-height: 1.22; color: var(--ink); margin: 0 0 8px; text-wrap: balance; }
 .tr .ac-two { display: grid; gap: clamp(28px, 5vw, 64px); grid-template-columns: 1fr; align-items: start; }
 @media (min-width: 900px) { .tr .ac-two { grid-template-columns: 1fr 1fr; } }
 .tr .ac-two .body + .body { margin-top: 14px; }
 .tr .ac-note { font-family: var(--serif); font-style: italic; font-size: .95rem; color: var(--ac-taupe); margin-top: 14px; }
-.tr .ac-status { display: inline-flex; align-items: center; gap: 8px; font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ac-taupe); }
-.tr .ac-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
 
 /* ---- Course catalog --------------------------------------------------- */
-.tr .ac-program { display: grid; gap: 18px 40px; grid-template-columns: 1fr; padding: 26px 0 30px; border-top: 2px solid var(--ac-oxblood); }
-@media (min-width: 900px) { .tr .ac-program { grid-template-columns: 1.4fr 1fr; align-items: end; } }
-.tr .ac-program-name { font-family: var(--serif); font-size: clamp(1.35rem, 2.6vw, 1.75rem); line-height: 1.15; color: var(--ink); margin: 10px 0 10px; }
-.tr .ac-program p { font-family: var(--serif); font-size: 1rem; line-height: 1.6; color: var(--ink-body); margin: 0; max-width: 60ch; }
-.tr .ac-program-side { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
-@media (min-width: 900px) { .tr .ac-program-side { align-items: flex-end; text-align: right; } }
 .tr .ac-courses { display: grid; gap: 16px; grid-template-columns: 1fr; }
 @media (min-width: 900px) { .tr .ac-courses { grid-template-columns: repeat(3, 1fr); } }
 .tr .ac-course { background: var(--paper); border: 1px solid var(--rule); padding: 24px 22px 22px; display: flex; flex-direction: column; transition: border-color .18s ease, transform .18s ease; }
@@ -79,7 +69,7 @@
 .tr .ac-course .ac-course-meta { margin-top: auto; padding-top: 16px; font-size: 12px; line-height: 1.5; color: var(--ac-taupe); }
 .tr .ac-course .ac-course-go { margin-top: 12px; display: inline-flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ac-oxblood); }
 
-/* ---- Two routes ------------------------------------------------------- */
+/* ---- Program link cards ----------------------------------------------- */
 .tr .ac-routes { display: grid; gap: 16px; grid-template-columns: 1fr; }
 @media (min-width: 760px) { .tr .ac-routes { grid-template-columns: 1fr 1fr; } }
 .tr .ac-route { background: var(--paper); border: 1px solid var(--rule); border-left: 3px solid var(--ac-taupe); padding: 26px 26px 24px; display: flex; flex-direction: column; gap: 10px; transition: border-color .18s ease; }
@@ -95,7 +85,6 @@
 .tr .ac-audiences li:first-child { border-top: 1px solid var(--rule); }
 .tr .ac-audiences li::before { content: ""; position: absolute; left: 4px; top: 1.25em; width: 7px; height: 7px; background: var(--ac-oxblood); transform: rotate(45deg); }
 .tr .ac-outcomes { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; grid-template-columns: 1fr; }
-@media (min-width: 760px) { .tr .ac-outcomes.is-wide { grid-template-columns: 1fr 1fr; } }
 .tr .ac-outcomes li { font-family: var(--serif); font-size: 1rem; line-height: 1.55; color: var(--ink-body); padding: 15px 18px 15px 46px; background: var(--paper); border: 1px solid var(--rule); position: relative; }
 .tr .ac-outcomes li::before { content: ""; position: absolute; left: 18px; top: 20px; width: 12px; height: 7px; border-left: 2px solid var(--ac-oxblood); border-bottom: 2px solid var(--ac-oxblood); transform: rotate(-45deg); }
 .tr .ac-steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; counter-reset: ac-step; }
@@ -105,27 +94,42 @@
 .tr .ac-steps b { font-family: var(--serif); font-weight: 600; font-size: 1.05rem; color: var(--ink); }
 .tr .ac-steps span { font-family: var(--serif); font-size: .98rem; line-height: 1.6; color: var(--ink-body); }
 
-/* ---- Six disciplines -------------------------------------------------- */
-.tr .ac-disciplines { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 10px; grid-template-columns: repeat(2, 1fr); }
-@media (min-width: 620px) { .tr .ac-disciplines { grid-template-columns: repeat(3, 1fr); } }
-.tr .ac-discipline { background: var(--paper); border: 1px solid var(--rule); border-left: 3px solid var(--ac-oxblood); padding: 14px 16px; }
-.tr .ac-discipline .code { display: block; font-family: var(--sans); font-weight: 800; font-size: 13px; letter-spacing: .14em; color: var(--ac-oxblood); }
-.tr .ac-discipline .desc { display: block; margin-top: 6px; font-family: var(--serif); font-size: .92rem; line-height: 1.45; color: var(--ink-body); }
+/* ---- Program pages --------------------------------------------------- */
+.tr .ac-subtitle { font-family: var(--serif); font-style: italic; font-size: clamp(1.1rem, 2vw, 1.35rem); line-height: 1.4; color: var(--ac-taupe); margin: 14px 0 0; max-width: 46ch; }
+.tr .ac-eyebrow { font-size: 10.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--gold-deep); margin: 0; }
+.tr .ac-stage-line { font-family: var(--serif); font-size: clamp(1.2rem, 2.2vw, 1.5rem); line-height: 1.3; color: var(--ink); margin: 10px 0 0; max-width: 22ch; }
+.tr .ac-takeaway { background: var(--paper); border: 1px solid var(--rule); border-left: 3px solid var(--gold); padding: 24px 26px; }
+.tr .ac-takeaway .body { margin: 0; }
+.tr .ac-tools { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.tr .ac-tools li { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ac-oxblood); border: 1px solid var(--ac-oxblood); border-radius: 999px; padding: 6px 12px; }
+.tr .ac-two .ac-h3 + .body { margin-top: 0; }
 
-/* ---- Certificate pathway + course pages -------------------------------- */
-.tr .ac-step { display: grid; gap: 10px 40px; grid-template-columns: 1fr; padding: 30px 0; border-top: 1px solid var(--rule); }
-@media (min-width: 900px) { .tr .ac-step { grid-template-columns: 220px 1fr; } }
-.tr .ac-step:last-child { border-bottom: 1px solid var(--rule); }
-.tr .ac-step .ac-no { font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--gold-deep); }
-.tr .ac-step .ac-tag { font-family: var(--serif); font-style: italic; color: var(--ac-taupe); margin: 8px 0 0; }
-.tr .ac-step p.body { margin: 0; }
-.tr .ac-step .ac-format { margin: 12px 0 14px; font-size: 12.5px; line-height: 1.5; color: var(--ac-taupe); }
-.tr .ac-step .ac-format b { color: var(--ink); }
-.tr .ac-pager { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.tr .ac-pager a { display: flex; flex-direction: column; gap: 4px; max-width: 46%; }
-.tr .ac-pager a:last-child { text-align: right; margin-left: auto; }
-.tr .ac-pager .l { font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ac-taupe); }
-.tr .ac-pager .t { font-family: var(--serif); font-size: 1.05rem; color: var(--ac-oxblood); }
+/* ---- Academy front door ----------------------------------------------- */
+.tr .ac-feature { display: grid; gap: 24px 48px; grid-template-columns: 1fr; margin-top: 18px; padding-top: 26px; border-top: 2px solid var(--ac-oxblood); }
+@media (min-width: 900px) { .tr .ac-feature { grid-template-columns: 1.3fr 1fr; } }
+.tr .ac-feature-title { font-family: var(--serif); font-size: clamp(1.6rem, 3.2vw, 2.3rem); line-height: 1.1; color: var(--ink); margin: 10px 0 0; }
+.tr .ac-feature .ac-subtitle { margin-bottom: 18px; }
+.tr .ac-feature-side { background: var(--paper); border: 1px solid var(--rule); padding: 22px 24px; align-self: start; }
+.tr .ac-feature-side .body { margin: 0; }
+.tr .ac-feature-label { font-size: 10.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--ac-taupe); margin: 0 0 8px; }
+.tr .ac-stages { display: grid; gap: 0; grid-template-columns: 1fr; border: 1px solid var(--rule); background: var(--paper); }
+@media (min-width: 900px) { .tr .ac-stages { grid-template-columns: repeat(3, 1fr); } }
+.tr .ac-stage { display: flex; flex-direction: column; gap: 6px; padding: 26px 24px 22px; transition: background .18s ease; }
+.tr .ac-stage + .ac-stage { border-top: 1px solid var(--rule); }
+@media (min-width: 900px) { .tr .ac-stage + .ac-stage { border-top: 0; border-left: 1px solid var(--rule); } }
+.tr .ac-stage:hover { background: var(--ac-cream); }
+.tr .ac-stage-name { font-family: var(--serif); font-weight: 700; font-size: 1.7rem; line-height: 1; color: var(--ac-oxblood); }
+.tr .ac-stage-format { font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-deep); margin-top: 4px; }
+.tr .ac-stage-desc { font-family: var(--serif); font-size: 1rem; line-height: 1.5; color: var(--ink-body); }
+.tr .ac-stage-title { margin-top: auto; padding-top: 14px; font-family: var(--serif); font-size: .95rem; color: var(--ink); border-top: 1px solid var(--rule); }
+.tr .ac-stage .ac-course-go { margin-top: 6px; display: inline-flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ac-oxblood); }
+.tr .ac-promises { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .tr .ac-promises { grid-template-columns: repeat(3, 1fr); } }
+.tr .ac-promise { border-top: 2px solid var(--ac-oxblood); padding-top: 18px; }
+.tr .ac-promise p { font-family: var(--serif); font-size: .98rem; line-height: 1.6; color: var(--ink-body); margin: 0; }
+.tr .ac-who { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--rule); }
+.tr .ac-who-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 10px; }
+.tr .ac-who-list li { font-family: var(--serif); font-size: 1.05rem; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: 8px 14px; }
 
 /* ---- FAQ -------------------------------------------------------------- */
 .tr .ac-faq-wrap { max-width: 900px; }

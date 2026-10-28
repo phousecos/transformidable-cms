@@ -3,14 +3,20 @@
 // always one the collection accepts. Plain data, safe to import client-side.
 // Adding or renaming a value also means updating the matching enumColumns
 // entry in src/migrate.ts.
+// Every program value an inquiry can hold, including retired ones, so older
+// inquiries keep their answer. The values stay fixed; only labels change.
 export const ACADEMY_PROGRAMS = [
-  { label: 'Full certificate program', value: 'foundation-certificate' },
-  { label: 'Course 1: AI Explained for Executive Decision-Makers', value: 'course-1' },
-  { label: 'Course 2: Governing AI Adoption', value: 'course-2' },
-  { label: 'Course 3: Building AI Governance in Practice', value: 'course-3' },
-  { label: 'Executive briefing for a board or leadership team', value: 'executive-briefing' },
+  { label: 'AI Governance for Boards & Councils (90-minute briefing)', value: 'course-1' },
+  { label: 'Governing AI Adoption (4-hour workshop)', value: 'course-2' },
+  { label: 'Building AI Governance in Practice (applied program)', value: 'course-3' },
+  { label: 'More than one program', value: 'foundation-certificate' },
   { label: 'Not sure yet', value: 'not-sure' },
+  { label: 'Executive briefing (retired option)', value: 'executive-briefing' },
 ]
+
+// What the public form offers now, and all the API accepts from it.
+const RETIRED_PROGRAMS = ['executive-briefing']
+export const ACADEMY_PROGRAM_CHOICES = ACADEMY_PROGRAMS.filter((o) => !RETIRED_PROGRAMS.includes(o.value))
 
 export const ACADEMY_SECTORS = [
   { label: 'Local government / municipal', value: 'local-government' },

@@ -1,34 +1,34 @@
 // @ts-nocheck
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AcademyHero, AcademyRoutes, AcademyShell, Arrow, JsonLd } from "../../../components/academy/AcademySections";
-import { CERTIFICATE, COURSES, DISCIPLINES, PROGRAM_STATUS, courseHref } from "../../content";
+import { AcademyHero, AcademyRegister, AcademyShell, Arrow, JsonLd } from "../../../components/academy/AcademySections";
+import { PROGRAMS, programHref } from "../../content";
 
-const findCourse = (slug: string) => COURSES.find((c) => c.slug === slug);
+const findProgram = (slug: string) => PROGRAMS.find((p) => p.slug === slug);
 
 export function generateStaticParams() {
-  return COURSES.map((c) => ({ slug: c.slug }));
+  return PROGRAMS.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const course = findCourse(slug);
-  if (!course) return {};
+  const p = findProgram(slug);
+  if (!p) return {};
+  const description = `${p.subtitle}. ${p.intro[0]}`;
   return {
-    title: `${course.title} | Academy`,
-    description: course.summary,
-    alternates: { canonical: courseHref(course.slug) },
-    openGraph: { title: `${course.title} | Transformidable Academy`, description: course.summary, url: courseHref(course.slug) },
+    title: `${p.title} | Academy`,
+    description,
+    alternates: { canonical: programHref(p.slug) },
+    openGraph: { title: `${p.title} | Transformidable Academy`, description, url: programHref(p.slug) },
   };
 }
 
-export default async function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ProgramPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const course = findCourse(slug);
-  if (!course) notFound();
-  const i = COURSES.indexOf(course);
-  const prev = COURSES[i - 1];
-  const next = COURSES[i + 1];
+  const p = findProgram(slug);
+  if (!p) notFound();
+  const i = PROGRAMS.indexOf(p);
+  const others = PROGRAMS.filter((o) => o !== p);
 
   return (
     <AcademyShell>
@@ -36,94 +36,109 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
         data={{
           "@context": "https://schema.org",
           "@type": "Course",
-          name: course.title,
-          description: course.summary,
+          name: p.title,
+          description: p.subtitle,
           provider: { "@type": "Organization", name: "Transformidable Academy" },
-          isPartOf: { "@type": "EducationalOccupationalProgram", name: CERTIFICATE.name },
         }}
       />
 
-      <AcademyHero
-        kicker={`${course.no} of ${COURSES.length} · ${CERTIFICATE.name}`}
-        title={course.title}
-        intro={course.summary}
-        seed={101 + i * 7}
-      >
+      <AcademyHero kicker={p.eyebrow} title={p.title} seed={101 + i * 7}>
+        <p className="ac-subtitle">{p.subtitle}</p>
         <dl className="ac-facts">
-          <div><dt>Planned format</dt><dd>{course.format}</dd></div>
-          <div><dt>Delivery</dt><dd>{course.delivery}</dd></div>
-          <div><dt>Status</dt><dd>{PROGRAM_STATUS}</dd></div>
+          <div><dt>Format</dt><dd>{p.facts.format}</dd></div>
+          <div><dt>Delivery</dt><dd>{p.facts.delivery}</dd></div>
+          <div><dt>Prerequisites</dt><dd>None. Each program stands on its own.</dd></div>
         </dl>
         <div className="ac-hero-cta">
-          <a className="btn" href="#take-this-course">How to take this course <Arrow s={14} /></a>
+          <a className="btn" href="#register">{p.closing.button} <Arrow s={14} /></a>
         </div>
       </AcademyHero>
 
-      <section className="ac-band" aria-labelledby="ac-covers-h">
+      <section className="ac-band" aria-label="Overview">
         <div className="wrap ac-two">
           <div>
-            <p className="kicker">{course.tagline}</p>
-            <h2 className="ac-h2" id="ac-covers-h">What the course covers</h2>
+            <p className="kicker">{p.stage.name}</p>
+            <p className="ac-stage-line">{p.stage.line}</p>
           </div>
           <div>
-            {course.detail.map((d) => <p className="body" key={d}>{d}</p>)}
-            {course.slug === "governing-ai-adoption" && (
-              <ul className="ac-disciplines">
-                {DISCIPLINES.map((d) => (
-                  <li className="ac-discipline" key={d.code}>
-                    <span className="code">{d.code}</span>
-                    <span className="desc">{d.desc}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+            {p.intro.map((t) => <p className="body" key={t}>{t}</p>)}
           </div>
         </div>
       </section>
 
-      <section className="ac-band ac-band--parchment" aria-labelledby="ac-able-h">
+      <section className="ac-band ac-band--parchment" aria-labelledby="ac-explore-h">
         <div className="wrap ac-two">
           <div>
-            <p className="kicker">Outcomes</p>
-            <h2 className="ac-h2" id="ac-able-h">After this course, you will be able to</h2>
-            <p className="ac-note">No technical AI background is required.</p>
+            <h2 className="ac-h2" id="ac-explore-h">What You&rsquo;ll Explore</h2>
           </div>
-          <ul className="ac-outcomes">
-            {course.outcomes.map((o) => <li key={o}>{o}</li>)}
+          <ul className="ac-audiences">
+            {p.explore.map((t) => <li key={t}>{t}</li>)}
           </ul>
         </div>
       </section>
 
-      <section className="ac-band" aria-labelledby="ac-fit-h">
+      <section className="ac-band" aria-labelledby="ac-takeaway-h">
         <div className="wrap ac-two">
           <div>
-            <p className="kicker">Part of the certificate</p>
-            <h2 className="ac-h2" id="ac-fit-h">{course.no} of the {CERTIFICATE.name}</h2>
+            <h2 className="ac-h2" id="ac-takeaway-h">What You&rsquo;ll Take Away</h2>
           </div>
-          <div>
-            <p className="body">
-              {CERTIFICATE.summary} Completing all three courses, the learning assessments, and an applied
-              capstone earns the certificate.
-            </p>
-            <p style={{ marginTop: 16 }}><Link className="link" href={CERTIFICATE.href}>About the certificate <Arrow /></Link></p>
+          <div className="ac-takeaway">
+            <p className="body">{p.takeaway}</p>
+            <ul className="ac-tools" aria-label="Tools participants leave with">
+              {p.tools.map((t) => <li key={t}>{t}</li>)}
+            </ul>
           </div>
         </div>
       </section>
 
-      <div id="take-this-course">
-        <AcademyRoutes heading="How to take this course" query={`?program=${course.program}#register`} />
-      </div>
+      <section className="ac-band ac-band--parchment" aria-label="Who should attend and delivery">
+        <div className="wrap ac-two">
+          <div>
+            <h2 className="ac-h3">Who Should Attend</h2>
+            <p className="body">{p.attend}</p>
+          </div>
+          <div>
+            <h2 className="ac-h3">Delivery</h2>
+            {p.delivery.map((t) => <p className="body" key={t}>{t}</p>)}
+            {p.note && <p className="ac-note">{p.note}</p>}
+          </div>
+        </div>
+      </section>
 
-      <section className="ac-band" aria-label="Other courses" style={{ paddingBlock: "28px" }}>
-        <div className="wrap ac-pager">
-          {prev ? (
-            <Link href={courseHref(prev.slug)}><span className="l">&larr; {prev.no}</span><span className="t">{prev.title}</span></Link>
-          ) : <span />}
-          {next ? (
-            <Link href={courseHref(next.slug)}><span className="l">{next.no} &rarr;</span><span className="t">{next.title}</span></Link>
-          ) : (
-            <Link href={CERTIFICATE.href}><span className="l">The full program &rarr;</span><span className="t">{CERTIFICATE.name}</span></Link>
-          )}
+      <AcademyRegister
+        type="organization"
+        source={programHref(p.slug)}
+        program={p.program}
+        kicker={p.title}
+        heading={p.closing.form}
+        title={p.closing.headline}
+        intro={p.closing.line}
+      />
+
+      {p.individuals && (
+        <section className="ac-band" aria-label="For individuals" style={{ paddingBlock: "32px" }}>
+          <div className="wrap">
+            <p className="ac-note" style={{ marginTop: 0 }}>
+              Interested as an individual?{" "}
+              <Link className="ac-inline" href={`/academy/individuals?program=${p.program}#register`}>Register your interest in an upcoming program</Link>.
+            </p>
+          </div>
+        </section>
+      )}
+
+      <section className="ac-band" aria-labelledby="ac-others-h">
+        <div className="wrap">
+          <p className="kicker" id="ac-others-h">Other programs</p>
+          <div className="ac-routes" style={{ marginTop: 18 }}>
+            {others.map((o) => (
+              <Link className="ac-route" href={programHref(o.slug)} key={o.slug}>
+                <span className="ac-route-label">{o.stage.name} &middot; {o.stage.format}</span>
+                <span className="ac-route-title">{o.title}</span>
+                <span className="ac-route-desc">{o.stage.line}</span>
+                <span className="ac-route-go">View program <Arrow /></span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
     </AcademyShell>
