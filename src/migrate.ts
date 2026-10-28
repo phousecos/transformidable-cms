@@ -94,6 +94,8 @@ try {
     { table: 'academy_inquiries', column: 'delivery', validValues: ['in-person', 'virtual', 'hybrid', 'no-preference'] },
     { table: 'academy_inquiries', column: 'timeframe', validValues: ['0-3-months', '3-6-months', '6-12-months', 'exploring'] },
     { table: 'academy_inquiries', column: 'status', validValues: ['new', 'contacted', 'qualified', 'closed'] },
+    // Subscribers
+    { table: 'subscribers_lists', column: 'value', validValues: ['brief', 'book'] },
     // Newsletter Issues
     { table: 'newsletter_issues', column: 'status', validValues: ['draft', 'scheduled', 'published'] },
     // Users

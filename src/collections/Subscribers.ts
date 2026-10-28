@@ -30,6 +30,18 @@ export const Subscribers: CollectionConfig = {
       },
     },
     {
+      // Which mailing lists this person asked for. Empty on subscribers who
+      // signed up before lists existed; they all joined the Brief.
+      name: 'lists',
+      type: 'select',
+      hasMany: true,
+      defaultValue: ['brief'],
+      options: [
+        { label: 'The Transformidable Brief', value: 'brief' },
+        { label: 'Book updates', value: 'book' },
+      ],
+    },
+    {
       name: 'source',
       type: 'select',
       defaultValue: 'website',

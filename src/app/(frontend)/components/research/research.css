@@ -127,8 +127,9 @@
 .tr .utility .u-links { display: flex; align-items: center; gap: 18px; }
 .tr .utility .u-links a { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--on-wine); display: inline-flex; align-items: center; gap: 6px; }
 .tr .utility .u-links a:hover { color: #fff; }
-.tr .u-brief { display: none; }
-@media (min-width: 620px) { .tr .u-brief { display: inline-flex; } }
+/* Phones get these links in the mobile menu instead. */
+.tr .utility .u-links a.u-brief { display: none; }
+@media (min-width: 620px) { .tr .utility .u-links a.u-brief { display: inline-flex; } }
 .tr .theme-toggle { background: none; border: 1px solid var(--wine-rule); color: var(--on-wine); border-radius: 999px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
 .tr .theme-toggle:hover { border-color: var(--on-wine); }
 .tr .theme-toggle svg { width: 13px; height: 13px; }
@@ -139,7 +140,7 @@
 .tr .wordmark { display: flex; align-items: center; }
 
 .tr nav.primary { display: none; }
-@media (min-width: 1040px) { .tr nav.primary { display: flex; align-items: stretch; gap: 4px; height: 100%; } }
+@media (min-width: 940px) { .tr nav.primary { display: flex; align-items: stretch; gap: 4px; height: 100%; } }
 .tr .nav-item { position: relative; display: flex; align-items: center; height: 100%; }
 .tr .nav-item > a {
   font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
@@ -163,13 +164,13 @@
 .tr .mega a .m-desc { display: block; font-size: 11.5px; color: var(--ink-mute); margin-top: 2px; }
 
 .tr .burger { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--rule); border-radius: 2px; background: none; color: var(--ink); cursor: pointer; }
-@media (min-width: 1040px) { .tr .burger { display: none; } }
+@media (min-width: 940px) { .tr .burger { display: none; } }
 .tr .burger svg { width: 18px; height: 18px; }
 
 /* Mobile menu panel */
 .tr .mobile-menu { display: none; border-bottom: 1px solid var(--rule); background: var(--paper); }
 .tr .mobile-menu.is-open { display: block; }
-@media (min-width: 1040px) { .tr .mobile-menu { display: none !important; } }
+@media (min-width: 940px) { .tr .mobile-menu { display: none !important; } }
 .tr .mobile-menu a { display: block; padding: 14px 0; border-bottom: 1px solid var(--rule); font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); }
 .tr .mobile-menu a:last-child { border-bottom: 0; }
 .tr .mobile-menu .mm-sub { font-family: var(--serif); font-size: 13px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--ink-mute); padding: 8px 0 8px 16px; border-bottom: 0; }
@@ -357,8 +358,7 @@
 .tr .subscribe input::placeholder { color: var(--on-wine-mute); }
 .tr .subscribe input:focus-visible { outline-color: var(--gold); }
 .tr .footer-cols { display: grid; gap: 32px 40px; grid-template-columns: 1fr 1fr; padding-block: 42px; }
-@media (min-width: 720px) { .tr .footer-cols { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 1040px) { .tr .footer-cols { grid-template-columns: 1.3fr repeat(5, 1fr); } }
+@media (min-width: 720px) { .tr .footer-cols { grid-template-columns: 1.3fr repeat(4, 1fr); } }
 .tr .fcol h5 { font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--on-wine-mute); margin: 0 0 16px; font-weight: 700; }
 .tr .fcol a, .tr .fcol .fitem { display: block; font-size: 13px; color: var(--on-wine); padding: 5px 0; }
 .tr .fcol a:hover { color: #fff; }
@@ -368,6 +368,8 @@
 .tr .footer-legal span { font-size: 11px; letter-spacing: .04em; color: var(--on-wine-mute); }
 .tr .footer-legal-links { display: inline-flex; gap: 18px; }
 .tr .footer-legal-links a { color: var(--on-wine-mute); }
+.tr .footer-affiliation { font-family: var(--serif); font-size: 12.5px; line-height: 1.6; color: var(--on-wine-mute); max-width: 80ch; margin: 0; padding-bottom: 22px; }
+.tr .footer-affiliation a { color: var(--on-wine); text-decoration: underline; text-underline-offset: 3px; }
 .tr .footer-legal-links a:hover { color: #fff; }
 
 /* ---- Detail pages ----------------------------------------------------- */

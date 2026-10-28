@@ -2,6 +2,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ADVISORY_URL } from "../site";
 
 const Chevron = () => (
   <svg className="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
@@ -10,13 +11,17 @@ const ArrowRight = ({ s = 13 }: { s?: number }) => (
   <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
 );
 
-// Nav model mirrors the site information architecture.
+// Nav model mirrors the blueprint: four equal divisions, then About.
 const NAV = [
   {
-    label: "Research", href: "/research/agenda", children: [
-      { no: "01.1", name: "Research Agenda", desc: "The questions we set out to answer", href: "/research/agenda" },
-      { no: "01.2", name: "Datasets", desc: "The data behind the research", href: "/research/datasets" },
-      { no: "01.3", name: "Research Projects", desc: "Active lines of inquiry", href: "/research/projects" },
+    label: "Research", href: "/research", children: [
+      { no: "01.1", name: "Transformidable Research", desc: "Evidence on governance and transformation", href: "/research" },
+      { no: "01.2", name: "Research Agenda", desc: "The questions we set out to answer", href: "/research/agenda" },
+      { no: "01.3", name: "Case Files", desc: "Anatomies of real governance decisions", href: "/publications/case-files" },
+      { no: "01.4", name: "Publications", desc: "Articles, white papers, and annual reports", href: "/publications" },
+      { no: "01.5", name: "Research Notes", desc: "Working findings, in progress", href: "/publications/research-notes" },
+      { no: "01.6", name: "Datasets & Projects", desc: "The data and active lines of inquiry", href: "/research/datasets" },
+      { no: "01.7", name: "Governance Tools", desc: "The codebook, benchmarks, and risk models", href: "/tools/governance-codebook" },
     ],
   },
   {
@@ -28,35 +33,29 @@ const NAV = [
     ],
   },
   {
-    label: "Publications", href: "/publications", children: [
-      { no: "03.1", name: "Case Files", desc: "Anatomies of real governance decisions", href: "/publications/case-files" },
-      { no: "03.2", name: "Articles", desc: "Shorter, argued pieces", href: "/publications?type=article" },
-      { no: "03.3", name: "White Papers", desc: "Peer-reviewed depth", href: "/publications?type=white-paper" },
-      { no: "03.4", name: "Research Notes", desc: "Working findings, in progress", href: "/publications/research-notes" },
-      { no: "03.5", name: "Annual Reports", desc: "The state of governance, yearly", href: "/publications?type=annual-report" },
+    label: "Publishing", href: "/publishing", children: [
+      { no: "03.1", name: "The Transformidable Leader", desc: "The forthcoming book and workbook", href: "/publishing" },
+      { no: "03.2", name: "Book Updates", desc: "Hear about the release", href: "/publishing#book-updates" },
     ],
   },
   {
     // Episodic media you watch or listen to.
-    label: "Briefings", href: "/podcast", children: [
-      { no: "04.1", name: "The Governance Files", desc: "The podcast: governance decisions on the record", href: "/podcast" },
-      { no: "04.2", name: "Transformidable Briefing", desc: "Mixed-media briefings: video and articles", href: "/publications?type=transformidable-brief" },
-      { no: "04.3", name: "Webinar Archive", desc: "Past webinars and recordings", href: "/briefings/webinars" },
-      { no: "04.4", name: "Live Sessions", desc: "Upcoming and live briefings", href: "/briefings/live" },
+    label: "Media", href: "/media", children: [
+      { no: "04.1", name: "Transformidable Media", desc: "Podcast, briefings, interviews, and events", href: "/media" },
+      { no: "04.2", name: "The Governance Files", desc: "The podcast: governance decisions on the record", href: "/podcast" },
+      { no: "04.3", name: "Transformidable Briefing", desc: "Mixed-media briefings: video and articles", href: "/publications?type=transformidable-brief" },
+      { no: "04.4", name: "Webinar Archive", desc: "Past webinars and recordings", href: "/briefings/webinars" },
+      { no: "04.5", name: "Live Sessions", desc: "Upcoming and live briefings", href: "/briefings/live" },
     ],
   },
-  {
-    label: "Tools", href: "/tools/governance-codebook", children: [
-      { no: "05.1", name: "Governance Codebook", desc: "A structured governance reference", href: "/tools/governance-codebook" },
-      { no: "05.2", name: "Governance Watch", desc: "Monitoring governance signals", href: "/tools/governance-watch" },
-      { no: "05.3", name: "Assessment Tools", desc: "Assess your own governance", href: "/tools/assessments" },
-      { no: "05.4", name: "Benchmarks", desc: "How your sector compares", href: "/tools/benchmarks" },
-      { no: "05.5", name: "Risk Models", desc: "Anticipate governance risk", href: "/tools/risk-models" },
-    ],
-  },
-  { label: "Events", href: "/#events" },
   { label: "About", href: "/about" },
+];
+
+// Utility links: in the top bar on desktop, at the end of the mobile menu.
+const UTILITY = [
+  { label: "Subscribe", href: "#briefing" },
   { label: "Contact", href: "/contact" },
+  { label: "Advisory Services", href: ADVISORY_URL, external: true },
 ];
 
 export function ResearchNav() {
@@ -90,7 +89,13 @@ export function ResearchNav() {
         <div className="wrap utility-in">
           <span className="u-brand">Transformidable</span>
           <div className="u-links">
-            <Link className="u-brief" href="/publications?type=transformidable-brief">The Transformidable Brief</Link>
+            {UTILITY.map((u) =>
+              u.external ? (
+                <a className="u-brief" href={u.href} rel="noopener" key={u.label}>{u.label}</a>
+              ) : (
+                <Link className="u-brief" href={u.href} key={u.label}>{u.label}</Link>
+              ),
+            )}
             <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle light and dark theme">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
             </button>
@@ -142,6 +147,13 @@ export function ResearchNav() {
                 ))}
               </div>
             ))}
+            {UTILITY.map((u) =>
+              u.external ? (
+                <a href={u.href} rel="noopener" key={u.label}>{u.label}</a>
+              ) : (
+                <Link href={u.href} key={u.label} onClick={() => setMobileOpen(false)}>{u.label}</Link>
+              ),
+            )}
           </div>
         </div>
       </header>
@@ -149,7 +161,9 @@ export function ResearchNav() {
   );
 }
 
-export function ResearchSubscribe() {
+// `list` is the mailing list to join: the Transformidable Brief (the default)
+// or book updates. `onLight` is for a form on a paper surface, not the footer.
+export function ResearchSubscribe({ list = "brief", id = "tr-email", buttonLabel = "Subscribe", onLight = false }: { list?: "brief" | "book"; id?: string; buttonLabel?: string; onLight?: boolean }) {
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -163,7 +177,7 @@ export function ResearchSubscribe() {
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source: "research-homepage" }),
+        body: JSON.stringify({ email, source: "website", list }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
@@ -182,11 +196,11 @@ export function ResearchSubscribe() {
 
   return (
     <form className="subscribe" onSubmit={onSubmit}>
-      <label className="sr-only" htmlFor="tr-email">Email address</label>
-      <input id="tr-email" type="email" name="email" placeholder="you@institution.org" required value={email} onChange={(e) => setEmail(e.target.value)} />
-      <button className="btn" type="submit" disabled={state === "sending"}>{state === "sending" ? "Joining…" : "Subscribe"}</button>
+      <label className="sr-only" htmlFor={id}>Email address</label>
+      <input id={id} type="email" name="email" placeholder="you@institution.org" required value={email} onChange={(e) => setEmail(e.target.value)} />
+      <button className="btn" type="submit" disabled={state === "sending"}>{state === "sending" ? "Joining…" : buttonLabel}</button>
       {message && (
-        <p role="status" style={{ flexBasis: "100%", margin: "4px 0 0", fontSize: 12, color: state === "error" ? "#fff" : "var(--on-wine)" }}>{message}</p>
+        <p role="status" style={{ flexBasis: "100%", margin: "4px 0 0", fontSize: 12, color: onLight ? (state === "error" ? "var(--wine)" : "var(--ink-body)") : state === "error" ? "#fff" : "var(--on-wine)" }}>{message}</p>
       )}
     </form>
   );

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import Link from "next/link";
 import { ResearchSubscribe } from "./ResearchNav";
+import { ADVISORY_URL } from "../site";
 
 export function ResearchFooter() {
   return (
@@ -20,13 +21,18 @@ export function ResearchFooter() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="brandlogo" src="/logo-new.png" alt="Transformidable" width={240} height={60} />
           </Link>
-          <p>Independent research and advisory on governance, leadership, and institutional resilience.</p>
+          <p>Research, executive education, publishing, and media on the leadership and governance of organizational transformation.</p>
         </div>
         <div className="fcol">
           <h5>Research</h5>
+          <Link href="/research">Transformidable Research</Link>
           <Link href="/research/agenda">Research Agenda</Link>
+          <Link href="/publications/case-files">Case Files</Link>
+          <Link href="/publications">Publications</Link>
+          <Link href="/publications/research-notes">Research Notes</Link>
           <Link href="/research/datasets">Datasets</Link>
           <Link href="/research/projects">Research Projects</Link>
+          <Link href="/tools/governance-codebook">Governance Tools</Link>
         </div>
         <div className="fcol">
           <h5>Academy</h5>
@@ -37,38 +43,39 @@ export function ResearchFooter() {
           <Link href="/academy#register-individual">Register Interest</Link>
         </div>
         <div className="fcol">
-          <h5>Publications</h5>
-          <Link href="/publications/case-files">Case Files</Link>
-          <Link href="/publications?type=article">Articles</Link>
-          <Link href="/publications?type=white-paper">White Papers</Link>
-          <Link href="/publications/research-notes">Research Notes</Link>
-          <Link href="/publications?type=annual-report">Annual Reports</Link>
+          <h5>Publishing</h5>
+          <Link href="/publishing">The Transformidable Leader</Link>
+          <Link href="/publishing#book-updates">Book Updates</Link>
         </div>
         <div className="fcol">
-          <h5>Briefings</h5>
+          <h5>Media</h5>
+          <Link href="/media">Transformidable Media</Link>
           <Link href="/podcast">The Governance Files</Link>
           <Link href="/publications?type=transformidable-brief">Transformidable Briefing</Link>
           <Link href="/briefings/webinars">Webinar Archive</Link>
           <Link href="/briefings/live">Live Sessions</Link>
-        </div>
-        <div className="fcol">
-          <h5>Tools</h5>
-          <Link href="/tools/governance-codebook">Governance Codebook</Link>
-          <Link href="/tools/governance-watch">Governance Watch</Link>
-          <Link href="/tools/assessments">Assessment Tools</Link>
-          <Link href="/tools/benchmarks">Benchmarks</Link>
-          <Link href="/tools/risk-models">Risk Models</Link>
         </div>
       </div>
 
       <div className="wrap footer-legal">
         <span>&copy; 2026 Transformidable &middot; All rights reserved</span>
         <span className="footer-legal-links">
-          <Link href="/#events">Events</Link>
+          <Link href="/research#events">Events</Link>
           <Link href="/about">About</Link>
           <Link href="/contact">Contact</Link>
+          <a href={ADVISORY_URL} rel="noopener">Advisory Services</a>
         </span>
         <span>Set in Source Serif &amp; Archivo</span>
+      </div>
+
+      {/* Affiliation statement. DRAFT wording, pending approval. */}
+      <div className="wrap">
+        <p className="footer-affiliation">
+          Governance advisory services are provided separately by{" "}
+          <a href={ADVISORY_URL} rel="noopener">J.&nbsp;Lynne &amp; Co.</a>, an independent advisory firm
+          affiliated with Transformidable. Transformidable research is conducted independently and is not
+          commissioned on behalf of advisory clients.
+        </p>
       </div>
     </footer>
   );
