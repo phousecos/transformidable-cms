@@ -67,6 +67,9 @@ export default function AcademyPage() {
               </Link>
             ))}
           </div>
+          <p className="ac-request">
+            <Link className="link" href="/academy/organizations#register">Request information <Arrow /></Link>
+          </p>
           <p className="ac-note">
             Each program stands on its own. None is a prerequisite: a council may want only the briefing, an executive
             team may be ready for the workshop, and an organization building an AI governance program may need the
