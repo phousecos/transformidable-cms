@@ -1,0 +1,182 @@
+// @ts-nocheck
+import config from "@payload-config";
+import { getPayload } from "payload";
+import Link from "next/link";
+import { ResearchShell } from "../components/research/ResearchShell";
+import { Sky } from "../components/research/Sky";
+import { caseNo } from "../components/research/format";
+import "../components/home/home.css";
+
+export const dynamic = "force-dynamic";
+
+const DESCRIPTION =
+  "Transformidable Advisory brings the evidence from our research to an organization's own governance decisions: mergers and acquisitions, troubled programs, IT general controls, and AI governance.";
+
+export const metadata = {
+  title: "Advisory",
+  description: DESCRIPTION,
+  alternates: { canonical: "/advisory" },
+};
+
+const Arrow = ({ s = 14 }: { s?: number }) => (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+);
+
+// Advisory is organized by problem, not product: one page, four short blocks,
+// no sub-pages, pricing, or named service lines. The anchors are linked from
+// the homepage's "Where we help" cards.
+const AREAS = [
+  {
+    id: "mergers-acquisitions",
+    name: "Mergers & Acquisitions",
+    text: "The deal closes on paper long before the systems, data, and controls come together. We help leadership set the decision rights, dependencies, and accountability that integration or separation actually needs, from Day One through transition services.",
+  },
+  {
+    id: "troubled-programs",
+    name: "Troubled Programs",
+    text: "Status reports stay green while milestones slip, and the steering committee hears about problems after they become expensive. We help leadership get to reliable facts, make the recovery decisions, and put oversight in place that can change the trajectory.",
+  },
+  {
+    id: "it-general-controls",
+    name: "IT General Controls",
+    text: "When control findings persist, the gap is usually ownership, coordination, and evidence, not effort. We help organize how remediation is owned, coordinated, and overseen so the change lasts. We do not act as auditors or provide assurance conclusions.",
+  },
+  {
+    id: "ai-governance",
+    name: "AI Governance",
+    text: "Many organizations have an AI policy but no clear answer to five questions: who sees AI use, who decides, who owns it, when it escalates, and what evidence exists. We help turn the policy into practice.",
+    related: { label: "Academy: AI Governance for Boards & Councils", href: "/academy/courses/ai-governance-for-boards-and-councils" },
+  },
+];
+
+// The "From the research" card points at Case File No. 001, UCPath.
+const CASE_SLUG = "ucpath";
+
+async function caseFileCard() {
+  try {
+    const payload = await getPayload({ config });
+    const res = await payload.find({
+      collection: "case-files",
+      where: { status: { equals: "published" }, slug: { equals: CASE_SLUG } },
+      depth: 0,
+      limit: 1,
+    });
+    return res.docs?.[0] || null;
+  } catch {
+    // Collection may not be migrated yet in a fresh environment.
+    return null;
+  }
+}
+
+export default async function AdvisoryPage() {
+  const caseFile = await caseFileCard();
+
+  return (
+    <ResearchShell>
+      <section className="idx-hero tr-onsky">
+        <Sky variant="advisory" />
+        <div className="wrap idx-hero-in">
+          <p className="kicker">Transformidable Advisory</p>
+          <h1 className="idx-title">Tell us the governance problem in front of you.</h1>
+          <p className="idx-intro">
+            Most transformations don&rsquo;t fail for technical reasons. They fail because the people responsible
+            can&rsquo;t see what is actually happening, or can see it and don&rsquo;t act. Transformidable Advisory
+            brings the evidence from our research to your organization&rsquo;s own decisions. We don&rsquo;t sell a
+            menu of services. Tell us the problem; we&rsquo;ll tell you honestly whether and how we can help.
+          </p>
+          <div className="hero-cta" style={{ marginTop: 28 }}>
+            <Link className="btn" href="/advisory/conversation">Book a conversation <Arrow /></Link>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="av-areas-h">
+        <div className="wrap">
+          <div className="sec-head">
+            <div>
+              <p className="kicker">Where we help</p>
+              <h2 className="h" id="av-areas-h">Where we&rsquo;re most often called in.</h2>
+            </div>
+          </div>
+          <div className="av-areas">
+            {AREAS.map((a) => (
+              <div className="dv-card av-area" id={a.id} key={a.id}>
+                <h3>{a.name}</h3>
+                <p>{a.text}</p>
+                {a.related && <Link className="link" href={a.related.href}>{a.related.label} <Arrow s={13} /></Link>}
+              </div>
+            ))}
+          </div>
+          <p className="av-close">
+            Not on this list? Most governance problems aren&rsquo;t.{" "}
+            <Link className="link" href="/advisory/conversation">Tell us yours <Arrow s={13} /></Link>
+          </p>
+        </div>
+      </section>
+
+      <section className="rule-band" aria-labelledby="av-how-h">
+        <div className="wrap">
+          <div className="sec-head">
+            <div>
+              <p className="kicker">How it works</p>
+              <h2 className="h" id="av-how-h">Start with a conversation.</h2>
+            </div>
+          </div>
+          <ol className="av-steps">
+            <li><strong>Conversation.</strong> Thirty minutes on the situation and the decision in front of you.</li>
+            <li><strong>Our honest read.</strong> Whether we can help, how, and what it would involve, or a pointer elsewhere if we&rsquo;re not the right fit.</li>
+            <li><strong>Work together.</strong> Shaped around the problem, alongside your executives, steering committee, or board.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section className="rule-band" aria-labelledby="av-who-h">
+        <div className="wrap av-lead">
+          <div>
+            <p className="kicker">Who leads engagements</p>
+            <h2 className="hm-h2" id="av-who-h">Dr. Jerri Bland</h2>
+            <p className="body" style={{ marginTop: 18 }}>
+              Dr. Jerri Bland has spent more than 25 years in enterprise technology leadership, including as Deputy
+              CIO at Columbia University and as Associate Vice Chancellor for Enterprise Applications at UNC&ndash;Chapel
+              Hill, where she led a $42M+ implementation portfolio. She leads Transformidable&rsquo;s research on why
+              enterprise programs succeed or fail, and is the author of The Transformidable Leader.
+            </p>
+            <p className="av-creds">Ed.D. &middot; PMP &middot; CSM &middot; ITIL</p>
+          </div>
+          <div>
+            <Link className="hm-feat" href={caseFile ? `/publications/case-files/${CASE_SLUG}` : "/publications/case-files"}>
+              <span className="hm-feat-label">From the research</span>
+              {caseFile ? (
+                <>
+                  {caseFile.caseNumber && <span className="hm-feat-meta">{caseNo(caseFile.caseNumber)}</span>}
+                  <span className="hm-feat-title">{caseFile.title}</span>
+                  {caseFile.dek && <span className="hm-feat-desc">{caseFile.dek}</span>}
+                </>
+              ) : (
+                <>
+                  <span className="hm-feat-title">Case Files</span>
+                  <span className="hm-feat-desc">Anatomies of real governance decisions, traced from decision to outcome.</span>
+                </>
+              )}
+              <span className="hm-feat-go">Read the case <Arrow s={12} /></span>
+            </Link>
+            <p className="av-note">
+              We don&rsquo;t resell, implement, or take referral fees from technology vendors.{" "}
+              <Link className="link" href="/independence">Independence policy</Link>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="rule-band av-cta" aria-label="Book a conversation">
+        <div className="wrap av-cta-in">
+          <p className="av-cta-t">Tell us the governance problem in front of you.</p>
+          <div className="av-cta-btns">
+            <Link className="btn" href="/advisory/conversation">Book a conversation <Arrow /></Link>
+            <Link className="link" href="/briefings/live">Attend a live briefing <Arrow s={13} /></Link>
+          </div>
+        </div>
+      </section>
+    </ResearchShell>
+  );
+}

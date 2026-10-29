@@ -5,15 +5,16 @@ import Link from "next/link";
 import { ResearchShell } from "./components/research/ResearchShell";
 import { Sky } from "./components/research/Sky";
 import { caseNo, fullDate } from "./components/research/format";
+import { ResearchSubscribe } from "./components/research/ResearchNav";
 import "./components/home/home.css";
 
 export const dynamic = "force-dynamic";
 
 const DESCRIPTION =
-  "Transformidable brings together research, executive education, publishing, and media to examine how change is led, how decisions are governed, and what enables organizations to deliver lasting outcomes.";
+  "Transformidable brings together research, advisory, executive education, publishing, and media to help leaders and governing bodies govern consequential change, from mergers and troubled programs to IT controls and AI.";
 
 export const metadata = {
-  title: { absolute: "Transformidable | Leadership and governance for consequential transformation" },
+  title: { absolute: "Transformidable | Governance for Consequential Transformation" },
   description: DESCRIPTION,
   alternates: { canonical: "/" },
 };
@@ -22,8 +23,8 @@ const Arrow = ({ s = 14 }: { s?: number }) => (
   <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
 );
 
-// The four divisions, given equal weight: same card, same order everywhere.
-// None is the parent of another.
+// The five divisions, given equal weight: same card, same order everywhere.
+// Advisory sits directly after Research, the evidence it applies.
 const DIVISIONS = [
   {
     no: "01",
@@ -35,6 +36,14 @@ const DIVISIONS = [
   },
   {
     no: "02",
+    name: "Advisory",
+    href: "/advisory",
+    purpose: "Independent governance advisory for mergers and acquisitions, troubled programs, IT general controls, and AI adoption, grounded in the research.",
+    primary: { label: "See how we help", href: "/advisory" },
+    secondary: { label: "Book a conversation", href: "/advisory/conversation" },
+  },
+  {
+    no: "03",
     name: "Academy",
     href: "/academy",
     purpose: "Executive education: governance briefings, workshops, and applied programs for leadership teams and governing bodies.",
@@ -42,7 +51,7 @@ const DIVISIONS = [
     secondary: { label: "Inquire About a Cohort", href: "/academy/organizations" },
   },
   {
-    no: "03",
+    no: "04",
     name: "Publishing",
     href: "/publishing",
     purpose: "The Transformidable Leader, its companion workbook, future books, and substantive publications.",
@@ -50,12 +59,37 @@ const DIVISIONS = [
     secondary: { label: "Join Book Updates", href: "/publishing#book-updates" },
   },
   {
-    no: "04",
+    no: "05",
     name: "Media",
     href: "/media",
     purpose: "The Governance Files podcast, the Transformidable Briefing, interviews, and events.",
     primary: { label: "Listen to The Governance Files", href: "/podcast" },
     secondary: { label: "Attend a Briefing", href: "/briefings/live" },
+  },
+];
+
+// The four moments Advisory is most often called in for. Each links to its
+// block on the single /advisory page; there are no per-service pages.
+const WHERE_WE_HELP = [
+  {
+    name: "Mergers & Acquisitions",
+    href: "/advisory#mergers-acquisitions",
+    text: "The deal closes on paper long before the systems, data, and controls actually come together. We help govern the technology side from diligence through integration.",
+  },
+  {
+    name: "Troubled Programs",
+    href: "/advisory#troubled-programs",
+    text: "When the status reports stay green and the program doesn't, leadership has lost the truth. We help restore it, then the plan.",
+  },
+  {
+    name: "IT General Controls",
+    href: "/advisory#it-general-controls",
+    text: "When control findings keep coming back, the gap is usually ownership and coordination, not effort. We help put remediation on a footing that lasts.",
+  },
+  {
+    name: "AI Governance",
+    href: "/advisory#ai-governance",
+    text: "Moving from an AI policy on paper to clear answers about who sees, decides, owns, and escalates AI use.",
   },
 ];
 
@@ -104,6 +138,7 @@ export default async function HomePage() {
         <div className="wrap hero-in">
           <div className="hero-tags fade">
             <span>Research</span><span className="dot" aria-hidden="true"></span>
+            <span>Advisory</span><span className="dot" aria-hidden="true"></span>
             <span>Academy</span><span className="dot" aria-hidden="true"></span>
             <span>Publishing</span><span className="dot" aria-hidden="true"></span>
             <span>Media</span>
@@ -111,10 +146,13 @@ export default async function HomePage() {
           <h1 className="hero-head fade d1">
             Leadership and governance for consequential <span className="em">transformation.</span>
           </h1>
-          <p className="lead hm-lead fade d2" style={{ maxWidth: "60ch" }}>{DESCRIPTION}</p>
+          <p className="lead hm-lead fade d2" style={{ maxWidth: "60ch" }}>
+            We study how transformation succeeds and fails, then help leaders and governing bodies apply that
+            evidence to their own consequential decisions.
+          </p>
           <div className="hero-cta fade d2" style={{ marginTop: 28 }}>
-            <a className="btn" href="#divisions">Explore Transformidable <Arrow /></a>
-            <a className="link" href="#briefing">Follow our work <Arrow s={13} /></a>
+            <Link className="btn" href="/advisory/conversation">Book a conversation <Arrow /></Link>
+            <Link className="link" href="/research">Explore the research <Arrow s={13} /></Link>
           </div>
         </div>
       </section>
@@ -123,11 +161,11 @@ export default async function HomePage() {
         <div className="wrap">
           <div className="sec-head">
             <div>
-              <p className="kicker">Four divisions</p>
+              <p className="kicker">Five divisions</p>
               <h2 className="h" id="hm-div-h">One commitment to stronger leadership and governance.</h2>
             </div>
           </div>
-          <div className="hm-grid">
+          <div className="hm-grid hm-grid--5">
             {DIVISIONS.map((d) => (
               <article className="hm-div" key={d.name}>
                 <span className="hm-no">{d.no}</span>
@@ -140,6 +178,30 @@ export default async function HomePage() {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="rule-band hm-help" id="where-we-help" aria-labelledby="hm-help-h">
+        <div className="wrap">
+          <div className="sec-head">
+            <div>
+              <p className="kicker">Advisory</p>
+              <h2 className="h" id="hm-help-h">Four moments when governance decides the outcome.</h2>
+            </div>
+          </div>
+          <div className="hm-grid">
+            {WHERE_WE_HELP.map((w) => (
+              <Link className="hm-feat" href={w.href} key={w.name}>
+                <span className="hm-feat-title">{w.name}</span>
+                <span className="hm-feat-desc">{w.text}</span>
+                <span className="hm-feat-go">How we help <Arrow s={12} /></span>
+              </Link>
+            ))}
+          </div>
+          <p className="hm-help-close">
+            Something else? Tell us the governance problem.{" "}
+            <Link className="link" href="/advisory/conversation">Book a conversation <Arrow s={13} /></Link>
+          </p>
         </div>
       </section>
 
@@ -169,18 +231,18 @@ export default async function HomePage() {
               <span className="hm-feat-go">Read the case <Arrow s={12} /></span>
             </Link>
 
+            <Link className="hm-feat" href="/advisory">
+              <span className="hm-feat-label">Advisory</span>
+              <span className="hm-feat-title">When the reports stay green.</span>
+              <span className="hm-feat-desc">Tell us the governance problem in front of you.</span>
+              <span className="hm-feat-go">See how we help <Arrow s={12} /></span>
+            </Link>
+
             <Link className="hm-feat" href="/academy/courses/ai-governance-for-boards-and-councils">
               <span className="hm-feat-label">Academy &middot; Executive briefing</span>
               <span className="hm-feat-title">AI Governance for Boards &amp; Councils</span>
               <span className="hm-feat-desc">A 90-minute briefing for city councils, county commissions, university boards, and leadership teams, available as a private session.</span>
               <span className="hm-feat-go">View the briefing <Arrow s={12} /></span>
-            </Link>
-
-            <Link className="hm-feat" href="/publishing">
-              <span className="hm-feat-label">Publishing &middot; Forthcoming</span>
-              <span className="hm-feat-title">The Transformidable Leader</span>
-              <span className="hm-feat-desc">The forthcoming book from Transformidable, with a companion workbook.</span>
-              <span className="hm-feat-go">Discover the book <Arrow s={12} /></span>
             </Link>
 
             <Link className="hm-feat" href={episode ? `/podcast/${episode.slug}` : "/podcast"}>
@@ -205,29 +267,46 @@ export default async function HomePage() {
           </div>
           <div>
             <p className="body">
-              Transformidable advances the leadership and governance of organizational transformation through
-              research, education, publishing, and media. We equip leaders and governing bodies to understand
-              consequential change, make better decisions, and act with clarity and conviction.
+              Transformidable advances the leadership and governance of organizational transformation. Each division
+              serves its own audience. Research builds the evidence. Advisory applies it to an organization's own
+              decisions. The Academy turns it into executive education. Publishing carries the ideas further, and
+              Media brings them into conversation.
             </p>
             <p className="body">
-              Each division has its own audience and purpose. Research builds the evidence. The Academy turns it into
-              executive education. Publishing carries the ideas further, and Media brings them into conversation.
-              What they share is one intellectual identity and a commitment to stronger leadership and governance.
+              What connects them is one intellectual identity and a firm line between evidence and engagement: our
+              research is never commissioned by advisory clients, and we accept no compensation from technology vendors.
             </p>
-            <p style={{ marginTop: 22 }}><Link className="link" href="/about">About Transformidable <Arrow s={13} /></Link></p>
+            <p className="hm-approach-links">
+              <Link className="link" href="/about">About Transformidable <Arrow s={13} /></Link>
+              <Link className="link" href="/independence">Our independence policy <Arrow s={13} /></Link>
+            </p>
           </div>
         </div>
       </section>
 
-      <section className="rule-band hm-connect" aria-label="Stay connected">
-        <div className="wrap hm-connect-in">
-          <div>
-            <p className="kicker">Stay connected</p>
-            <p className="hm-connect-t">Follow the research, the programs, and the conversation.</p>
+      <section className="rule-band hm-ways" aria-labelledby="hm-ways-h">
+        <div className="wrap">
+          <div className="sec-head">
+            <div>
+              <h2 className="h" id="hm-ways-h">Start where you are.</h2>
+            </div>
           </div>
-          <div className="hm-connect-cta">
-            <a className="btn" href="#briefing">Subscribe to the Brief <Arrow /></a>
-            <Link className="link" href="/contact">Contact us <Arrow s={13} /></Link>
+          <div className="hm-ways-grid">
+            <div className="hm-way">
+              <h3>Talk it through</h3>
+              <p>A 30-minute conversation about the decision in front of you.</p>
+              <Link className="btn" href="/advisory/conversation">Book a conversation <Arrow /></Link>
+            </div>
+            <div className="hm-way">
+              <h3>See it in practice</h3>
+              <p>Join a live briefing on the governance questions leaders are facing now.</p>
+              <Link className="link" href="/briefings/live">Attend a live briefing <Arrow s={13} /></Link>
+            </div>
+            <div className="hm-way">
+              <h3>Follow the work</h3>
+              <p>The Transformidable Brief: research, case files, and briefings by email.</p>
+              <ResearchSubscribe id="hm-ways-email" onLight />
+            </div>
           </div>
         </div>
       </section>

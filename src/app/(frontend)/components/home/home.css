@@ -1,12 +1,15 @@
 /* ==========================================================================
    TRANSFORMIDABLE — parent homepage
-   Layered on research.css inside .tr. The four division cards share one
+   Layered on research.css inside .tr. The five division cards share one
    treatment so no division reads as the parent of another.
    ========================================================================== */
 
 .tr .tr-sky--home .tr-sky-glow { background:
   radial-gradient(96% 134% at 4% 60%, rgba(201,162,39,.16), transparent 62%),
   linear-gradient(90deg, #45091c 0%, #3a0818 30%, #2a1214 58%, #150b0b 80%, #0b0808 100%); }
+.tr .tr-sky--advisory .tr-sky-glow { background:
+  radial-gradient(94% 132% at 4% 62%, rgba(201,162,39,.13), transparent 62%),
+  linear-gradient(90deg, #3b0a1a 0%, #320916 30%, #241113 58%, #140b0b 80%, #0a0808 100%); }
 .tr .tr-sky--publishing .tr-sky-glow { background:
   radial-gradient(92% 132% at 4% 62%, rgba(214,170,90,.15), transparent 62%),
   linear-gradient(90deg, #3e1016 0%, #350d13 30%, #261312 58%, #150c0a 80%, #0b0907 100%); }
@@ -18,10 +21,13 @@
 .tr .hm-h2 { font-family: var(--serif); font-size: clamp(1.5rem, 3vw, 2.15rem); line-height: 1.12; letter-spacing: -.01em; color: var(--ink); margin: 12px 0 0; max-width: 20ch; text-wrap: balance; }
 .tr .hm-lead { margin-top: 24px; }
 
-/* ---- Four equal divisions --------------------------------------------- */
+/* ---- Five equal divisions --------------------------------------------- */
 .tr .hm-grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
 @media (min-width: 640px) { .tr .hm-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1040px) { .tr .hm-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 1040px) { .tr .hm-grid--5 { grid-template-columns: repeat(5, 1fr); } }
+.tr .hm-grid--5 .hm-div { padding-inline: 18px; }
+.tr .hm-grid--5 .hm-div h3 { font-size: 1.45rem; }
 .tr .hm-div { background: var(--paper); border: 1px solid var(--rule); border-top: 3px solid var(--wine); padding: 26px 22px 24px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
 .tr .hm-no { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; color: var(--gold-deep); }
 .tr .hm-div h3 { font-family: var(--serif); font-size: 1.6rem; line-height: 1.1; color: var(--ink); margin: 12px 0 10px; }
@@ -43,14 +49,27 @@
 .tr .hm-feat-desc { font-family: var(--serif); font-size: .92rem; line-height: 1.55; color: var(--ink-body); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 .tr .hm-feat-go { margin-top: auto; padding-top: 10px; display: inline-flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--wine); }
 
-/* ---- Approach + connect ----------------------------------------------- */
+/* ---- Where we help ---------------------------------------------------- */
+.tr .hm-help .hm-feat-desc { -webkit-line-clamp: unset; overflow: visible; }
+.tr .hm-help-close { margin: 26px 0 0; font-family: var(--serif); font-size: 1.05rem; color: var(--ink-body); display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+
+/* ---- Approach ---------------------------------------------------------- */
 .tr .hm-approach-in { display: grid; gap: clamp(28px, 5vw, 64px); grid-template-columns: 1fr; }
 @media (min-width: 900px) { .tr .hm-approach-in { grid-template-columns: 1fr 1fr; } }
 .tr .hm-approach .body + .body { margin-top: 16px; }
-.tr .hm-connect { background: var(--paper-3); padding-block: clamp(36px, 5vw, 56px); }
-.tr .hm-connect-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 40px; }
-.tr .hm-connect-t { font-family: var(--serif); font-size: clamp(1.15rem, 2.2vw, 1.45rem); color: var(--ink); margin: 10px 0 0; max-width: 34ch; }
-.tr .hm-connect-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; }
+.tr .hm-approach-links { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 12px 28px; }
+
+/* ---- Three ways in ----------------------------------------------------- */
+.tr .hm-ways { background: var(--paper-3); }
+.tr .hm-ways-grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 860px) { .tr .hm-ways-grid { grid-template-columns: repeat(3, 1fr); } }
+.tr .hm-way { background: var(--paper); border: 1px solid var(--rule); border-top: 3px solid var(--wine); padding: 26px 22px 24px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.tr .hm-way h3 { font-family: var(--serif); font-size: 1.35rem; line-height: 1.2; color: var(--ink); margin: 0; }
+.tr .hm-way p { font-family: var(--serif); font-size: .98rem; line-height: 1.6; color: var(--ink-body); margin: 0 0 6px; }
+.tr .hm-way > .btn, .tr .hm-way > .link, .tr .hm-way > .subscribe { margin-top: auto; }
+.tr .hm-way .subscribe { width: 100%; }
+.tr .hm-way .subscribe input { background: var(--paper); color: var(--ink); border-color: var(--rule-strong); }
+.tr .hm-way .subscribe input::placeholder { color: var(--ink-faint); }
 
 /* ---- Division landing pages (Publishing, Media) ------------------------ */
 .tr .dv-grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
@@ -71,3 +90,40 @@
 @media (min-width: 900px) { .tr .dv-signup-in { grid-template-columns: 1fr 1fr; } }
 .tr .dv-signup .subscribe input { background: var(--paper); color: var(--ink); border-color: var(--rule-strong); }
 .tr .dv-signup .subscribe input::placeholder { color: var(--ink-faint); }
+
+/* ---- Advisory (/advisory, /advisory/conversation) ---------------------- */
+.tr .av-areas { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .tr .av-areas { grid-template-columns: repeat(2, 1fr); } }
+.tr .av-area { scroll-margin-top: 110px; }
+.tr .av-close { margin: 26px 0 0; font-family: var(--serif); font-size: 1.05rem; color: var(--ink-body); }
+.tr .av-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; grid-template-columns: 1fr; counter-reset: av-step; }
+@media (min-width: 860px) { .tr .av-steps { grid-template-columns: repeat(3, 1fr); } }
+.tr .av-steps li { counter-increment: av-step; border-top: 1px solid var(--rule-strong); padding-top: 18px; font-family: var(--serif); font-size: 1rem; line-height: 1.6; color: var(--ink-body); }
+.tr .av-steps li::before { content: "0" counter(av-step); display: block; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; color: var(--gold-deep); margin-bottom: 10px; }
+.tr .av-steps strong { color: var(--ink); }
+.tr .av-lead { display: grid; gap: 28px 56px; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 900px) { .tr .av-lead { grid-template-columns: 1.4fr 1fr; } }
+.tr .av-creds { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-deep); margin: 14px 0 0; }
+.tr .av-note { font-family: var(--serif); font-size: .9rem; color: var(--ink-mute); margin: 18px 0 0; }
+.tr .av-cta { background: var(--paper-3); padding-block: clamp(36px, 5vw, 56px); }
+.tr .av-cta-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 40px; }
+.tr .av-cta-t { font-family: var(--serif); font-size: clamp(1.15rem, 2.2vw, 1.45rem); color: var(--ink); margin: 0; max-width: 34ch; }
+.tr .av-cta-btns { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; }
+
+/* Booking: intake card, then the Cal.com scheduler. */
+.tr .av-book { display: grid; gap: 28px 48px; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 960px) { .tr .av-book { grid-template-columns: 1fr 1.25fr; } }
+.tr .av-card { background: var(--paper); border: 1px solid var(--rule); border-top: 3px solid var(--wine); padding: clamp(22px, 4vw, 34px); }
+.tr .av-card h2 { font-family: var(--serif); font-size: 1.3rem; color: var(--ink); margin: 0 0 6px; }
+.tr .av-card > p { font-family: var(--serif); color: var(--ink-body); margin: 0 0 8px; line-height: 1.55; }
+.tr .av-form-grid { display: grid; gap: 0 16px; grid-template-columns: 1fr; }
+@media (min-width: 620px) { .tr .av-form-grid { grid-template-columns: 1fr 1fr; } }
+.tr .av-form-grid > div { display: flex; flex-direction: column; }
+.tr .av-form-grid .case-form-label:first-child { margin-top: 14px; }
+.tr .av-form .case-form-btn { margin-top: 18px; align-self: flex-start; }
+.tr .av-cal { min-height: 640px; background: var(--paper); border: 1px solid var(--rule); overflow: auto; }
+.tr .av-cal-wait { padding: 28px; font-family: var(--serif); color: var(--ink-mute); }
+.tr .av-fallback { margin: 28px 0 0; font-family: var(--serif); font-size: 1rem; color: var(--ink-body); }
+.tr .av-cal { scroll-margin-top: 110px; }
+/* Inline links inside serif sentences keep the sans link face. */
+.tr .hm-help-close .link, .tr .av-close .link, .tr .av-note .link, .tr .av-fallback .link { font-family: var(--sans); }

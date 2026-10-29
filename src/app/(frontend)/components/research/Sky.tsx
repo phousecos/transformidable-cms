@@ -41,6 +41,8 @@ export const SKY_VARIANTS = {
   tools:        { seed: 83, count: 30, region: { x0: 0.54, x1: 1, y0: 0,    y1: 0.82 }, focal: { x: 78, y: 40 } },
   // Home (parent site) — broad right field, airy.
   home:         { seed: 3,  count: 30, region: { x0: 0.5,  x1: 1, y0: 0,    y1: 1    }, focal: { x: 80, y: 36 } },
+  // Advisory — right, mid band, medium.
+  advisory:     { seed: 97, count: 24, region: { x0: 0.5,  x1: 1, y0: 0.12, y1: 0.9  }, focal: { x: 76, y: 48 } },
   // Publishing — right, upper band, sparse.
   publishing:   { seed: 59, count: 20, region: { x0: 0.52, x1: 1, y0: 0,    y1: 0.7  }, focal: { x: 70, y: 24 } },
   // Media — far right, full, medium.

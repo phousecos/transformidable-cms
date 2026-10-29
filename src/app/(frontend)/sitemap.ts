@@ -11,6 +11,8 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://transformidablethin
 const STATIC_PATHS = [
   "",
   "/research",
+  "/advisory",
+  "/advisory/conversation",
   "/publishing",
   "/media",
   "/publications",
