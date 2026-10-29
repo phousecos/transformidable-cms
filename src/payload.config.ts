@@ -27,6 +27,7 @@ import { AcademyInquiries } from './collections/AcademyInquiries.ts'
 import { PodcastEpisodes } from './collections/PodcastEpisodes.ts'
 import { Documents } from './collections/Documents.ts'
 import { AdvisoryBookings } from './collections/AdvisoryBookings.ts'
+import { ToolRequests } from './collections/ToolRequests.ts'
 import { Assets } from './collections/library/Assets.ts'
 import { AssetFiles } from './collections/library/AssetFiles.ts'
 import { ApiClients } from './collections/library/ApiClients.ts'
@@ -254,6 +255,7 @@ export default buildConfig({
     PodcastEpisodes,
     Documents,
     AdvisoryBookings,
+    ToolRequests,
     // J. Lynne library (moved from the jlynne.io instance)
     Assets,
     AssetFiles,

@@ -34,9 +34,10 @@
     { "pattern": "jlynne.io", "custom_domain": true },
   ],
   "vars": {
-    // Where /api/assets/current points prospects for J. Lynne downloads.
-    // jlynne.co is being retired: change this when downloads have a new home.
-    "PUBLIC_DOWNLOAD_BASE_URL": "https://jlynne.co/downloads",
+    // Where /api/assets/current points people for downloads: the Advisory
+    // tools pages. Change to transformidablethinking.com when that domain
+    // moves to this Worker.
+    "PUBLIC_DOWNLOAD_BASE_URL": "https://transformidable.net/advisory/tools",
   },
   "r2_buckets": [
     {
