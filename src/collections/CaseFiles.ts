@@ -1,5 +1,5 @@
 import type { CollectionConfig, Where } from 'payload'
-import { isLoggedIn } from '../access/checkRole.ts'
+import { isLoggedIn, isStaffUser } from '../access/checkRole.ts'
 import { DOMAINS } from '../lib/governanceDomains.ts'
 import { CONSEQUENCE_TYPES, SEGMENT_TYPES, selectOptions } from '../lib/governanceCodebook.ts'
 
@@ -20,7 +20,7 @@ export const CaseFiles: CollectionConfig = {
   access: {
     create: isLoggedIn,
     read: ({ req: { user } }) => {
-      if (!user) {
+      if (!isStaffUser(user)) {
         const publishedOnly: Where = { status: { equals: 'published' } }
         return publishedOnly
       }

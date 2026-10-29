@@ -26,6 +26,10 @@ import { ContactMessages } from './collections/ContactMessages.ts'
 import { AcademyInquiries } from './collections/AcademyInquiries.ts'
 import { PodcastEpisodes } from './collections/PodcastEpisodes.ts'
 import { Documents } from './collections/Documents.ts'
+import { AdvisoryBookings } from './collections/AdvisoryBookings.ts'
+import { Assets } from './collections/library/Assets.ts'
+import { AssetFiles } from './collections/library/AssetFiles.ts'
+import { ApiClients } from './collections/library/ApiClients.ts'
 import { SiteSettings } from './globals/SiteSettings.ts'
 import { TransformidableFeature } from './globals/TransformidableFeature.ts'
 import { PodcastSettings } from './globals/PodcastSettings.ts'
@@ -147,6 +151,9 @@ const csrfOrigins = Array.from(
       'https://cms.transformidable.media',
       'https://transformidable.media',
       'https://www.transformidable.media',
+      // The combined admin in the J. Lynne Cloudflare account.
+      'https://transformidable.net',
+      'https://www.transformidable.net',
       // Escape hatch: comma-separated extra origins. Lets a domain change be
       // fixed with an env var instead of a code change and a redeploy.
       ...(process.env.PAYLOAD_CSRF_ORIGINS?.split(',').map((origin) => origin.trim()) ?? []),
@@ -244,6 +251,11 @@ export default buildConfig({
     AcademyInquiries,
     PodcastEpisodes,
     Documents,
+    AdvisoryBookings,
+    // J. Lynne library (moved from the jlynne.io instance)
+    Assets,
+    AssetFiles,
+    ApiClients,
     // Legacy collections — hidden from nav, kept for data access
     { ...Authors, admin: { ...Authors.admin, hidden: true } },
     { ...BrandPillars, admin: { ...BrandPillars.admin, hidden: true } },
@@ -313,7 +325,11 @@ export default buildConfig({
           alwaysInsertFields: true,
           bucket: cloudflareEnv.MEDIA_BUCKET,
           clientUploads: true,
-          collections: { media: true, documents: { prefix: 'documents' } },
+          collections: {
+            media: true,
+            documents: { prefix: 'documents' },
+            'asset-files': { prefix: 'asset-files' },
+          },
         })
       : // Under Node (build-time migrations, local dev): fields only, and
         // files stay on local disk.
@@ -322,6 +338,7 @@ export default buildConfig({
           collections: {
             media: { adapter: null },
             documents: { adapter: null, prefix: 'documents' },
+            'asset-files': { adapter: null, prefix: 'asset-files' },
           },
           enabled: false,
         }),

@@ -1,5 +1,5 @@
 import type { CollectionConfig, Where } from 'payload'
-import { isLoggedIn } from '../access/checkRole.ts'
+import { isLoggedIn, isStaffUser } from '../access/checkRole.ts'
 import { validateHttpUrl } from '../access/validateUrl.ts'
 
 export const Books: CollectionConfig = {
@@ -12,7 +12,7 @@ export const Books: CollectionConfig = {
   access: {
     create: isLoggedIn,
     read: ({ req: { user } }) => {
-      if (!user) {
+      if (!isStaffUser(user)) {
         const publishedOnly: Where = { status: { equals: 'published' } }
         return publishedOnly
       }

@@ -11,6 +11,7 @@
     "start": "next start",
     "preview:cf": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy:cf": "opennextjs-cloudflare build && opennextjs-cloudflare deploy -- --keep-vars",
+    "deploy:cf:jlynne": "opennextjs-cloudflare build --config wrangler.jlynne.jsonc && opennextjs-cloudflare deploy --config wrangler.jlynne.jsonc -- --keep-vars",
     "lint": "next lint",
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap",
