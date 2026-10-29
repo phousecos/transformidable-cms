@@ -88,10 +88,6 @@ From this step on, jlynne.io runs this code. Do steps 4–8 in one sitting:
 - **KADE:** its old key stops working at this step and works again after step 8.
 - **Library:** jlynne.io/admin shows an empty library until step 7.
 
-**Before you start**, in J. Lynne account → Workers & Pages → `jlynne-cms` →
-Settings → **Variables and Secrets**: note the current `PAYLOAD_SECRET` in your
-password manager. You'd need it to roll back to the old version.
-
 J. Lynne account → Workers & Pages → `jlynne-cms` → Settings → **Build**:
 
 - [ ] Change the connected repository from `phousecos/jlynne-cms` to
@@ -105,18 +101,30 @@ J. Lynne account → Workers & Pages → `jlynne-cms` → Settings → **Build**
 
 | Name | Value |
 | --- | --- |
-| `POSTGRES_URL` | Supabase Session pooler URL, as on the Transformidable account |
-| `PAYLOAD_SECRET` | **Exactly** the Transformidable value. A different one logs everyone out and breaks existing API keys. |
+| `POSTGRES_URL` | Supabase Session pooler URL, the same one the J. Lynne Hyperdrive uses |
+| `PAYLOAD_SECRET` | A new value from `openssl rand -hex 32`. Use the same value for the build variable and the runtime secret. |
 | `NEXT_PUBLIC_SERVER_URL` | `https://transformidable.net` |
 | `NEXT_PUBLIC_SITE_URL` | `https://transformidablethinking.com` |
 
 **Runtime variables and secrets** (Settings → Variables and Secrets):
 - Set the four above. `PAYLOAD_SECRET` *replaces* the old J. Lynne value.
-- Copy these from the Transformidable Worker, with the same values:
-  - `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`
-  - `EMAIL_FROM`, `CONTACT_NOTIFY_EMAIL`, `CRON_SECRET`
-  - any `SYNDICATE_…`
+- Email: `SMTP_HOST=smtp.protonmail.ch`, `SMTP_PORT=587`, `SMTP_SECURE=false`,
+  `SMTP_USER` (the Proton address), and `SMTP_PASS` (a **new** Proton SMTP token,
+  so the current site's token isn't touched). Also `EMAIL_FROM` and
+  `CONTACT_NOTIFY_EMAIL`. Without these, email isn't sent, and nothing else
+  fails.
+- `CRON_SECRET`: a new value from `openssl rand -hex 32`.
+- `SYNDICATE_…`: optional. If they're left out, syndication is skipped and logged.
 - Add `CAL_WEBHOOK_SECRET` (step 9).
+
+**New secrets are fine.**
+- With a new `PAYLOAD_SECRET`, everyone signs in again with the same
+  password, since passwords don't depend on it. Only API keys made under the
+  old secret stop working, and KADE gets a new one in step 8.
+- Set the `jlynne-cms` secrets at switch time, not before. Changing them on
+  the running old library would sign everyone out and break KADE's current
+  key early.
+- Paste generated values straight into the dashboard.
 - `PUBLIC_DOWNLOAD_BASE_URL` is set in `wrangler.jlynne.jsonc`.
 
 Then trigger a build (Deployments → **Retry** / redeploy, or push to `main`).
@@ -125,8 +133,9 @@ There is no cron on this Worker yet. The Transformidable Worker still sends the
 daily digest, and two schedulers would send it twice.
 
 **To roll back:** Deployments → pick the last J. Lynne version → **Rollback**.
-Then put the old `PAYLOAD_SECRET` back and reconnect the jlynne-cms repo. The
-old D1 and R2 were never changed.
+Then reconnect the jlynne-cms repo. The old D1 and R2 were never changed.
+The old library would need fresh sign-ins and a new KADE key, but passwords
+still work.
 
 ## 5. First check
 
