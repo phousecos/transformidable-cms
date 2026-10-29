@@ -1,21 +1,26 @@
 # Moving to the J. Lynne Cloudflare account
 
-One Payload instance for Transformidable and the J. Lynne library, running in
-the **J. Lynne** Cloudflare account with its admin at **transformidable.net/admin**.
+One Payload instance for Transformidable and the J. Lynne library. It runs as
+the existing **`jlynne-cms`** Worker in the **J. Lynne** Cloudflare account,
+with its admin at **transformidable.net/admin** (jlynne.io/admin also works).
 
-**Nothing is deleted along the way.** The current Transformidable Worker and
-jlynne.io keep running, untouched, until each is switched off on purpose
-later.
+**Nothing is deleted along the way.**
+- The current Transformidable Worker keeps running, untouched, until it's
+  switched off on purpose later.
+- On `jlynne-cms`, the code is replaced, but its D1 database and R2 bucket
+  stay as they are. The import only reads them.
+- Cloudflare keeps every deployed version of a Worker, so the old J. Lynne
+  version can be restored from the Worker's **Deployments** tab.
 
 ## Where everything lives
 
 | | Before | After |
 | --- | --- | --- |
 | Code | transformidable-cms, jlynne-cms | transformidable-cms only (wrangler.jlynne.jsonc) |
-| Worker | `transformidable-cms` (Transformidable account), `jlynne-cms` (J. Lynne account) | `transformidable-cms` (J. Lynne account) |
+| Worker | `transformidable-cms` (Transformidable account), `jlynne-cms` (J. Lynne account) | `jlynne-cms` (J. Lynne account), running this repo |
 | Database | **Supabase Postgres** (Transformidable); D1 `jlynne-cms` (J. Lynne) | **Supabase Postgres**, the same database, reached through a Hyperdrive in the J. Lynne account |
 | Files | R2 `transformidable-media` (Transformidable account); R2 `jlynne-cms` | R2 `transformidable-media` in the J. Lynne account. J. Lynne files go under `asset-files/` |
-| Admin | cms.transformidablethinking.com, jlynne.io/admin | transformidable.net/admin |
+| Admin | cms.transformidablethinking.com, jlynne.io/admin | transformidable.net/admin (and jlynne.io/admin) |
 
 > **The database is Supabase, outside Cloudflare.** It does not move in this
 > step. Both Workers use the same database while they run side by side, so
@@ -54,59 +59,83 @@ protections, which is why the order above matters.
 
 ## 1. File storage in the J. Lynne account
 
-- [ ] J. Lynne account → R2 → **Create bucket** `transformidable-media`.
-- [ ] Copy the files from the Transformidable account's `transformidable-media`
-      into it. Use R2 → **Data Migration**: the source is the Transformidable
-      bucket, using an R2 API token from the Transformidable account. Copying
-      leaves the source as it is.
+- [x] J. Lynne account → R2 → **Create bucket** `transformidable-media`.
+- [x] Copy the files from the Transformidable account's `transformidable-media`
+      into it. Done 29 Oct 2026: 26 objects, sizes and checksums verified. The
+      source was only read.
 
 You don't need to copy `jlynne-cms` by hand. The import in step 7 copies its
 61 files (7 MB).
 
 ## 2. Database connection (Hyperdrive)
 
-- [ ] J. Lynne account → Storage & Databases → Hyperdrive → **Create**.
+- [x] J. Lynne account → Storage & Databases → Hyperdrive → **Create**.
       Use the same Supabase **Session pooler** connection string as the
       Transformidable account's Hyperdrive (`…pooler.supabase.com:5432`).
-- [ ] Put the new Hyperdrive's ID in `wrangler.jlynne.jsonc` in place of
-      `REPLACE_WITH_JLYNNE_HYPERDRIVE_ID`. The ID isn't secret. Until it's
-      set, deploys fail on purpose.
+- [x] Put the new Hyperdrive's ID in `wrangler.jlynne.jsonc`
+      (`ccad495920d74de8933471385e2ba4b6`). The ID isn't secret.
 
 ## 3. The domain
 
-- [ ] Add **transformidable.net** to the J. Lynne account (Websites → Add a
-      domain), and change its nameservers at the registrar to the two
-      Cloudflare gives you.
+- [x] **transformidable.net** is active in the J. Lynne account and attached to
+      the `jlynne-cms` Worker, next to jlynne.io. The config lists both, so
+      deploys keep them attached.
 
-The Worker attaches transformidable.net itself on its first deploy.
+## 4. Switch `jlynne-cms` to this code
 
-## 4. The Worker
+From this step on, jlynne.io runs this code. Do steps 4–8 in one sitting:
 
-J. Lynne account → Workers & Pages → Create → Import a repository →
-`phousecos/transformidable-cms`, branch `main`.
+- **KADE:** its old key stops working at this step and works again after step 8.
+- **Library:** jlynne.io/admin shows an empty library until step 7.
 
+J. Lynne account → Workers & Pages → `jlynne-cms` → Settings → **Build**:
+
+- [ ] Change the connected repository from `phousecos/jlynne-cms` to
+      `phousecos/transformidable-cms`, branch `main`. Otherwise a push to
+      jlynne-cms would put the old code back.
 - Build command: `npx opennextjs-cloudflare build --config wrangler.jlynne.jsonc`
 - Deploy command: `npx opennextjs-cloudflare deploy --config wrangler.jlynne.jsonc -- --keep-vars`
-- The account needs **Workers Paid** ($5/month). The bundle is over the free
-  plan's size limit, and jlynne-cms already needed Paid.
+- The account is already on **Workers Paid**, which the bundle size needs.
 
 **Build variables** (the build runs migrations):
 
 | Name | Value |
 | --- | --- |
-| `POSTGRES_URL` | Supabase Session pooler URL, as on the Transformidable account |
-| `PAYLOAD_SECRET` | **Exactly** the Transformidable value. A different one logs everyone out and breaks existing API keys. |
+| `POSTGRES_URL` | Supabase Session pooler URL, the same one the J. Lynne Hyperdrive uses |
+| `PAYLOAD_SECRET` | A new value from `openssl rand -hex 32`. Use the same value for the build variable and the runtime secret. |
 | `NEXT_PUBLIC_SERVER_URL` | `https://transformidable.net` |
 | `NEXT_PUBLIC_SITE_URL` | `https://transformidablethinking.com` |
 
-**Runtime variables and secrets** (Worker → Settings → Variables and Secrets):
-the four above, plus the same values as the Transformidable Worker for
-`SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`,
-`EMAIL_FROM`, `CONTACT_NOTIFY_EMAIL`, `CRON_SECRET`, and any `SYNDICATE_…`.
-Also add `CAL_WEBHOOK_SECRET` (step 9).
+**Runtime variables and secrets** (Settings → Variables and Secrets):
+- Set the four above. `PAYLOAD_SECRET` *replaces* the old J. Lynne value.
+- Email: `SMTP_HOST=smtp.protonmail.ch`, `SMTP_PORT=587`, `SMTP_SECURE=false`,
+  `SMTP_USER` (the Proton address), and `SMTP_PASS` (a **new** Proton SMTP token,
+  so the current site's token isn't touched). Also `EMAIL_FROM` and
+  `CONTACT_NOTIFY_EMAIL`. Without these, email isn't sent, and nothing else
+  fails.
+- `CRON_SECRET`: a new value from `openssl rand -hex 32`.
+- `SYNDICATE_…`: optional. If they're left out, syndication is skipped and logged.
+- Add `CAL_WEBHOOK_SECRET` (step 9).
+
+**New secrets are fine.**
+- With a new `PAYLOAD_SECRET`, everyone signs in again with the same
+  password, since passwords don't depend on it. Only API keys made under the
+  old secret stop working, and KADE gets a new one in step 8.
+- Set the `jlynne-cms` secrets at switch time, not before. Changing them on
+  the running old library would sign everyone out and break KADE's current
+  key early.
+- Paste generated values straight into the dashboard.
+- `PUBLIC_DOWNLOAD_BASE_URL` is set in `wrangler.jlynne.jsonc`.
+
+Then trigger a build (Deployments → **Retry** / redeploy, or push to `main`).
 
 There is no cron on this Worker yet. The Transformidable Worker still sends the
 daily digest, and two schedulers would send it twice.
+
+**To roll back:** Deployments → pick the last J. Lynne version → **Rollback**.
+Then reconnect the jlynne-cms repo. The old D1 and R2 were never changed.
+The old library would need fresh sign-ins and a new KADE key, but passwords
+still work.
 
 ## 5. First check
 
@@ -117,11 +146,10 @@ daily digest, and two schedulers would send it twice.
 - [ ] The sidebar should have a **J. Lynne Library** group (Assets, Asset Files,
       API Clients) and **Advisory Bookings**, all empty for now.
 
-## 6. Freeze jlynne.io
+## 6. (Nothing to freeze)
 
-From now on, make library changes only at transformidable.net. Anything added
-at jlynne.io before step 7 is copied. Anything changed there after step 7 isn't
-(the import skips what's already copied).
+The old library stopped taking edits when step 4 replaced its code, so the
+import in step 7 copies everything it ever held.
 
 ## 7. Copy the J. Lynne library
 
@@ -154,7 +182,7 @@ KADE's old key belonged to jlynne.io and doesn't carry over.
       `KADE Analytics` → tick **Enable API Key** → Save → copy the key into
       KADE.
 - [ ] Update KADE's settings:
-  - Base URL: `https://transformidable.net`
+  - Base URL: `https://transformidable.net` (`https://jlynne.io` also works for now)
   - Header: `Authorization: api-clients API-Key <key>` (was `users API-Key`)
   - Files: `/api/asset-files/…` (was `/api/media/…`)
   - `/api/assets` and `/api/assets/current` are unchanged.
@@ -175,12 +203,15 @@ the admin, and they see only published Transformidable content, like a visitor.
 
 ## Later (separate steps, nothing deleted)
 
-- **jlynne.co** still reads jlynne.io. Point it at transformidable.net (with an
-  API client key) before jlynne.io is ever switched off.
+- **Downloads:** jlynne.co is being retired. `/api/assets/current` still hands
+  out `jlynne.co/downloads/{slug}` links (`PUBLIC_DOWNLOAD_BASE_URL` in
+  `wrangler.jlynne.jsonc`). Point it at the downloads' new home before
+  jlynne.co goes.
 - **transformidablethinking.com**: when you're ready, move the domain to the
   J. Lynne account and attach it to this Worker. Then:
   - add the cron to `wrangler.jlynne.jsonc`,
   - remove it from the Transformidable Worker, and
   - turn off that Worker's builds.
-- **Leftovers:** jlynne.io, the `jlynne-cms` D1 and R2, and the Transformidable
-  account's bucket stay as they are until you decide to retire them.
+- **Leftovers:** the `jlynne-cms` D1 and R2, the phousecos/jlynne-cms repo, and
+  the Transformidable account's bucket stay as they are until you decide to
+  retire them.

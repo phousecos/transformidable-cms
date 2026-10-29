@@ -151,9 +151,11 @@ const csrfOrigins = Array.from(
       'https://cms.transformidable.media',
       'https://transformidable.media',
       'https://www.transformidable.media',
-      // The combined admin in the J. Lynne Cloudflare account.
+      // The combined admin in the J. Lynne Cloudflare account (the jlynne-cms
+      // Worker), and the old library address that Worker still answers on.
       'https://transformidable.net',
       'https://www.transformidable.net',
+      'https://jlynne.io',
       // Escape hatch: comma-separated extra origins. Lets a domain change be
       // fixed with an env var instead of a code change and a redeploy.
       ...(process.env.PAYLOAD_CSRF_ORIGINS?.split(',').map((origin) => origin.trim()) ?? []),

@@ -1,5 +1,7 @@
 // The combined Transformidable + J. Lynne instance, in the J. Lynne Cloudflare
-// account. Same code as wrangler.jsonc (the Transformidable account), which
+// account. It deploys as the existing `jlynne-cms` Worker, replacing the old
+// J. Lynne library code there (its D1 and R2 stay, bound below for the
+// import). Same code as wrangler.jsonc (the Transformidable account), which
 // stays as it is until transformidablethinking.com moves over.
 //
 // Build:  npx opennextjs-cloudflare build --config wrangler.jlynne.jsonc
@@ -7,7 +9,7 @@
 // Steps and secrets: docs/jlynne-account-move.md
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "transformidable-cms",
+  "name": "jlynne-cms",
   "account_id": "eafd097bc9914edce898c4d47bd6d875",
   "main": "worker.ts",
   "compatibility_date": "2026-10-01",
@@ -22,12 +24,20 @@
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "transformidable-cms",
+      "service": "jlynne-cms",
     },
   ],
   "routes": [
     { "pattern": "transformidable.net", "custom_domain": true },
+    // The old library's address, which KADE reads until it moves to
+    // transformidable.net.
+    { "pattern": "jlynne.io", "custom_domain": true },
   ],
+  "vars": {
+    // Where /api/assets/current points prospects for J. Lynne downloads.
+    // jlynne.co is being retired: change this when downloads have a new home.
+    "PUBLIC_DOWNLOAD_BASE_URL": "https://jlynne.co/downloads",
+  },
   "r2_buckets": [
     {
       // Transformidable media and documents, copied from the Transformidable
@@ -51,11 +61,10 @@
   ],
   "hyperdrive": [
     {
-      // Create a Hyperdrive in the J. Lynne account pointing at the same
-      // Supabase Session pooler URL as the Transformidable account's, then
-      // put its id here. Until then deploys fail, by design.
+      // The J. Lynne account's Hyperdrive, pointing at the same Supabase
+      // Session pooler URL as the Transformidable account's.
       "binding": "HYPERDRIVE",
-      "id": "REPLACE_WITH_JLYNNE_HYPERDRIVE_ID",
+      "id": "ccad495920d74de8933471385e2ba4b6",
       "localConnectionString": "postgresql://postgres:postgres@localhost:5432/postgres",
     },
   ],
