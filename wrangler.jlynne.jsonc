@@ -1,0 +1,68 @@
+// The combined Transformidable + J. Lynne instance, in the J. Lynne Cloudflare
+// account. Same code as wrangler.jsonc (the Transformidable account), which
+// stays as it is until transformidablethinking.com moves over.
+//
+// Build:  npx opennextjs-cloudflare build --config wrangler.jlynne.jsonc
+// Deploy: npx opennextjs-cloudflare deploy --config wrangler.jlynne.jsonc -- --keep-vars
+// Steps and secrets: docs/jlynne-account-move.md
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "transformidable-cms",
+  "account_id": "eafd097bc9914edce898c4d47bd6d875",
+  "main": "worker.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public",
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "transformidable-cms",
+    },
+  ],
+  "routes": [
+    { "pattern": "transformidable.net", "custom_domain": true },
+  ],
+  "r2_buckets": [
+    {
+      // Transformidable media and documents, copied from the Transformidable
+      // account's bucket of the same name. Asset files go under asset-files/.
+      "binding": "MEDIA_BUCKET",
+      "bucket_name": "transformidable-media",
+    },
+    {
+      // The jlynne.io bucket, read by the one-time import only.
+      "binding": "JLYNNE_R2",
+      "bucket_name": "jlynne-cms",
+    },
+  ],
+  "d1_databases": [
+    {
+      // The jlynne.io database, read by the one-time import only.
+      "binding": "JLYNNE_D1",
+      "database_name": "jlynne-cms",
+      "database_id": "d14351b1-38d3-4a9d-977e-c3cd86e08827",
+    },
+  ],
+  "hyperdrive": [
+    {
+      // Create a Hyperdrive in the J. Lynne account pointing at the same
+      // Supabase Session pooler URL as the Transformidable account's, then
+      // put its id here. Until then deploys fail, by design.
+      "binding": "HYPERDRIVE",
+      "id": "REPLACE_WITH_JLYNNE_HYPERDRIVE_ID",
+      "localConnectionString": "postgresql://postgres:postgres@localhost:5432/postgres",
+    },
+  ],
+  // No cron yet: the Transformidable account's Worker sends the daily case
+  // digest, and two schedulers would send it twice. Add
+  // "triggers": { "crons": ["0 13 * * *"] } here, and remove it there, at cutover.
+  "observability": {
+    "enabled": true,
+  },
+}

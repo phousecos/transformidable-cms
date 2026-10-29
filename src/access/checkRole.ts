@@ -1,8 +1,20 @@
 import type { Access, FieldAccess } from 'payload'
 
-export const isLoggedIn: Access = ({ req: { user } }) => Boolean(user)
+// People sign in through the `users` collection. Connected systems (KADE)
+// authenticate as `api-clients` with an API key; they are signed in too, but
+// get only the read access a collection grants them explicitly, so every
+// "any logged-in user" check here must mean a person.
+export const isStaffUser = (user: unknown): boolean =>
+  Boolean(user) && (user as { collection?: string }).collection === 'users'
 
-export const isLoggedInFieldAccess: FieldAccess = ({ req: { user } }) => Boolean(user)
+export const isApiClient = (user: unknown): boolean =>
+  Boolean(user) && (user as { collection?: string }).collection === 'api-clients'
+
+export const isLoggedIn: Access = ({ req: { user } }) => isStaffUser(user)
+
+export const isLoggedInFieldAccess: FieldAccess = ({ req: { user } }) => isStaffUser(user)
+
+export const isStaffOrApiClient: Access = ({ req: { user } }) => isStaffUser(user) || isApiClient(user)
 
 // ── Legacy role helpers (kept for hidden collections that still reference them) ──
 

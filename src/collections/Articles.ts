@@ -1,5 +1,5 @@
 import type { CollectionConfig, Where } from 'payload'
-import { isLoggedIn } from '../access/checkRole.ts'
+import { isLoggedIn, isStaffUser } from '../access/checkRole.ts'
 import { syndicateArticleAfterChange } from './hooks/syndicate.ts'
 import { deriveBodyFromMarkdown } from './hooks/markdownToBody.ts'
 
@@ -17,7 +17,7 @@ export const Articles: CollectionConfig = {
   access: {
     create: isLoggedIn,
     read: ({ req: { user } }) => {
-      if (!user) {
+      if (!isStaffUser(user)) {
         const publishedOnly: Where = { status: { equals: 'published' } }
         return publishedOnly
       }

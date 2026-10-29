@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { isStaffUser } from '../access/checkRole.ts'
 
 export const Issues: CollectionConfig = {
   slug: 'issues',
@@ -9,7 +10,7 @@ export const Issues: CollectionConfig = {
   },
   access: {
     read: ({ req: { user } }) => {
-      if (!user) return { status: { equals: 'published' } }
+      if (!isStaffUser(user)) return { status: { equals: 'published' } }
       return true
     },
   },

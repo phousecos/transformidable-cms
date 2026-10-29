@@ -1,5 +1,5 @@
 import type { CollectionConfig, Where } from 'payload'
-import { isLoggedIn } from '../access/checkRole.ts'
+import { isLoggedIn, isStaffUser } from '../access/checkRole.ts'
 
 // Publications — the edited, on-the-record output of the research: The
 // Governance Files (flagship series), Articles, White Papers, and Annual
@@ -14,7 +14,7 @@ export const Publications: CollectionConfig = {
   access: {
     create: isLoggedIn,
     read: ({ req: { user } }) => {
-      if (!user) {
+      if (!isStaffUser(user)) {
         const publishedOnly: Where = { status: { equals: 'published' } }
         return publishedOnly
       }

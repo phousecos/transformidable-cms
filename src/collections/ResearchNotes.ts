@@ -1,5 +1,5 @@
 import type { CollectionConfig, Where } from 'payload'
-import { isLoggedIn } from '../access/checkRole.ts'
+import { isLoggedIn, isStaffUser } from '../access/checkRole.ts'
 
 // Research Notes — the "Research Notes" area of the Research section: shorter,
 // working findings that stand on their own and can also be attached to a Case
@@ -14,7 +14,7 @@ export const ResearchNotes: CollectionConfig = {
   access: {
     create: isLoggedIn,
     read: ({ req: { user } }) => {
-      if (!user) {
+      if (!isStaffUser(user)) {
         const publishedOnly: Where = { status: { equals: 'published' } }
         return publishedOnly
       }

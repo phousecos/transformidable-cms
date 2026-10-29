@@ -200,7 +200,12 @@ try {
     // during schema push. These tables only store historical snapshots — the
     // actual articles/episodes in the main tables are unaffected.
     // This is far more robust than trying to backfill every possible NULL column.
-    const versionTables = ['_articles_v', '_podcast_episodes_v']
+    //
+    // Opt-in (MIGRATE_TRUNCATE_VERSIONS=true): it deletes version history, and
+    // more than one deployment now builds against this database, so it must
+    // not happen on every build. Set it only for a build whose push fails on
+    // a NOT NULL change to one of these tables.
+    const versionTables = process.env.MIGRATE_TRUNCATE_VERSIONS === 'true' ? ['_articles_v', '_podcast_episodes_v'] : []
     for (const vt of versionTables) {
       try {
         // Also truncate associated junction tables first (FK constraints)
@@ -277,7 +282,7 @@ try {
 
   console.log('[migrate] Pushing schema to database...')
   const { pushSchema } = adapter.requireDrizzleKit()
-  const { apply, hasDataLoss, warnings, statements } = await pushSchema(
+  const { apply, hasDataLoss, warnings, statementsToExecute: statements = [] } = await pushSchema(
     adapter.schema,
     adapter.drizzle,
     adapter.schemaName ? [adapter.schemaName] : undefined,
@@ -292,6 +297,21 @@ try {
     if (hasDataLoss) {
       console.log('[migrate] DATA LOSS WARNING — proceeding (legacy columns preserved via hidden fields)')
     }
+  }
+
+  // Refuse a push that would drop a table or column. More than one deployment
+  // builds against this database (the Transformidable and J. Lynne accounts),
+  // and one built from code that lacks a newer collection would otherwise
+  // delete that collection's data here. Planned removals are pre-dropped in
+  // Phase 1 (staleTables/staleColumns), so a normal push has nothing to drop.
+  // To accept a drop deliberately, rerun with ALLOW_SCHEMA_DROPS=true.
+  const drops = (statements as string[]).filter((sql) => /\bDROP\s+(TABLE|COLUMN)\b/i.test(sql))
+  if (drops.length && process.env.ALLOW_SCHEMA_DROPS !== 'true') {
+    throw new Error(
+      `Schema push would drop data and was stopped:\n${drops.join('\n')}\n` +
+        'If this build is from older code than the database, deploy the newer code instead. ' +
+        'If the drop is intended, rerun with ALLOW_SCHEMA_DROPS=true.',
+    )
   }
 
   await apply()
