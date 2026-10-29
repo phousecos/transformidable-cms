@@ -54,8 +54,8 @@ protections, which is why the order above matters.
 
 ## 1. File storage in the J. Lynne account
 
-- [ ] J. Lynne account → R2 → **Create bucket** `transformidable-media`.
-- [ ] Copy the files from the Transformidable account's `transformidable-media`
+- [x] J. Lynne account → R2 → **Create bucket** `transformidable-media`.
+- [x] Copy the files from the Transformidable account's `transformidable-media`
       into it. Use R2 → **Data Migration**: the source is the Transformidable
       bucket, using an R2 API token from the Transformidable account. Copying
       leaves the source as it is.
@@ -68,9 +68,8 @@ You don't need to copy `jlynne-cms` by hand. The import in step 7 copies its
 - [ ] J. Lynne account → Storage & Databases → Hyperdrive → **Create**.
       Use the same Supabase **Session pooler** connection string as the
       Transformidable account's Hyperdrive (`…pooler.supabase.com:5432`).
-- [ ] Put the new Hyperdrive's ID in `wrangler.jlynne.jsonc` in place of
-      `REPLACE_WITH_JLYNNE_HYPERDRIVE_ID`. The ID isn't secret. Until it's
-      set, deploys fail on purpose.
+- [x] Put the new Hyperdrive's ID in `wrangler.jlynne.jsonc`
+      (`ccad495920d74de8933471385e2ba4b6`). The ID isn't secret.
 
 ## 3. The domain
 

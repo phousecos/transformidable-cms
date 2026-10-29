@@ -51,11 +51,10 @@
   ],
   "hyperdrive": [
     {
-      // Create a Hyperdrive in the J. Lynne account pointing at the same
-      // Supabase Session pooler URL as the Transformidable account's, then
-      // put its id here. Until then deploys fail, by design.
+      // The J. Lynne account's Hyperdrive, pointing at the same Supabase
+      // Session pooler URL as the Transformidable account's.
       "binding": "HYPERDRIVE",
-      "id": "REPLACE_WITH_JLYNNE_HYPERDRIVE_ID",
+      "id": "ccad495920d74de8933471385e2ba4b6",
       "localConnectionString": "postgresql://postgres:postgres@localhost:5432/postgres",
     },
   ],
