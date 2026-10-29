@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ResearchShell } from "../research/ResearchShell";
 import { Constellation } from "../research/Constellation";
 import { AcademyInquiryForm } from "./AcademyInquiryForm";
-import { ROUTES } from "../../academy/content";
 import "./academy.css";
 
 export const Arrow = ({ s = 13 }: { s?: number }) => (
@@ -34,22 +33,27 @@ export function AcademyHero({ kicker, title, intro, children = null, seed = 97 }
   );
 }
 
-// The two ways to take the courses, side by side and equal.
-export function AcademyRoutes({ heading = "Two ways to take the courses", query = "" }) {
+// Organizations first: private sessions are the main way to take a program.
+// Individuals get a quiet line pointing to the interest list.
+export function AcademyPrivateSessions({ individuals = true }) {
   return (
-    <section className="ac-band" aria-labelledby="ac-routes-h">
-      <div className="wrap">
-        <p className="kicker">How to take part</p>
-        <h2 className="ac-h2" id="ac-routes-h">{heading}</h2>
-        <div className="ac-routes">
-          {Object.values(ROUTES).map((r) => (
-            <Link className="ac-route" href={`${r.href}${query}`} key={r.href}>
-              <span className="ac-route-label">{r.label}</span>
-              <span className="ac-route-title">{r.title}</span>
-              <span className="ac-route-desc">{r.summary}</span>
-              <span className="ac-route-go">{r.cta} <Arrow /></span>
-            </Link>
-          ))}
+    <section className="ac-band ac-band--parchment" aria-labelledby="ac-private-h">
+      <div className="wrap ac-two">
+        <div>
+          <p className="kicker">Private sessions</p>
+          <h2 className="ac-h2" id="ac-private-h">For your entire leadership team or governing body.</h2>
+        </div>
+        <div>
+          <p className="body">
+            Every program can be arranged as a private session for your council, commission, board, or executive
+            team, virtually or in person, and adapted to your organization.
+          </p>
+          <p style={{ marginTop: 16 }}><Link className="link" href="/academy/organizations">Private sessions for organizations <Arrow /></Link></p>
+          {individuals && (
+            <p className="ac-note">
+              Interested as an individual? <Link className="ac-inline" href="/academy/individuals">Join the interest list</Link> for future open programs.
+            </p>
+          )}
         </div>
       </div>
     </section>
@@ -89,16 +93,16 @@ export function AcademyFaq({ items, heading = "Questions", more = true, groups =
 }
 
 // The closing form on an audience page. One form, one audience.
-export function AcademyRegister({ type, source, title, intro }) {
+export function AcademyRegister({ type, source, title, intro, program = "", heading = undefined, kicker = undefined }) {
   return (
     <section className="ac-band ac-band--parchment" id="register" aria-labelledby="ac-register-h">
       <div className="wrap ac-register">
         <div className="ac-register-copy">
-          <p className="kicker">{type === "organization" ? "Start a conversation" : "Interest list"}</p>
+          <p className="kicker">{kicker || (type === "organization" ? "Start a conversation" : "Interest list")}</p>
           <h2 className="ac-h2" id="ac-register-h">{title}</h2>
           <p className="body">{intro}</p>
         </div>
-        <AcademyInquiryForm source={source} type={type} />
+        <AcademyInquiryForm source={source} type={type} program={program} heading={heading} />
       </div>
     </section>
   );

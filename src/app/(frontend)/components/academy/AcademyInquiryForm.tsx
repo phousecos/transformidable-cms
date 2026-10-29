@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import {
   ACADEMY_DELIVERY,
   ACADEMY_PARTICIPANTS,
-  ACADEMY_PROGRAMS,
+  ACADEMY_PROGRAM_CHOICES,
   ACADEMY_SECTORS,
   ACADEMY_TIMEFRAMES,
 } from "../../../../lib/academyOptions.ts";
@@ -16,7 +16,7 @@ const EMPTY = {
   organization: "",
   phone: "",
   sector: "",
-  program: "foundation-certificate",
+  program: "",
   participants: "",
   delivery: "",
   timeframe: "",
@@ -24,7 +24,7 @@ const EMPTY = {
   company_website: "",
 };
 
-const PROGRAM_VALUES = ACADEMY_PROGRAMS.map((o) => o.value);
+const PROGRAM_VALUES = ACADEMY_PROGRAM_CHOICES.map((o) => o.value);
 
 function Select({ id, label, value, onChange, options, optional = true }) {
   return (
@@ -45,9 +45,21 @@ function Select({ id, label, value, onChange, options, optional = true }) {
 // One form per audience: organizations asking about a private cohort, and
 // individuals joining the interest list. Organizational buyers need sizing and
 // timing questions that would only get in an individual's way. A course page
-// links here with ?program=<value> so the course it came from is preselected.
-export function AcademyInquiryForm({ source, type }: { source: string; type: "organization" | "individual" }) {
-  const [fields, setFields] = useState(EMPTY);
+// links here with ?program=<value> so the program it came from is preselected;
+// a program page that carries the form itself passes `program` instead.
+export function AcademyInquiryForm({
+  source,
+  type,
+  program: defaultProgram = "",
+  heading,
+}: {
+  source: string;
+  type: "organization" | "individual";
+  program?: string;
+  heading?: string;
+}) {
+  const initial = { ...EMPTY, program: defaultProgram };
+  const [fields, setFields] = useState(initial);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [feedback, setFeedback] = useState("");
 
@@ -75,7 +87,7 @@ export function AcademyInquiryForm({ source, type }: { source: string; type: "or
       if (res.ok) {
         setStatus("success");
         setFeedback(data.message || "Thank you. We will be in touch.");
-        setFields(EMPTY);
+        setFields(initial);
       } else {
         setStatus("error");
         setFeedback(data.error || "Something went wrong. Please try again.");
@@ -99,11 +111,11 @@ export function AcademyInquiryForm({ source, type }: { source: string; type: "or
 
   return (
     <div className="ac-form-card">
-      <h3 className="ac-form-h">{isOrg ? "Request a private cohort discussion" : "Join the interest list"}</h3>
+      <h3 className="ac-form-h">{heading || (isOrg ? "Request a private session" : "Join the interest list")}</h3>
       <p className="ac-form-sub">
         {isOrg
           ? "Tell us about your group and we will arrange a conversation about scope, format, and timing."
-          : "Receive program announcements, upcoming dates, and enrollment information."}
+          : "We will let you know when an open program is scheduled."}
       </p>
 
       <form className="case-form" onSubmit={handleSubmit} noValidate>
@@ -148,7 +160,7 @@ export function AcademyInquiryForm({ source, type }: { source: string; type: "or
             <Select id={`${idp}-sector`} label="Sector" value={fields.sector} onChange={set("sector")} options={ACADEMY_SECTORS} />
           </div>
           <div>
-            <Select id={`${idp}-program`} label="Program interest" value={fields.program} onChange={set("program")} options={ACADEMY_PROGRAMS} />
+            <Select id={`${idp}-program`} label="Program interest" value={fields.program} onChange={set("program")} options={ACADEMY_PROGRAM_CHOICES} />
           </div>
           {isOrg && (
             <>

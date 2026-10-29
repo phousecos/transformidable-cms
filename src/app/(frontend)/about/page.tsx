@@ -61,7 +61,7 @@ export default function AboutPage() {
               </p>
               <ul>
                 <li><Link href="/research">Research</Link>: Case Files, the governance codebook, evidence-based findings, and the research agenda.</li>
-                <li><Link href="/academy">Academy</Link>: executive education, governance workshops, cohort programs, and future certificates.</li>
+                <li><Link href="/academy">Academy</Link>: executive education, with governance briefings, workshops, and applied programs for leadership teams and governing bodies.</li>
                 <li><Link href="/publishing">Publishing</Link>: The Transformidable Leader, its companion workbook, future books, and substantive publications.</li>
                 <li><Link href="/media">Media</Link>: The Governance Files podcast, the Transformidable Briefing, interviews, and events.</li>
               </ul>

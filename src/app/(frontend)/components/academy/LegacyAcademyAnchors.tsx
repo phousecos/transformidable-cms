@@ -8,9 +8,9 @@ const LEGACY = {
   "#register-organization": "/academy/organizations#register",
   "#cohorts": "/academy/organizations",
   "#register-individual": "/academy/individuals#register",
-  "#register": "/academy/individuals#register",
+  "#register": "/academy/organizations#register",
   "#faq": "/academy/faq",
-  "#programs": "/academy#courses",
+  "#courses": "/academy#programs",
 };
 
 export function LegacyAcademyAnchors() {

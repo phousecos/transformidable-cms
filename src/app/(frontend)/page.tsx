@@ -37,7 +37,7 @@ const DIVISIONS = [
     no: "02",
     name: "Academy",
     href: "/academy",
-    purpose: "Executive education, governance workshops, cohort programs, and future certificates.",
+    purpose: "Executive education: governance briefings, workshops, and applied programs for leadership teams and governing bodies.",
     primary: { label: "Explore Programs", href: "/academy" },
     secondary: { label: "Inquire About a Cohort", href: "/academy/organizations" },
   },
@@ -169,11 +169,11 @@ export default async function HomePage() {
               <span className="hm-feat-go">Read the case <Arrow s={12} /></span>
             </Link>
 
-            <Link className="hm-feat" href="/academy/foundation-certificate">
-              <span className="hm-feat-label">Academy &middot; In development</span>
-              <span className="hm-feat-title">Foundation Certificate in AI Governance</span>
-              <span className="hm-feat-desc">A three-course executive education program for boards, executives, and public-sector leaders. Interest registration is open.</span>
-              <span className="hm-feat-go">View the program <Arrow s={12} /></span>
+            <Link className="hm-feat" href="/academy/courses/ai-governance-for-boards-and-councils">
+              <span className="hm-feat-label">Academy &middot; Executive briefing</span>
+              <span className="hm-feat-title">AI Governance for Boards &amp; Councils</span>
+              <span className="hm-feat-desc">A 90-minute briefing for city councils, county commissions, university boards, and leadership teams, available as a private session.</span>
+              <span className="hm-feat-go">View the briefing <Arrow s={12} /></span>
             </Link>
 
             <Link className="hm-feat" href="/publishing">

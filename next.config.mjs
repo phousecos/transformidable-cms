@@ -58,6 +58,20 @@ const nextConfig = {
         destination: '/admin',
         permanent: false,
       },
+      // The Academy's first Course 1 was replaced by the Boards & Councils
+      // briefing.
+      {
+        source: '/academy/courses/ai-explained',
+        destination: '/academy/courses/ai-governance-for-boards-and-councils',
+        permanent: true,
+      },
+      // The certificate is not advertised while its curriculum and
+      // requirements are settled. Temporary, so the page can return.
+      {
+        source: '/academy/foundation-certificate',
+        destination: '/academy',
+        permanent: false,
+      },
     ]
   },
   async headers() {

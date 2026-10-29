@@ -26,11 +26,12 @@ const NAV = [
   },
   {
     label: "Academy", href: "/academy", children: [
-      { no: "02.1", name: "Courses", desc: "Executive education in AI governance", href: "/academy" },
-      { no: "02.2", name: "Foundation Certificate in AI Governance", desc: "Three courses, one credential", href: "/academy/foundation-certificate" },
-      { no: "02.3", name: "For Organizations", desc: "Private cohorts for boards and leadership teams", href: "/academy/organizations" },
-      { no: "02.4", name: "For Individuals", desc: "Open enrollment for executives and professionals", href: "/academy/individuals" },
-      { no: "02.5", name: "FAQ", desc: "Common questions, answered", href: "/academy/faq" },
+      { no: "02.1", name: "AI Governance Education", desc: "Programs for boards, councils, and leadership teams", href: "/academy" },
+      { no: "02.2", name: "AI Governance for Boards & Councils", desc: "Executive briefing · 90 minutes", href: "/academy/courses/ai-governance-for-boards-and-councils" },
+      { no: "02.3", name: "Governing AI Adoption", desc: "Facilitated workshop · 4 hours", href: "/academy/courses/governing-ai-adoption" },
+      { no: "02.4", name: "Building AI Governance in Practice", desc: "Applied program · about 7 hours", href: "/academy/courses/building-ai-governance" },
+      { no: "02.5", name: "Private Sessions", desc: "For your whole leadership or governing body", href: "/academy/organizations" },
+      { no: "02.6", name: "FAQ", desc: "Common questions, answered", href: "/academy/faq" },
     ],
   },
   {
