@@ -1,7 +1,7 @@
 // @ts-nocheck
 import Link from "next/link";
 import { ResearchSubscribe } from "./ResearchNav";
-import { ADVISORY_URL } from "../site";
+import { ADVISORY_ENTITY } from "../site";
 
 export function ResearchFooter() {
   return (
@@ -21,7 +21,7 @@ export function ResearchFooter() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="brandlogo" src="/logo-new.png" alt="Transformidable" width={240} height={60} />
           </Link>
-          <p>Research, executive education, publishing, and media on the leadership and governance of organizational transformation.</p>
+          <p>Research, advisory, executive education, publishing, and media on the leadership and governance of organizational transformation.</p>
         </div>
         <div className="fcol">
           <h5>Research</h5>
@@ -33,6 +33,11 @@ export function ResearchFooter() {
           <Link href="/research/datasets">Datasets</Link>
           <Link href="/research/projects">Research Projects</Link>
           <Link href="/tools/governance-codebook">Governance Tools</Link>
+        </div>
+        <div className="fcol">
+          <h5>Advisory</h5>
+          <Link href="/advisory">Transformidable Advisory</Link>
+          <Link href="/advisory/conversation">Book a Conversation</Link>
         </div>
         <div className="fcol">
           <h5>Academy</h5>
@@ -63,18 +68,17 @@ export function ResearchFooter() {
           <Link href="/research#events">Events</Link>
           <Link href="/about">About</Link>
           <Link href="/contact">Contact</Link>
-          <a href={ADVISORY_URL} rel="noopener">Advisory Services</a>
+          <Link href="/independence">Independence</Link>
         </span>
         <span>Set in Source Serif &amp; Archivo</span>
       </div>
 
-      {/* Affiliation statement. DRAFT wording, pending approval. */}
+      {/* Contracting disclosure. Matches /independence. */}
       <div className="wrap">
         <p className="footer-affiliation">
-          Governance advisory services are provided separately by{" "}
-          <a href={ADVISORY_URL} rel="noopener">J.&nbsp;Lynne &amp; Co.</a>, an independent advisory firm
-          affiliated with Transformidable. Transformidable research is conducted independently and is not
-          commissioned on behalf of advisory clients.
+          Advisory engagements are contracted through {ADVISORY_ENTITY}, an affiliate of Transformidable.
+          Transformidable research is conducted independently and is never commissioned by advisory clients.{" "}
+          <Link href="/independence">Read our independence policy.</Link>
         </p>
       </div>
     </footer>

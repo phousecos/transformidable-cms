@@ -2,7 +2,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ADVISORY_URL } from "../site";
 
 const Chevron = () => (
   <svg className="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
@@ -11,7 +10,8 @@ const ArrowRight = ({ s = 13 }: { s?: number }) => (
   <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
 );
 
-// Nav model mirrors the blueprint: four equal divisions, then About.
+// Nav model mirrors the blueprint: five divisions, in the order Research,
+// Advisory, Academy, Publishing, Media, then About.
 const NAV = [
   {
     label: "Research", href: "/research", children: [
@@ -25,29 +25,35 @@ const NAV = [
     ],
   },
   {
+    label: "Advisory", href: "/advisory", children: [
+      { no: "02.1", name: "Transformidable Advisory", desc: "Tell us the governance problem in front of you", href: "/advisory" },
+      { no: "02.2", name: "Book a Conversation", desc: "Start with a 30-minute call", href: "/advisory/conversation" },
+    ],
+  },
+  {
     label: "Academy", href: "/academy", children: [
-      { no: "02.1", name: "AI Governance Education", desc: "Programs for boards, councils, and leadership teams", href: "/academy" },
-      { no: "02.2", name: "AI Governance for Boards & Councils", desc: "Executive briefing · 90 minutes", href: "/academy/courses/ai-governance-for-boards-and-councils" },
-      { no: "02.3", name: "Governing AI Adoption", desc: "Facilitated workshop · 4 hours", href: "/academy/courses/governing-ai-adoption" },
-      { no: "02.4", name: "Building AI Governance in Practice", desc: "Applied program · about 7 hours", href: "/academy/courses/building-ai-governance" },
-      { no: "02.5", name: "Private Sessions", desc: "For your whole leadership or governing body", href: "/academy/organizations" },
-      { no: "02.6", name: "FAQ", desc: "Common questions, answered", href: "/academy/faq" },
+      { no: "03.1", name: "AI Governance Education", desc: "Programs for boards, councils, and leadership teams", href: "/academy" },
+      { no: "03.2", name: "AI Governance for Boards & Councils", desc: "Executive briefing · 90 minutes", href: "/academy/courses/ai-governance-for-boards-and-councils" },
+      { no: "03.3", name: "Governing AI Adoption", desc: "Facilitated workshop · 4 hours", href: "/academy/courses/governing-ai-adoption" },
+      { no: "03.4", name: "Building AI Governance in Practice", desc: "Applied program · about 7 hours", href: "/academy/courses/building-ai-governance" },
+      { no: "03.5", name: "Private Sessions", desc: "For your whole leadership or governing body", href: "/academy/organizations" },
+      { no: "03.6", name: "FAQ", desc: "Common questions, answered", href: "/academy/faq" },
     ],
   },
   {
     label: "Publishing", href: "/publishing", children: [
-      { no: "03.1", name: "The Transformidable Leader", desc: "The forthcoming book and workbook", href: "/publishing" },
-      { no: "03.2", name: "Book Updates", desc: "Hear about the release", href: "/publishing#book-updates" },
+      { no: "04.1", name: "The Transformidable Leader", desc: "The forthcoming book and workbook", href: "/publishing" },
+      { no: "04.2", name: "Book Updates", desc: "Hear about the release", href: "/publishing#book-updates" },
     ],
   },
   {
     // Episodic media you watch or listen to.
     label: "Media", href: "/media", children: [
-      { no: "04.1", name: "Transformidable Media", desc: "Podcast, briefings, interviews, and events", href: "/media" },
-      { no: "04.2", name: "The Governance Files", desc: "The podcast: governance decisions on the record", href: "/podcast" },
-      { no: "04.3", name: "Transformidable Briefing", desc: "Mixed-media briefings: video and articles", href: "/publications?type=transformidable-brief" },
-      { no: "04.4", name: "Webinar Archive", desc: "Past webinars and recordings", href: "/briefings/webinars" },
-      { no: "04.5", name: "Live Sessions", desc: "Upcoming and live briefings", href: "/briefings/live" },
+      { no: "05.1", name: "Transformidable Media", desc: "Podcast, briefings, interviews, and events", href: "/media" },
+      { no: "05.2", name: "The Governance Files", desc: "The podcast: governance decisions on the record", href: "/podcast" },
+      { no: "05.3", name: "Transformidable Briefing", desc: "Mixed-media briefings: video and articles", href: "/publications?type=transformidable-brief" },
+      { no: "05.4", name: "Webinar Archive", desc: "Past webinars and recordings", href: "/briefings/webinars" },
+      { no: "05.5", name: "Live Sessions", desc: "Upcoming and live briefings", href: "/briefings/live" },
     ],
   },
   { label: "About", href: "/about" },
@@ -57,7 +63,7 @@ const NAV = [
 const UTILITY = [
   { label: "Subscribe", href: "#briefing" },
   { label: "Contact", href: "/contact" },
-  { label: "Advisory Services", href: ADVISORY_URL, external: true },
+  { label: "Book a conversation", href: "/advisory/conversation" },
 ];
 
 export function ResearchNav() {
