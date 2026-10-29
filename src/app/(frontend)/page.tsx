@@ -37,7 +37,7 @@ const DIVISIONS = [
     no: "02",
     name: "Academy",
     href: "/academy",
-    purpose: "Executive education, governance workshops, cohort programs, and future certificates.",
+    purpose: "Executive education: governance briefings, workshops, and applied programs for leadership teams and governing bodies.",
     primary: { label: "Explore Programs", href: "/academy" },
     secondary: { label: "Inquire About a Cohort", href: "/academy/organizations" },
   },
