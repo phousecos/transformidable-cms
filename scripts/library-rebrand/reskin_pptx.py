@@ -1,0 +1,110 @@
+"""Re-skin the J. Lynne webinar deck in the Transformidable design.
+
+Usage: python3 -I reskin_pptx.py <art-dir> <src.pptx> <out.pptx>
+"""
+import os
+import re
+import sys
+import zipfile
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import brand  # noqa: E402
+
+art, src, dst = sys.argv[1:4]
+
+COLORS = dict(brand.COLORS, **{
+    'F6F6F2': 'F8F3E6',
+    '1F46BE': '6A2222',  # five-step card ramp
+    '162F7F': '561B1B',
+    '11235F': '421414',
+    '4F74E6': '9A4545',  # big section numbers on blue panels
+    '6B707A': '6E6760',
+})
+
+DARK = ('14161A', '2552DE')  # backgrounds that take the light mark
+BG = {
+    '14161A': '<a:gradFill rotWithShape="1"><a:gsLst><a:gs pos="0"><a:srgbClr val="3D0B13"/></a:gs><a:gs pos="50000"><a:srgbClr val="1E0A0D"/></a:gs><a:gs pos="100000"><a:srgbClr val="0D0B0B"/></a:gs></a:gsLst><a:lin ang="0" scaled="0"/></a:gradFill>',
+    '2552DE': '<a:gradFill rotWithShape="1"><a:gsLst><a:gs pos="0"><a:srgbClr val="7B2828"/></a:gs><a:gs pos="100000"><a:srgbClr val="4A1419"/></a:gs></a:gsLst><a:lin ang="0" scaled="0"/></a:gradFill>',
+}
+
+TEXT = brand.TEXT + [
+    ('J. Lynne &amp; Co. elephant logo', 'Transformidable logo'),
+    ('Decorative circle and bars', 'Decorative constellation'),
+]
+
+
+def is_motif(sp):
+    """The J. Lynne circle-and-bars motif drawn as shapes: big ellipses and
+    tall narrow bars hanging from the top edge."""
+    geom = re.search(r'prst="(\w+)"', sp)
+    off = re.search(r'<a:off x="(\d+)" y="(\d+)"/><a:ext cx="(\d+)" cy="(\d+)"/>', sp)
+    if not geom or not off or '<a:t>' in sp:
+        return False
+    x, y, cx, cy = map(int, off.groups())
+    return (geom.group(1) == 'ellipse' and cx >= 3_000_000) or (geom.group(1) == 'rect' and y == 0 and cx < 600_000 and cy > 3_000_000)
+
+
+def font_for(rpr, text):
+    size = int((re.search(r'sz="(\d+)"', rpr) or [0, 0])[1])
+    if size >= 3600:
+        return 'Source Serif 4'
+    if 'spc="' in rpr and text.isupper():
+        return 'Archivo'
+    return 'DM Sans'
+
+
+def set_fonts(xml):
+    def run(m):
+        rpr, text = m.group(1), m.group(2)
+        latin = f'<a:latin typeface="{font_for(rpr, text)}"/>'
+        if rpr.endswith('/>'):
+            rpr = rpr[:-2] + '>' + latin + '</a:rPr>'
+        else:
+            rpr = rpr.replace('</a:rPr>', latin + '</a:rPr>')
+        return f'<a:r>{rpr}<a:t>{m.group(2)}</a:t></a:r>'
+    return re.sub(r'<a:r>(<a:rPr[^>]*/>|<a:rPr[^>]*>.*?</a:rPr>)<a:t>([^<]*)</a:t></a:r>', run, xml, flags=re.S)
+
+
+light_mark = open(os.path.join(art, 'mark-parchment.png'), 'rb').read()
+dark_slides = set()
+
+with zipfile.ZipFile(src) as zin:
+    names = zin.namelist()
+    for n in names:
+        if re.match(r'ppt/slides/slide\d+\.xml$', n):
+            bg = re.search(r'<p:bg>.*?val="(\w+)".*?</p:bg>', zin.read(n).decode(), re.S)
+            if bg and bg.group(1) in DARK:
+                dark_slides.add(n.rsplit('/', 1)[1])
+
+    with zipfile.ZipFile(dst, 'w', zipfile.ZIP_DEFLATED) as zout:
+        for item in zin.infolist():
+            n = item.filename
+            data = zin.read(n)
+            if n == 'ppt/media/image1.png':      # logo mark
+                data = open(os.path.join(art, 'mark-oxblood.png'), 'rb').read()
+            elif n == 'ppt/media/image2.png':    # circle-and-bars panel
+                data = open(os.path.join(art, 'mark-deck-side.png'), 'rb').read()
+            elif n.startswith('ppt/media/') and n.endswith('.png'):
+                data = brand.recolor_png(data)
+            elif re.match(r'ppt/slides/_rels/slide\d+\.xml\.rels$', n) and n.rsplit('/', 1)[1][:-5] in dark_slides:
+                data = data.decode().replace('../media/image1.png', '../media/image1-light.png').encode()
+            elif n.endswith('.xml'):
+                xml = data.decode('utf8')
+                if n.startswith('ppt/slides/slide'):
+                    xml = re.sub(r'<p:sp>.*?</p:sp>', lambda m: '' if is_motif(m.group(0)) else m.group(0), xml, flags=re.S)
+                    xml = re.sub(r'(<p:bg><p:bgPr>)<a:solidFill><a:srgbClr val="(\w+)"/></a:solidFill>',
+                                 lambda m: m.group(1) + BG.get(m.group(2), m.group(0)[len(m.group(1)):]), xml)
+                    xml = set_fonts(xml)
+                if n.startswith('ppt/theme/'):
+                    xml = xml.replace('<a:latin typeface="Inter"/>', '<a:latin typeface="Source Serif 4"/>', 1)  # majorFont comes first
+                    xml = xml.replace('<a:latin typeface="Inter"/>', '<a:latin typeface="DM Sans"/>')
+                xml = re.sub(r'(?<=val=")([0-9A-Fa-f]{6})(?=")', lambda m: COLORS.get(m.group(1).upper(), m.group(1)), xml)
+                for old, new in TEXT:
+                    xml = xml.replace(old, new)
+                data = xml.encode('utf8')
+            zout.writestr(item, data)
+        zout.writestr('ppt/media/image1-light.png', light_mark)
+
+with zipfile.ZipFile(dst) as z:
+    left = [n for n in z.namelist() if n.endswith('.xml') and re.search(r'(?i)lynne|elephant', z.read(n).decode('utf8'))]
+print('dark slides:', len(dark_slides), '| leftover J. Lynne:', left or 'none')

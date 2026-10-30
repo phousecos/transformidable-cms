@@ -86,9 +86,9 @@ export const currentAsset: Endpoint = {
         brand: asset.brand,
         updatedAt: asset.updatedAt,
       },
-      // Transformidable items live on their own site; everything else goes through its Advisory tools page.
+      // Items with a stored file go through their Advisory tools page; the rest live at their own URL.
       url:
-        asset.brand === 'transformidable' ? asset.externalUrl : `${downloadBase()}/${asset.slug}`,
+        !asset.publishedFile && asset.externalUrl ? asset.externalUrl : `${downloadBase()}/${asset.slug}`,
       fallback,
     })
   },

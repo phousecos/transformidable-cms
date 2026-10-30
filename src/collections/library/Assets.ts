@@ -141,13 +141,13 @@ export const Assets: CollectionConfig = {
           name: 'brand',
           type: 'select',
           required: true,
-          defaultValue: 'jlynne',
+          defaultValue: 'transformidable',
           options: [
-            { label: 'J. Lynne', value: 'jlynne' },
+            { label: 'J. Lynne (legacy)', value: 'jlynne' },
             { label: 'Transformidable', value: 'transformidable' },
           ],
           admin: {
-            description: 'Transformidable items are referenced by URL, not stored here.',
+            description: 'The library moved from J. Lynne to Transformidable; new items are Transformidable.',
           },
         },
         {
@@ -173,7 +173,6 @@ export const Assets: CollectionConfig = {
       relationTo: 'asset-files',
       admin: {
         description: 'Word original.',
-        condition: (data) => data?.brand !== 'transformidable',
       },
     },
     {
@@ -182,7 +181,6 @@ export const Assets: CollectionConfig = {
       relationTo: 'asset-files',
       admin: {
         description: 'Accessible (tagged) PDF, or video.',
-        condition: (data) => data?.brand !== 'transformidable',
       },
     },
     {
@@ -190,11 +188,12 @@ export const Assets: CollectionConfig = {
       type: 'text',
       validate: (
         value: string | null | undefined,
-        { siblingData }: { siblingData: { brand?: string } },
+        { siblingData }: { siblingData: { brand?: string; publishedFile?: unknown } },
       ) => {
+        // Transformidable items without a stored file live elsewhere.
         if (!value) {
-          return siblingData?.brand === 'transformidable'
-            ? 'Transformidable items need a URL.'
+          return siblingData?.brand === 'transformidable' && !siblingData?.publishedFile
+            ? 'Add a published file, or the URL where this item lives.'
             : true
         }
         try {
@@ -205,7 +204,7 @@ export const Assets: CollectionConfig = {
         }
       },
       admin: {
-        description: 'For Transformidable items or hosted video.',
+        description: 'For items kept elsewhere (no published file) or hosted video.',
       },
     },
     {
