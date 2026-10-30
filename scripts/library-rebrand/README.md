@@ -9,7 +9,7 @@ and bars motif is dropped; dark panels use the constellation from the site's
 
 | File | What it does |
 | --- | --- |
-| `art.cjs` | Renders document covers, the deck side panel, the LinkedIn post and header, and the Open Graph image from HTML templates (Playwright). |
+| `art.cjs` | Renders document covers, the deck side panel, the LinkedIn post and header, the Open Graph image, and four plain constellation backgrounds (`bg-*`, 3840×2160) from HTML templates (Playwright). Pass template names to render only those, e.g. `node art.cjs out bg-1-even`. |
 | `brand.py` | The colour, font, wording and link maps, and the blue → oxblood image recolour. |
 | `reskin_docx.py` | Re-skins Word files: colours, fonts, wording, links, covers, footer mark, illustrations. |
 | `reskin_pptx.py` | Same for the deck, and removes the circle and bars shapes. |

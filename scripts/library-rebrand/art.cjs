@@ -50,11 +50,24 @@ ${extra}</style></head><body>${body}</body></html>`
 const wordmark = (size) => `<div style="display:flex;align-items:center;gap:${size * 0.35}px">
   <img class="mark" src="${MARK}" style="width:${size}px;height:${size}px"><span class="serif" style="font-weight:700;font-size:${size * 0.92}px;color:${C.parchment}">Transformidable</span></div>`
 
+// Plain constellation backgrounds (no text or mark), 16:9 at 2x. `gold` turns
+// every Nth light node into a glowing, ringed gold node.
+function background(bg, net, gold) {
+  let svg = constellation(1920, 1080, net)
+  if (gold) {
+    let i = 0
+    svg = svg.replace(/<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)" fill="rgba\(244,237,216,[\d.]+\)"\/>/g, (m, x, y, r) =>
+      ++i % gold === 0
+        ? `<circle cx="${x}" cy="${y}" r="${+r + 1}" fill="${C.gold}"/><circle cx="${x}" cy="${y}" r="${+r + 7}" fill="none" stroke="${C.gold}" stroke-opacity=".6"/>`
+        : m)
+  }
+  return [1920, 1080, `<!doctype html><html><body style="margin:0;width:1920px;height:1080px;overflow:hidden;background:${bg};position:relative"><style>.net{position:absolute;inset:0}.net circle[fill="${C.gold}"]{filter:drop-shadow(0 0 6px rgba(201,162,39,.85))}</style>${svg}</body></html>`, 2]
+}
+const GRADIENT = 'linear-gradient(100deg,#3D0B13 0%,#1E0A0D 48%,#0D0B0B 100%)'
+
 const templates = {
-  // Word/PDF cover band: 8.5in x 5.5in at 200dpi. The document puts its own
+  // Word/PDF cover band: 8.5in x 5.5in at 200dpi. The document sets its own
   // eyebrow, title and byline over the left two-thirds, so the art stays right.
-  // The document sets its own eyebrow, title and byline over the left
-  // two-thirds, so the art stays to the right.
   'doc-cover': [1700, 1100, base(1700, 1100, `${constellation(1700, 1100, { seed: 11, count: 70, xMin: 0.5 })}
     <img src="${MARK}" style="position:absolute;right:150px;top:150px;width:140px;height:140px;opacity:.9">`)],
 
@@ -100,14 +113,20 @@ const templates = {
       <div class="rule" style="width:120px;margin:34px 0 26px"></div>
       <div class="serif" style="font-size:26px;color:rgba(244,237,216,.8)">Jerri Bland, Ed.D. · Transformidable</div>
     </div>`)],
+
+  // Constellation backgrounds for slides, screens and video (3840x2160).
+  'bg-1-even': background(GRADIENT, { seed: 9, count: 110 }, 7),
+  'bg-2-right-weighted': background(GRADIENT, { seed: 11, count: 90, xMin: 0.45 }, 7),
+  'bg-3-sparse': background('linear-gradient(100deg,#2E0A10 0%,#170A0C 50%,#0B0A0A 100%)', { seed: 5, count: 45, alpha: 0.85 }, 5),
+  'bg-4-dense-gold': background('radial-gradient(ellipse at 30% 40%,#4A0F18 0%,#1E0A0D 55%,#0B0909 100%)', { seed: 17, count: 170, alpha: 1.3 }, 4),
 }
 
 ;(async () => {
   const only = process.argv.slice(3)
   const browser = await chromium.launch()
-  for (const [name, [w, h, html]] of Object.entries(templates)) {
+  for (const [name, [w, h, html, scale = 1]] of Object.entries(templates)) {
     if (only.length && !only.includes(name)) continue
-    const page = await browser.newPage({ viewport: { width: w, height: h } })
+    const page = await browser.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: scale })
     const transparent = name.startsWith('mark')
     await page.setContent(html)
     await page.evaluate(() => document.fonts.ready)
