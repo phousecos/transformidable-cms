@@ -14,7 +14,9 @@ const MARK = mark('parchment')
 const C = { oxblood: '#7B2828', obsidian: '#1A1A1A', gold: '#C9A227', parchment: '#F4EDD8' }
 
 // Seeded constellation like the site's og.png: faint nodes and links, a few gold.
-function constellation(w, h, { seed = 7, count = 60, xMin = 0, alpha = 1, scale = 1 } = {}) {
+// `ink` is the node and line colour as an "r,g,b" string; `accent` marks
+// every ninth node. Defaults draw parchment and gold on the dark gradient.
+function constellation(w, h, { seed = 7, count = 60, xMin = 0, alpha = 1, scale = 1, ink = '244,237,216', accent = C.gold } = {}) {
   let s = seed
   const rnd = () => ((s = (s * 16807) % 2147483647) / 2147483647)
   const pts = Array.from({ length: count }, () => [xMin * w + rnd() * w * (1 - xMin), rnd() * h])
@@ -22,13 +24,13 @@ function constellation(w, h, { seed = 7, count = 60, xMin = 0, alpha = 1, scale 
   let lines = ''
   pts.forEach((a, i) => pts.slice(i + 1).forEach((b) => {
     const d = Math.hypot(a[0] - b[0], a[1] - b[1])
-    if (d < reach) lines += `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="rgba(244,237,216,${0.09 * alpha})" stroke-width="${scale}"/>`
+    if (d < reach) lines += `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="rgba(${ink},${0.09 * alpha})" stroke-width="${scale}"/>`
   }))
   const dots = pts.map((p, i) => {
     const gold = i % 9 === 0
     const r = (gold ? 3 : 1.5 + rnd() * 2) * scale
-    const fill = gold ? C.gold : `rgba(244,237,216,${0.35 * alpha})`
-    const ring = gold || i % 5 === 0 ? `<circle cx="${p[0]}" cy="${p[1]}" r="${r + 5 * scale}" stroke-width="${scale}" fill="none" stroke="${gold ? C.gold : 'rgba(244,237,216,.25)'}" stroke-opacity="${0.7 * alpha}"/>` : ''
+    const fill = gold ? accent : `rgba(${ink},${0.35 * alpha})`
+    const ring = gold || i % 5 === 0 ? `<circle cx="${p[0]}" cy="${p[1]}" r="${r + 5 * scale}" stroke-width="${scale}" fill="none" stroke="${gold ? accent : `rgba(${ink},.25)`}" stroke-opacity="${0.7 * alpha}"/>` : ''
     return `<circle cx="${p[0]}" cy="${p[1]}" r="${r}" fill="${fill}"/>${ring}`
   }).join('')
   return `<svg class="net" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${lines}${dots}</svg>`
@@ -52,16 +54,18 @@ const wordmark = (size) => `<div style="display:flex;align-items:center;gap:${si
 
 // Plain constellation backgrounds (no text or mark), 16:9 at 2x. `gold` turns
 // every Nth light node into a glowing, ringed gold node.
-function background(bg, net, gold) {
+function background(bg, net, gold, glow = 'rgba(201,162,39,.85)') {
+  const accent = net.accent || C.gold
   let svg = constellation(1920, 1080, net)
   if (gold) {
     let i = 0
-    svg = svg.replace(/<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)" fill="rgba\(244,237,216,[\d.]+\)"\/>/g, (m, x, y, r) =>
+    const ink = net.ink || '244,237,216'
+    svg = svg.replace(new RegExp(`<circle cx="([\\d.]+)" cy="([\\d.]+)" r="([\\d.]+)" fill="rgba\\(${ink},[\\d.]+\\)"\\/>`, 'g'), (m, x, y, r) =>
       ++i % gold === 0
-        ? `<circle cx="${x}" cy="${y}" r="${+r + 1}" fill="${C.gold}"/><circle cx="${x}" cy="${y}" r="${+r + 7}" fill="none" stroke="${C.gold}" stroke-opacity=".6"/>`
+        ? `<circle cx="${x}" cy="${y}" r="${+r + 1}" fill="${accent}"/><circle cx="${x}" cy="${y}" r="${+r + 7}" fill="none" stroke="${accent}" stroke-opacity=".6"/>`
         : m)
   }
-  return [1920, 1080, `<!doctype html><html><body style="margin:0;width:1920px;height:1080px;overflow:hidden;background:${bg};position:relative"><style>.net{position:absolute;inset:0}.net circle[fill="${C.gold}"]{filter:drop-shadow(0 0 6px rgba(201,162,39,.85))}</style>${svg}</body></html>`, 2]
+  return [1920, 1080, `<!doctype html><html><body style="margin:0;width:1920px;height:1080px;overflow:hidden;background:${bg};position:relative"><style>.net{position:absolute;inset:0}.net circle[fill="${accent}"]{filter:drop-shadow(0 0 6px ${glow})}</style>${svg}</body></html>`, 2]
 }
 const GRADIENT = 'linear-gradient(100deg,#3D0B13 0%,#1E0A0D 48%,#0D0B0B 100%)'
 
@@ -119,6 +123,12 @@ const templates = {
   'bg-2-right-weighted': background(GRADIENT, { seed: 11, count: 90, xMin: 0.45 }, 7),
   'bg-3-sparse': background('linear-gradient(100deg,#2E0A10 0%,#170A0C 50%,#0B0A0A 100%)', { seed: 5, count: 45, alpha: 0.85 }, 5),
   'bg-4-dense-gold': background('radial-gradient(ellipse at 30% 40%,#4A0F18 0%,#1E0A0D 55%,#0B0909 100%)', { seed: 17, count: 170, alpha: 1.3 }, 4),
+
+  // Gold grounds with oxblood nodes, for variety.
+  'bg-5-gold-oxblood': background('linear-gradient(100deg,#D8B544 0%,#C9A227 50%,#A8841A 100%)',
+    { seed: 23, count: 110, ink: '90,24,28', accent: C.oxblood, alpha: 1.8, scale: 1.4 }, 5, 'rgba(123,40,40,.55)'),
+  'bg-6-light-gold-oxblood': background('linear-gradient(100deg,#F4EDD8 0%,#E8D49A 55%,#D4B556 100%)',
+    { seed: 29, count: 90, xMin: 0.35, ink: '123,40,40', accent: C.oxblood, alpha: 1.6, scale: 1.4 }, 5, 'rgba(123,40,40,.45)'),
 }
 
 ;(async () => {
