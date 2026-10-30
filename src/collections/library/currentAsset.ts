@@ -10,7 +10,7 @@ const codes = (options: { value: string }[]) => options.map((o) => o.value)
 
 // Prospects get the public Advisory tools page for an asset, never the API.
 const downloadBase = () =>
-  (process.env.PUBLIC_DOWNLOAD_BASE_URL || 'https://transformidable.net/advisory/tools').replace(/\/+$/, '')
+  (process.env.PUBLIC_DOWNLOAD_BASE_URL || 'https://betransformidable.com/advisory/tools').replace(/\/+$/, '')
 
 /**
  * GET /api/assets/current?track=T1&sectorEdition=credit-union&assetType=governance-brief

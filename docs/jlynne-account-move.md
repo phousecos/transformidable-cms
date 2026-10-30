@@ -20,7 +20,8 @@ with its admin at **transformidable.net/admin** (jlynne.io/admin also works).
 | Worker | `transformidable-cms` (Transformidable account), `jlynne-cms` (J. Lynne account) | `jlynne-cms` (J. Lynne account), running this repo |
 | Database | **Supabase Postgres** (Transformidable); D1 `jlynne-cms` (J. Lynne) | **Supabase Postgres**, the same database, reached through a Hyperdrive in the J. Lynne account |
 | Files | R2 `transformidable-media` (Transformidable account); R2 `jlynne-cms` | R2 `transformidable-media` in the J. Lynne account. J. Lynne files go under `asset-files/` |
-| Admin | cms.transformidablethinking.com, jlynne.io/admin | transformidable.net/admin (and jlynne.io/admin) |
+| Admin | cms.transformidablethinking.com, jlynne.io/admin | transformidable.net/admin (and jlynne.io/admin). Both are admin-only: other paths redirect to /admin |
+| Public site | transformidablethinking.com (Transformidable account) | **betransformidable.com** (this Worker). transformidablethinking.com keeps running on the old Worker until it's redirected |
 
 > **The database is Supabase, outside Cloudflare.** It does not move in this
 > step. Both Workers use the same database while they run side by side, so
@@ -79,7 +80,16 @@ You don't need to copy `jlynne-cms` by hand. The import in step 7 copies its
 
 - [x] **transformidable.net** is active in the J. Lynne account and attached to
       the `jlynne-cms` Worker, next to jlynne.io. The config lists both, so
-      deploys keep them attached.
+      deploys keep them attached. Both are admin-only.
+- [ ] **betransformidable.com** (and `www.`) is the public website. The config
+      attaches both on the next deploy. If the domain already has a website
+      record (an A or CNAME record for `betransformidable.com` or `www`), the
+      deploy stops with "already has externally managed DNS records". Delete
+      those two records in DNS and rerun the build. Leave the email (MX/TXT)
+      records alone.
+- [ ] Change the build variable `NEXT_PUBLIC_SITE_URL` to
+      `https://betransformidable.com`. It sets canonical links, the sitemap and
+      email links, and is read at build time.
 
 ## 4. Switch `jlynne-cms` to this code
 
@@ -104,7 +114,7 @@ J. Lynne account → Workers & Pages → `jlynne-cms` → Settings → **Build**
 | `POSTGRES_URL` | Supabase Session pooler URL, the same one the J. Lynne Hyperdrive uses |
 | `PAYLOAD_SECRET` | A new value from `openssl rand -hex 32`. Use the same value for the build variable and the runtime secret. |
 | `NEXT_PUBLIC_SERVER_URL` | `https://transformidable.net` |
-| `NEXT_PUBLIC_SITE_URL` | `https://transformidablethinking.com` |
+| `NEXT_PUBLIC_SITE_URL` | `https://betransformidable.com` |
 
 **Runtime variables and secrets** (Settings → Variables and Secrets):
 - Set the four above. `PAYLOAD_SECRET` *replaces* the old J. Lynne value.
@@ -143,7 +153,7 @@ still work.
       Transformidable account. It's the same database, so the same login.
 - [ ] Check that Case Files, Publications and Media all open, and that an image
       loads.
-- [ ] The sidebar should have a **J. Lynne Library** group (Assets, Asset Files,
+- [ ] The sidebar should have a **Advisory** group (Assets, Asset Files,
       API Clients) and **Advisory Bookings**, all empty for now.
 
 ## 6. (Nothing to freeze)
@@ -178,7 +188,7 @@ Transformidable content. To copy them anyway, use
 
 KADE's old key belonged to jlynne.io and doesn't carry over.
 
-- [ ] transformidable.net/admin → J. Lynne Library → **API Clients** → Create
+- [ ] transformidable.net/admin → Advisory → **API Clients** → Create
       `KADE Analytics` → tick **Enable API Key** → Save → copy the key into
       KADE.
 - [ ] Update KADE's settings:
@@ -203,12 +213,10 @@ the admin, and they see only published Transformidable content, like a visitor.
 
 ## Later (separate steps, nothing deleted)
 
-- **Downloads:** jlynne.co is being retired. `/api/assets/current` still hands
-  out `jlynne.co/downloads/{slug}` links (`PUBLIC_DOWNLOAD_BASE_URL` in
-  `wrangler.jlynne.jsonc`). Point it at the downloads' new home before
-  jlynne.co goes.
-- **transformidablethinking.com**: when you're ready, move the domain to the
-  J. Lynne account and attach it to this Worker. Then:
+- **Downloads** now point at `betransformidable.com/advisory/tools/{slug}`
+  (`PUBLIC_DOWNLOAD_BASE_URL` in `wrangler.jlynne.jsonc`), so jlynne.co can go.
+- **transformidablethinking.com**: when you're ready, redirect it to
+  betransformidable.com. Then:
   - add the cron to `wrangler.jlynne.jsonc`,
   - remove it from the Transformidable Worker, and
   - turn off that Worker's builds.

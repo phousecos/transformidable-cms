@@ -21,7 +21,6 @@ export const Assets: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'track', 'assetType', 'sectorEdition', 'status', 'version'],
     listSearchableFields: ['title', 'slug'],
-    group: 'J. Lynne Library',
   },
   access: {
     read: isStaffOrApiClient,
