@@ -211,15 +211,51 @@ the admin, and they see only published Transformidable content, like a visitor.
       appears under **Advisory Bookings**, with the intake answers and any
       `?cohort=` tag.
 
+## 10. Retire the Transformidable account's Worker
+
+`jlynne-cms` takes over the old Worker's addresses and its daily digest:
+- **transformidablethinking.com and transformidable.media** (with `www.`):
+  every page redirects permanently to the same path on betransformidable.com.
+  `/api` still answers, so unsubscribe links in emails already sent keep
+  working.
+- **cms.transformidablethinking.com** is an admin address, like
+  transformidable.net.
+- **The digest:** the `0 13 * * *` cron moves into `wrangler.jlynne.jsonc`.
+
+Do these in order. Deleting the old Worker first takes those sites down until
+the rest is done.
+
+1. [ ] **Add transformidablethinking.com to the J. Lynne account** (Websites →
+       Add a domain). Before changing anything at the registrar, compare its
+       imported DNS records with the old zone's, and copy over anything
+       missing. The **email records** matter most: MX, the SPF TXT, DKIM, and
+       DMARC. `hello@transformidablethinking.com` sends the site's mail.
+2. [ ] Change the nameservers at the registrar to the two the J. Lynne account
+       gives you, and wait for the zone to show **Active**.
+3. [ ] Delete the **website** records the import brought in: the A, AAAA and
+       CNAME records for `transformidablethinking.com`, `www` and `cms`. Do the
+       same in the **transformidable.media** zone (already in the J. Lynne
+       account) for the root domain and `www`. Leave MX and TXT alone. The
+       deploy creates the website records itself, and stops if it finds
+       existing ones ("already has externally managed DNS records").
+4. [ ] Merge the PR with these changes. The build attaches the domains, the
+       redirects take effect, and this Worker starts sending the digest.
+5. [ ] Check that https://transformidablethinking.com/research lands on
+       https://betransformidable.com/research.
+6. [ ] **Then** delete the Transformidable account's `transformidable-cms`
+       Worker. Do it soon after step 4, because until then both Workers send
+       the digest.
+
+Deleting that Worker doesn't touch the database (Supabase) or its R2 bucket.
+Its Hyperdrive and bucket can be removed later, once you no longer need them
+as a fallback.
+
 ## Later (separate steps, nothing deleted)
 
-- **Downloads** now point at `betransformidable.com/advisory/tools/{slug}`
-  (`PUBLIC_DOWNLOAD_BASE_URL` in `wrangler.jlynne.jsonc`), so jlynne.co can go.
-- **transformidablethinking.com**: when you're ready, redirect it to
-  betransformidable.com. Then:
-  - add the cron to `wrangler.jlynne.jsonc`,
-  - remove it from the Transformidable Worker, and
-  - turn off that Worker's builds.
+- **Email for the site:** set `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`,
+  `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM` and `CONTACT_NOTIFY_EMAIL` on
+  `jlynne-cms` (step 4's table). Until then, digests, contact and Academy
+  notifications aren't sent.
 - **Leftovers:** the `jlynne-cms` D1 and R2, the phousecos/jlynne-cms repo, and
-  the Transformidable account's bucket stay as they are until you decide to
-  retire them.
+  the Transformidable account's bucket and Hyperdrive stay as they are until you
+  decide to retire them.

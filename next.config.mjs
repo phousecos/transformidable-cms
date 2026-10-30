@@ -53,6 +53,22 @@ const nextConfig = {
   // API, or a static file to the admin login.
   async redirects() {
     return [
+      // The public site doesn't host the admin: transformidable.net does.
+      {
+        source: '/admin/:path*',
+        has: [{ type: 'host', value: '(?:www\\.)?betransformidable\\.com' }],
+        destination: 'https://transformidable.net/admin/:path*',
+        permanent: false,
+      },
+      // The former public addresses send pages to betransformidable.com,
+      // keeping the path. /api is left alone so links in emails already
+      // sent (unsubscribe, digests) keep working.
+      {
+        source: '/:path((?!api/).*)',
+        has: [{ type: 'host', value: '(?:www\\.)?(?:transformidablethinking\\.com|transformidable\\.media)' }],
+        destination: 'https://betransformidable.com/:path',
+        permanent: true,
+      },
       {
         source: '/:path((?!admin|api|_next)(?!.*\\.\\w+$).*)',
         has: [{ type: 'host', value: '(?:cms\\..*|(?:www\\.)?(?:transformidable\\.net|jlynne\\.io))' }],
