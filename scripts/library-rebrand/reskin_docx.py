@@ -29,6 +29,12 @@ def fix_xml(name, xml):
             xml = xml.replace(f'Target="{old}"', f'Target="{new}"')
         return xml
     xml = brand.map_colors(xml)
+    if name == 'word/styles.xml':
+        # Title and heading styles take the display face, without bold.
+        def heading(m):
+            style = re.sub(r'w:(ascii|hAnsi|eastAsia|cs)="[^"]*"', rf'w:\1="{brand.DISPLAY}"', m.group(0))
+            return style.replace('<w:b/>', '').replace('<w:bCs/>', '')
+        xml = re.sub(r'<w:style [^>]*w:styleId="(?:%s)".*?</w:style>' % '|'.join(brand.HEADING_STYLES), heading, xml, flags=re.S)
     xml = xml.replace('<w:color w:val="FFFFFF"/>', f'<w:color w:val="{brand.WHITE_TEXT}"/>')
     for old, new in brand.FONTS.items():
         xml = re.sub(rf'(w:(?:ascii|hAnsi|eastAsia|cs)=")({old})(")', rf'\g<1>{new}\3', xml)

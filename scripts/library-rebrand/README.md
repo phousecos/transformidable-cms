@@ -14,7 +14,8 @@ Transformidable brand.
   `logo-light-ground.png` is the deep oxblood mark with an ink wordmark;
   `mark-gold.png` and `mark-oxblood.png` are the symbols, for dark and light
   backgrounds. The wordmark is set in DM Serif Display.
-- **Type:** Source Serif 4 headings, DM Sans body, Archivo labels (under review).
+- **Type:** DM Serif Display (the wordmark's face) for titles and headings,
+  never bold; DM Sans for body text, labels and tables.
 - The J. Lynne circle and bars motif is dropped; dark panels use a
   constellation instead.
 

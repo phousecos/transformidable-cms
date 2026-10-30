@@ -33,7 +33,11 @@ COLORS = {
 # White text becomes cream, as in the logo's wordmark; white paper stays white.
 WHITE_TEXT = CREAM
 
-FONTS = {'Inter': 'DM Sans', 'Poppins': 'Source Serif 4'}
+# Type: DM Serif Display (the wordmark's face) for titles and headings, DM Sans
+# for everything else. DM Serif Display has one weight, so headings are never bold.
+DISPLAY, TEXT_FACE = 'DM Serif Display', 'DM Sans'
+HEADING_STYLES = ('Title', 'Heading1', 'Heading2')
+FONTS = {'Inter': TEXT_FACE, 'Poppins': TEXT_FACE}
 
 SITE = 'betransformidable.com'
 

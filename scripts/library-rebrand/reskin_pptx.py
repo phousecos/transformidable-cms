@@ -50,23 +50,25 @@ def is_motif(sp):
 
 def font_for(rpr, text):
     size = int((re.search(r'sz="(\d+)"', rpr) or [0, 0])[1])
-    if size >= 3600:
-        return 'Source Serif 4'
-    if 'spc="' in rpr and text.isupper():
-        return 'Archivo'
-    return 'DM Sans'
+    return brand.DISPLAY if size >= 3600 else brand.TEXT_FACE
 
 
 def set_fonts(xml):
     def run(m):
         rpr, text = m.group(1), m.group(2)
-        latin = f'<a:latin typeface="{font_for(rpr, text)}"/>'
+        face = font_for(rpr, text)
+        latin = f'<a:latin typeface="{face}"/>'
+        if face == brand.DISPLAY:
+            rpr = rpr.replace(' b="1"', '')  # one weight only; never fake bold
         if rpr.endswith('/>'):
             rpr = rpr[:-2] + '>' + latin + '</a:rPr>'
         else:
             rpr = rpr.replace('</a:rPr>', latin + '</a:rPr>')
         return f'<a:r>{rpr}<a:t>{m.group(2)}</a:t></a:r>'
-    return re.sub(r'<a:r>(<a:rPr[^>]*/>|<a:rPr[^>]*>.*?</a:rPr>)<a:t>([^<]*)</a:t></a:r>', run, xml, flags=re.S)
+    xml = re.sub(r'<a:r>(<a:rPr[^>]*/>|<a:rPr[^>]*>.*?</a:rPr>)<a:t>([^<]*)</a:t></a:r>', run, xml, flags=re.S)
+    # Empty paragraph ends carry no face; give them the text face so nothing
+    # falls back to a system font.
+    return re.sub(r'<a:endParaRPr([^>]*)/>', rf'<a:endParaRPr\1><a:latin typeface="{brand.TEXT_FACE}"/></a:endParaRPr>', xml)
 
 
 light_mark = open(os.path.join(art, 'mark-gold.png'), 'rb').read()  # official gold symbol for dark slides
@@ -101,8 +103,8 @@ with zipfile.ZipFile(src) as zin:
                     xml = set_fonts(xml)
                     xml = re.sub(r'<a:rPr[^>]*>.*?</a:rPr>', lambda m: m.group(0).replace('<a:srgbClr val="FFFFFF"/>', f'<a:srgbClr val="{brand.WHITE_TEXT}"/>'), xml, flags=re.S)
                 if n.startswith('ppt/theme/'):
-                    xml = xml.replace('<a:latin typeface="Inter"/>', '<a:latin typeface="Source Serif 4"/>', 1)  # majorFont comes first
-                    xml = xml.replace('<a:latin typeface="Inter"/>', '<a:latin typeface="DM Sans"/>')
+                    xml = xml.replace('<a:latin typeface="Inter"/>', f'<a:latin typeface="{brand.DISPLAY}"/>', 1)  # majorFont comes first
+                    xml = xml.replace('<a:latin typeface="Inter"/>', f'<a:latin typeface="{brand.TEXT_FACE}"/>')
                 xml = re.sub(r'(?<=val=")([0-9A-Fa-f]{6})(?=")', lambda m: COLORS.get(m.group(1).upper(), m.group(1)), xml)
                 for old, new in TEXT:
                     xml = xml.replace(old, new)

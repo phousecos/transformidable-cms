@@ -49,8 +49,8 @@ body{position:relative;color:${C.cream};font-family:'DM Sans',sans-serif;
   background:${DARK}}
 .net{position:absolute;inset:0}
 .scrim{position:absolute;inset:0;pointer-events:none}
-.serif{font-family:'Source Serif 4',serif}
-.eyebrow{font-family:'Archivo',sans-serif;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:${C.gold}}
+.serif{font-family:'DM Serif Display',serif;font-weight:400}
+.eyebrow{font-family:'DM Sans',sans-serif;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:${C.gold}}
 .rule{height:2px;background:${C.gold}}
 .mark{display:block}
 ${extra}</style></head><body>${body}</body></html>`
@@ -106,7 +106,7 @@ const templates = {
     <div class="scrim" style="background:linear-gradient(90deg,rgba(92,29,39,.85) 0%,rgba(26,23,20,.6) 62%,rgba(26,23,20,0) 85%)"></div>
     <div style="position:absolute;inset:96px;display:flex;flex-direction:column">
       <div class="eyebrow" style="font-size:24px">An executive briefing</div>
-      <div class="serif" style="font-weight:700;font-size:96px;line-height:1.04;margin-top:40px">Are we governing AI<br><span style="color:${C.gold};font-style:italic;font-weight:600">or just letting it happen?</span></div>
+      <div class="serif" style="font-size:100px;line-height:1.02;margin-top:40px">Are we governing AI<br><span style="color:${C.gold};font-style:italic">or just letting it happen?</span></div>
       <div class="rule" style="width:120px;margin:56px 0 40px"></div>
       <div style="font-size:34px;line-height:1.4;max-width:820px;color:${C.mist}">Five questions every leadership team should be able to answer about AI. None of them are tech questions.</div>
       <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end">
@@ -119,7 +119,7 @@ const templates = {
     <div class="scrim" style="background:radial-gradient(ellipse 520px 230px at 600px 315px,rgba(26,23,20,.9),rgba(26,23,20,0))"></div>
     <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 80px">
       <div class="eyebrow" style="font-size:18px">An executive briefing</div>
-      <div class="serif" style="font-weight:700;font-size:68px;line-height:1.08;margin-top:26px">Are we governing AI<br><span style="color:${C.gold};font-style:italic;font-weight:600">or just letting it happen?</span></div>
+      <div class="serif" style="font-size:72px;line-height:1.05;margin-top:26px">Are we governing AI<br><span style="color:${C.gold};font-style:italic">or just letting it happen?</span></div>
       <div class="rule" style="width:120px;margin:34px 0 26px"></div>
       <div class="serif" style="font-size:26px;color:${C.mist}">Jerri Bland, Ed.D. · Transformidable</div>
     </div>`)],
