@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
     // email adapter is configured (e.g. local dev without SMTP env vars).
     try {
       await payload.sendEmail({
-        to: process.env.CONTACT_NOTIFY_EMAIL || process.env.EMAIL_FROM || 'hello@transformidablethinking.com',
+        to: process.env.CONTACT_NOTIFY_EMAIL || process.env.EMAIL_FROM || 'hello@betransformidable.com',
         replyTo: normalizedEmail,
         subject: `New contact form message${cleanSubject ? `: ${cleanSubject}` : ''}`,
         text: `From: ${cleanName} <${normalizedEmail}>\n\n${cleanMessage}`,

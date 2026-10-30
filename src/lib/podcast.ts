@@ -8,7 +8,7 @@ export const PODCAST_DEFAULTS = {
   description:
     'The Transformidable podcast. Conversations on governance, leadership, and institutional transformation, examined on the record.',
   author: 'Jerri L. Bland, Ed.D.',
-  ownerEmail: 'hello@transformidable.media',
+  ownerEmail: 'hello@betransformidable.com',
   primaryCategory: 'Business|Management',
   secondaryCategory: 'Technology',
   explicit: false,

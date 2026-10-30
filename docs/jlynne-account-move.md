@@ -226,10 +226,9 @@ Do these in order. Deleting the old Worker first takes those sites down until
 the rest is done.
 
 1. [ ] **Add transformidablethinking.com to the J. Lynne account** (Websites →
-       Add a domain). Before changing anything at the registrar, compare its
-       imported DNS records with the old zone's, and copy over anything
-       missing. The **email records** matter most: MX, the SPF TXT, DKIM, and
-       DMARC. `hello@transformidablethinking.com` sends the site's mail.
+       Add a domain). The site's email now uses betransformidable.com, so the
+       old domain's mail records only matter if a mailbox there is still in
+       use. Copy them over if one is.
 2. [ ] Change the nameservers at the registrar to the two the J. Lynne account
        gives you, and wait for the zone to show **Active**.
 3. [ ] Delete the **website** records the import brought in: the A, AAAA and
@@ -252,10 +251,12 @@ as a fallback.
 
 ## Later (separate steps, nothing deleted)
 
-- **Email for the site:** set `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`,
-  `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM` and `CONTACT_NOTIFY_EMAIL` on
-  `jlynne-cms` (step 4's table). Until then, digests, contact and Academy
-  notifications aren't sent.
+- **Email for the site** sends from betransformidable.com. Set `SMTP_HOST`,
+  `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`
+  (`hello@betransformidable.com`) and `CONTACT_NOTIFY_EMAIL` on `jlynne-cms`.
+  The SMTP account has to be allowed to send as that address, and
+  betransformidable.com needs SPF, DKIM and DMARC records for that provider.
+  Until then, digests, contact and Academy notifications aren't sent.
 - **Leftovers:** the `jlynne-cms` D1 and R2, the phousecos/jlynne-cms repo, and
   the Transformidable account's bucket and Hyperdrive stay as they are until you
   decide to retire them.
