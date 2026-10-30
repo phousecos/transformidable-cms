@@ -13,18 +13,22 @@ import brand  # noqa: E402
 art, src, dst = sys.argv[1:4]
 
 COLORS = dict(brand.COLORS, **{
-    'F6F6F2': 'F8F3E6',
-    '1F46BE': '6A2222',  # five-step card ramp
-    '162F7F': '561B1B',
-    '11235F': '421414',
-    '4F74E6': '9A4545',  # big section numbers on blue panels
-    '6B707A': '6E6760',
+    # Five-step cards: oxblood to ink, in palette steps.
+    '1F46BE': brand.OXBLOOD,
+    '162F7F': brand.DEEP,
+    '11235F': brand.INK,
+    '4F74E6': brand.DEEP,  # big section numbers on oxblood panels
 })
 
 DARK = ('14161A', '2552DE')  # backgrounds that take the light mark
+def gradient(a, b, mid=100000):
+    return (f'<a:gradFill rotWithShape="1"><a:gsLst><a:gs pos="0"><a:srgbClr val="{a}"/></a:gs>'
+            f'<a:gs pos="{mid}"><a:srgbClr val="{b}"/></a:gs></a:gsLst><a:lin ang="0" scaled="0"/></a:gradFill>')
+
+
 BG = {
-    '14161A': '<a:gradFill rotWithShape="1"><a:gsLst><a:gs pos="0"><a:srgbClr val="3D0B13"/></a:gs><a:gs pos="50000"><a:srgbClr val="1E0A0D"/></a:gs><a:gs pos="100000"><a:srgbClr val="0D0B0B"/></a:gs></a:gsLst><a:lin ang="0" scaled="0"/></a:gradFill>',
-    '2552DE': '<a:gradFill rotWithShape="1"><a:gsLst><a:gs pos="0"><a:srgbClr val="7B2828"/></a:gs><a:gs pos="100000"><a:srgbClr val="4A1419"/></a:gs></a:gsLst><a:lin ang="0" scaled="0"/></a:gradFill>',
+    '14161A': gradient(brand.DEEP, brand.INK, 62000),
+    '2552DE': gradient(brand.OXBLOOD, brand.DEEP),
 }
 
 TEXT = brand.TEXT + [
@@ -46,26 +50,28 @@ def is_motif(sp):
 
 def font_for(rpr, text):
     size = int((re.search(r'sz="(\d+)"', rpr) or [0, 0])[1])
-    if size >= 3600:
-        return 'Source Serif 4'
-    if 'spc="' in rpr and text.isupper():
-        return 'Archivo'
-    return 'DM Sans'
+    return brand.DISPLAY if size >= 3600 else brand.TEXT_FACE
 
 
 def set_fonts(xml):
     def run(m):
         rpr, text = m.group(1), m.group(2)
-        latin = f'<a:latin typeface="{font_for(rpr, text)}"/>'
+        face = font_for(rpr, text)
+        latin = f'<a:latin typeface="{face}"/>'
+        if face == brand.DISPLAY:
+            rpr = rpr.replace(' b="1"', '')  # one weight only; never fake bold
         if rpr.endswith('/>'):
             rpr = rpr[:-2] + '>' + latin + '</a:rPr>'
         else:
             rpr = rpr.replace('</a:rPr>', latin + '</a:rPr>')
         return f'<a:r>{rpr}<a:t>{m.group(2)}</a:t></a:r>'
-    return re.sub(r'<a:r>(<a:rPr[^>]*/>|<a:rPr[^>]*>.*?</a:rPr>)<a:t>([^<]*)</a:t></a:r>', run, xml, flags=re.S)
+    xml = re.sub(r'<a:r>(<a:rPr[^>]*/>|<a:rPr[^>]*>.*?</a:rPr>)<a:t>([^<]*)</a:t></a:r>', run, xml, flags=re.S)
+    # Empty paragraph ends carry no face; give them the text face so nothing
+    # falls back to a system font.
+    return re.sub(r'<a:endParaRPr([^>]*)/>', rf'<a:endParaRPr\1><a:latin typeface="{brand.TEXT_FACE}"/></a:endParaRPr>', xml)
 
 
-light_mark = open(os.path.join(art, 'mark-parchment.png'), 'rb').read()
+light_mark = open(os.path.join(art, 'mark-gold.png'), 'rb').read()  # official gold symbol for dark slides
 dark_slides = set()
 
 with zipfile.ZipFile(src) as zin:
@@ -95,9 +101,10 @@ with zipfile.ZipFile(src) as zin:
                     xml = re.sub(r'(<p:bg><p:bgPr>)<a:solidFill><a:srgbClr val="(\w+)"/></a:solidFill>',
                                  lambda m: m.group(1) + BG.get(m.group(2), m.group(0)[len(m.group(1)):]), xml)
                     xml = set_fonts(xml)
+                    xml = re.sub(r'<a:rPr[^>]*>.*?</a:rPr>', lambda m: m.group(0).replace('<a:srgbClr val="FFFFFF"/>', f'<a:srgbClr val="{brand.WHITE_TEXT}"/>'), xml, flags=re.S)
                 if n.startswith('ppt/theme/'):
-                    xml = xml.replace('<a:latin typeface="Inter"/>', '<a:latin typeface="Source Serif 4"/>', 1)  # majorFont comes first
-                    xml = xml.replace('<a:latin typeface="Inter"/>', '<a:latin typeface="DM Sans"/>')
+                    xml = xml.replace('<a:latin typeface="Inter"/>', f'<a:latin typeface="{brand.DISPLAY}"/>', 1)  # majorFont comes first
+                    xml = xml.replace('<a:latin typeface="Inter"/>', f'<a:latin typeface="{brand.TEXT_FACE}"/>')
                 xml = re.sub(r'(?<=val=")([0-9A-Fa-f]{6})(?=")', lambda m: COLORS.get(m.group(1).upper(), m.group(1)), xml)
                 for old, new in TEXT:
                     xml = xml.replace(old, new)

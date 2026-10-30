@@ -15,12 +15,11 @@ ACCOUNT="${CF_ACCOUNT_ID:-eafd097bc9914edce898c4d47bd6d875}"
 R2="https://api.cloudflare.com/client/v4/accounts/$ACCOUNT/r2/buckets/transformidable-media/objects"
 mkdir -p "$WORK/src" "$WORK/art" "$WORK/final" "$HOME/.fonts"
 
-echo "== Fonts (the site's: Source Serif 4, DM Sans, Archivo)"
+echo "== Fonts (DM Serif Display, the wordmark's face, and DM Sans)"
 python3 -I - "$HOME/.fonts" <<'EOF'
 import re, subprocess, sys, urllib.parse
 out = sys.argv[1]
-for fam in ['Source Serif 4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600',
-            'DM Sans:ital,wght@0,400;0,500;0,600;0,700;1,400', 'Archivo:wght@400;500;600;700;800']:
+for fam in ['DM Serif Display:ital@0;1', 'DM Sans:ital,wght@0,400;0,500;0,600;0,700;1,400']:
     css = subprocess.run(['curl', '-sS', 'https://fonts.googleapis.com/css2?family=' + urllib.parse.quote(fam, safe=':,;@.')],
                          capture_output=True, text=True, check=True).stdout
     for blk in re.findall(r'@font-face \{(.*?)\}', css, re.S):

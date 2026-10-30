@@ -1,15 +1,27 @@
 # Library rebrand: J. Lynne → Transformidable
 
 Re-skins the 30 advisory library assets (Word originals and their PDFs), the
-"Are we governing AI?" deck, and the LinkedIn and Open Graph art in the site's
-Transformidable design: oxblood, obsidian, gold and parchment, Source Serif 4
-headings, DM Sans body, Archivo labels, and the T mark. The J. Lynne circle
-and bars motif is dropped; dark panels use the constellation from the site's
-`og.png` instead.
+"Are we governing AI?" deck, and the LinkedIn and Open Graph art in the
+Transformidable brand.
+
+- **Colour:** the brand kit palette only: oxblood `#6B1429`, gold `#C0A23C`,
+  ink `#1A1714`, slate `#6E5D53`, mist `#E7DFD2`, cream `#F7F3EB`. Two colours
+  come from the official logo files: deep oxblood `#5C1D27` for dark tones and
+  mark gold `#9E810A` for small gold text on cream. Every J. Lynne colour,
+  including the colours inside illustrations, maps to one of these.
+- **Logo:** the official artwork in `marks/`, never retyped or recoloured.
+  `logo-dark-ground.png` is the gold mark with a cream wordmark;
+  `logo-light-ground.png` is the deep oxblood mark with an ink wordmark;
+  `mark-gold.png` and `mark-oxblood.png` are the symbols, for dark and light
+  backgrounds. The wordmark is set in DM Serif Display.
+- **Type:** DM Serif Display (the wordmark's face) for titles and headings,
+  never bold; DM Sans for body text, labels and tables.
+- The J. Lynne circle and bars motif is dropped; dark panels use a
+  constellation instead.
 
 | File | What it does |
 | --- | --- |
-| `art.cjs` | Renders document covers, the deck side panel, the LinkedIn post and header, and the Open Graph image from HTML templates (Playwright). |
+| `art.cjs` | Renders document covers, the deck side panel, the LinkedIn post and header, the Open Graph image, and six plain constellation backgrounds (`bg-*`, 3840×2160: four on the dark gradient, two in oxblood on gold) from HTML templates (Playwright). Pass template names to render only those, e.g. `node art.cjs out bg-1-even`. |
 | `brand.py` | The colour, font, wording and link maps, and the blue → oxblood image recolour. |
 | `reskin_docx.py` | Re-skins Word files: colours, fonts, wording, links, covers, footer mark, illustrations. |
 | `reskin_pptx.py` | Same for the deck, and removes the circle and bars shapes. |
