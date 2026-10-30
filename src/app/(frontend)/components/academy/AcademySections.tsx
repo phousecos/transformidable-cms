@@ -19,15 +19,23 @@ export function AcademyShell({ children }) {
 }
 
 // The Academy's light banner, in place of the research side's dark sky.
-export function AcademyHero({ kicker, title, intro, children = null, seed = 97 }) {
+// With an image (a transparent cutout), the photo takes the constellation's place.
+export function AcademyHero({ kicker, title, intro, children = null, seed = 97, image = null }) {
   return (
-    <section className="ac-hero">
-      <Constellation seed={seed} count={22} region={{ x0: 0.58, x1: 1, y0: 0, y1: 1 }} focal={{ x: 84, y: 40 }} className="ac-hero-stars" />
+    <section className={image ? "ac-hero ac-hero--photo" : "ac-hero"}>
+      {!image && <Constellation seed={seed} count={22} region={{ x0: 0.58, x1: 1, y0: 0, y1: 1 }} focal={{ x: 84, y: 40 }} className="ac-hero-stars" />}
       <div className="wrap ac-hero-in">
-        {kicker && <p className="kicker">{kicker}</p>}
-        <h1 className="ac-title">{title}</h1>
-        {intro && <p className="ac-hero-intro">{intro}</p>}
-        {children}
+        <div className="ac-hero-text">
+          {kicker && <p className="kicker">{kicker}</p>}
+          <h1 className="ac-title">{title}</h1>
+          {intro && <p className="ac-hero-intro">{intro}</p>}
+          {children}
+        </div>
+        {image && (
+          <div className="ac-hero-photo">
+            <img src={image.src} alt={image.alt} width={image.width} height={image.height} fetchPriority="high" />
+          </div>
+        )}
       </div>
     </section>
   );
