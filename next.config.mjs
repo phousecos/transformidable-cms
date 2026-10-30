@@ -60,12 +60,12 @@ const nextConfig = {
         destination: 'https://transformidable.net/admin/:path*',
         permanent: false,
       },
-      // The former public addresses send pages to betransformidable.com,
-      // keeping the path. /api is left alone so links in emails already
-      // sent (unsubscribe, digests) keep working.
+      // The former public address sends pages to betransformidable.com,
+      // keeping the path. /api is left alone so links already sent keep
+      // working.
       {
         source: '/:path((?!api/).*)',
-        has: [{ type: 'host', value: '(?:www\\.)?(?:transformidablethinking\\.com|transformidable\\.media)' }],
+        has: [{ type: 'host', value: '(?:www\\.)?transformidable\\.media' }],
         destination: 'https://betransformidable.com/:path',
         permanent: true,
       },

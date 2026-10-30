@@ -213,37 +213,22 @@ the admin, and they see only published Transformidable content, like a visitor.
 
 ## 10. Retire the Transformidable account's Worker
 
-`jlynne-cms` takes over the old Worker's addresses and its daily digest:
-- **transformidablethinking.com and transformidable.media** (with `www.`):
-  every page redirects permanently to the same path on betransformidable.com.
-  `/api` still answers, so unsubscribe links in emails already sent keep
-  working.
-- **cms.transformidablethinking.com** is an admin address, like
-  transformidable.net.
-- **The digest:** the `0 13 * * *` cron moves into `wrangler.jlynne.jsonc`.
+`jlynne-cms` takes over what the old Worker still does:
+- **transformidable.media** (with `www.`): every page redirects permanently to
+  the same path on betransformidable.com. `/api` still answers.
+- **The digest:** the `0 13 * * *` cron is in `wrangler.jlynne.jsonc`.
+- **transformidablethinking.com is parked.** It isn't served by `jlynne-cms`,
+  and deleting the old Worker takes it offline.
 
-Do these in order. Deleting the old Worker first takes those sites down until
-the rest is done.
-
-1. [ ] **Add transformidablethinking.com to the J. Lynne account** (Websites →
-       Add a domain). The site's email now uses betransformidable.com, so the
-       old domain's mail records only matter if a mailbox there is still in
-       use. Copy them over if one is.
-2. [ ] Change the nameservers at the registrar to the two the J. Lynne account
-       gives you, and wait for the zone to show **Active**.
-3. [ ] Delete the **website** records the import brought in: the A, AAAA and
-       CNAME records for `transformidablethinking.com`, `www` and `cms`. Do the
-       same in the **transformidable.media** zone (already in the J. Lynne
-       account) for the root domain and `www`. Leave MX and TXT alone. The
-       deploy creates the website records itself, and stops if it finds
+Steps:
+1. [ ] In the **transformidable.media** zone (J. Lynne account), delete the
+       website records (A, AAAA, CNAME) for the root domain and `www`. Leave MX
+       and TXT. The deploy creates its own records, and stops if it finds
        existing ones ("already has externally managed DNS records").
-4. [ ] Merge the PR with these changes. The build attaches the domains, the
-       redirects take effect, and this Worker starts sending the digest.
-5. [ ] Check that https://transformidablethinking.com/research lands on
-       https://betransformidable.com/research.
-6. [ ] **Then** delete the Transformidable account's `transformidable-cms`
-       Worker. Do it soon after step 4, because until then both Workers send
-       the digest.
+2. [ ] Merge the PR with these changes, and check the build attached
+       transformidable.media.
+3. [ ] Delete the Transformidable account's `transformidable-cms` Worker. Do it
+       soon after step 2, because until then both Workers send the digest.
 
 Deleting that Worker doesn't touch the database (Supabase) or its R2 bucket.
 Its Hyperdrive and bucket can be removed later, once you no longer need them
