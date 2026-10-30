@@ -197,7 +197,8 @@ KADE's old key belonged to jlynne.io and doesn't carry over.
   - Files: `/api/asset-files/…` (was `/api/media/…`)
   - `/api/assets` and `/api/assets/current` are unchanged.
 
-API clients can read Assets and Asset Files and nothing else. They can't open
+API clients can read Assets, Asset Files and the messaging copy (Message
+Templates, Message Snippets, Senders, Messaging Settings) and nothing else. They can't open
 the admin, and they see only published Transformidable content, like a visitor.
 
 ## 9. Advisory bookings (Cal.com)
