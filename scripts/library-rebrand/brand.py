@@ -5,20 +5,33 @@ import re
 import numpy as np
 from PIL import Image
 
-# J. Lynne hex -> Transformidable hex (site tokens: oxblood 7B2828, obsidian
-# 1A1A1A, gold C9A227, parchment F4EDD8).
+# The brand kit palette (palette A), plus two colours taken from the official
+# logo files: DEEP (the light-ground mark) and MARK_GOLD (the gold symbol),
+# used for dark tones and small gold text on cream. Every J. Lynne colour maps
+# to one of these; nothing else is introduced. The logo artwork keeps its own
+# colours and is never recoloured.
+OXBLOOD, DEEP, INK, GOLD, MARK_GOLD = '6B1429', '5C1D27', '1A1714', 'C0A23C', '9E810A'
+CREAM, MIST, SLATE = 'F7F3EB', 'E7DFD2', '6E5D53'
+
 COLORS = {
-    '2552DE': '7B2828',  # primary blue -> oxblood
-    '1A3A9E': '5A1C1C',  # deep blue -> deep oxblood
-    '3A66EA': '9A3B3B',  # light blue -> light oxblood
-    '1F4D78': '5A1C1C',  # Word default heading blues
-    '2E74B5': '7B2828',
-    '14161A': '1A1A1A',  # ink -> obsidian
-    '4A4F58': '57514A',  # cool grey text -> warm grey
-    'F6F6F2': 'F8F3E6',  # paper -> light parchment
-    'E9EBF0': 'F1E9D6',  # cool grey fill -> parchment fill
-    'C9CDD6': 'DDD3BE',  # cool rule -> warm rule
+    '2552DE': OXBLOOD,  # primary blue
+    '3A66EA': OXBLOOD,  # light blue
+    '2E74B5': OXBLOOD,  # Word default heading blue
+    '1A3A9E': DEEP,     # deep blue
+    '1F4D78': DEEP,     # Word default heading blue
+    '14161A': INK,
+    '4A4F58': SLATE,    # grey text
+    '6B707A': SLATE,
+    'F6F6F2': CREAM,    # paper panels
+    'E9EBF0': MIST,     # cool grey fills
+    'C9CDD6': MIST,     # rules
+    'C9A227': GOLD,
+    'F3D77A': GOLD,     # light gold on blue slides
+    '7F6619': MARK_GOLD,  # dark gold labels on light paper
 }
+
+# White text becomes cream, as in the logo's wordmark; white paper stays white.
+WHITE_TEXT = CREAM
 
 FONTS = {'Inter': 'DM Sans', 'Poppins': 'Source Serif 4'}
 
@@ -56,32 +69,47 @@ def map_text(xml: str) -> str:
     return xml
 
 
+# Every flat colour found in the J. Lynne illustrations, and the palette colour
+# it becomes. Ordered light-to-dark within each family so shading survives.
+IMAGE_MAP = {
+    '2552DE': OXBLOOD, '1F46BE': OXBLOOD,
+    '2049CC': DEEP, '436AE2': DEEP, '53649A': DEEP, '566597': DEEP,
+    '1A3A9E': DEEP, '1D347C': DEEP, '162F7F': DEEP,
+    '11235F': INK, '14161A': INK,
+    '6E89DE': MIST, '6D88DE': MIST, '8FA4E5': MIST, '92A9EF': MIST, '90A4E6': MIST,
+    'C8D3F7': MIST, 'C7D1F2': MIST, 'C8CCD6': MIST, 'E9EBF0': MIST,
+    '8991A7': SLATE,
+    'F6F6F2': CREAM, 'FFFFFF': 'FFFFFF',
+    'C9A227': GOLD, 'F3D77A': GOLD,
+    '8A7122': MARK_GOLD, '6F5C21': MARK_GOLD, '9C7F24': MARK_GOLD, '7F6619': MARK_GOLD,
+}
+
+
+def _rgb(hexes):
+    return np.array([[int(h[i:i + 2], 16) for i in (0, 2, 4)] for h in hexes], np.float32)
+
+
 def recolor_png(data: bytes) -> bytes:
-    """Shift blue pixels to oxblood, keeping their lightness relationships and
-    leaving gold, white, black and greys alone."""
+    """Map each flat J. Lynne colour to its palette colour. A pixel between two
+    source colours (an anti-aliased edge) becomes the same blend of their two
+    targets, so no colour outside the palette appears except at those edges."""
     im = Image.open(io.BytesIO(data))
     mode = im.mode
     rgba = np.asarray(im.convert('RGBA')).astype(np.float32)
-    rgb = rgba[..., :3] / 255
-    hsv = np.asarray(Image.fromarray((rgb * 255).astype(np.uint8)).convert('HSV')).astype(np.float32)
-    h, s, v = hsv[..., 0] * 360 / 255, hsv[..., 1] / 255, hsv[..., 2] / 255
-    bluish = (h > 195) & (h < 255)
-    blue = bluish & (s > 0.18)
-    # Blend weight eases in over saturation so anti-aliased edges stay smooth.
-    w = np.clip((s - 0.18) / 0.2, 0, 1) * blue
-    # 2552DE (s .83, v .87) -> 7B2828 (s .67, v .48)
-    ns, nv = s * 0.8, np.clip(v * 0.52 + (1 - s) * v * 0.35, 0, 1)
-    target = Image.fromarray(np.dstack([np.zeros_like(h), ns * 255, nv * 255]).astype(np.uint8), 'HSV').convert('RGB')
-    t = np.asarray(target).astype(np.float32) / 255
-    out = rgb * (1 - w[..., None]) + t * w[..., None]
-    # Pale blue tints and cool light greys (E9EBF0) -> parchment tints.
-    pale = bluish & (s <= 0.4) & (v > 0.75) & (w < 1)
-    pw = pale * (1 - w)
-    warm = Image.fromarray(np.dstack([np.full_like(h, 30 * 255 / 360), np.clip(0.06 + s * 0.6, 0, 1) * 255, v * 0.97 * 255]).astype(np.uint8), 'HSV').convert('RGB')
-    wt = np.asarray(warm).astype(np.float32) / 255
-    out = out * (1 - pw[..., None]) + wt * pw[..., None]
-    rgba[..., :3] = out * 255
-    res = Image.fromarray(rgba.astype(np.uint8), 'RGBA')
+    src, dst = _rgb(IMAGE_MAP.keys()), _rgb(IMAGE_MAP.values())
+    h, w = rgba.shape[:2]
+    flat = rgba[..., :3].reshape(-1, 3)
+    out = np.empty_like(flat)
+    for a in range(0, len(flat), 262144):
+        p = flat[a:a + 262144]
+        d = ((p[:, None, :] - src[None]) ** 2).sum(-1)
+        near = np.argsort(d, axis=1)[:, :2]
+        i, j = near[:, 0], near[:, 1]
+        seg = src[j] - src[i]
+        t = np.clip(((p - src[i]) * seg).sum(-1) / np.maximum((seg ** 2).sum(-1), 1), 0, 1)
+        out[a:a + 262144] = dst[i] + (dst[j] - dst[i]) * t[:, None]
+    rgba[..., :3] = out.reshape(h, w, 3)
+    res = Image.fromarray(np.clip(rgba, 0, 255).astype(np.uint8), 'RGBA')
     if mode != 'RGBA':
         res = res.convert('RGB')
     buf = io.BytesIO()

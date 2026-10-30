@@ -1,11 +1,22 @@
 # Library rebrand: J. Lynne → Transformidable
 
 Re-skins the 30 advisory library assets (Word originals and their PDFs), the
-"Are we governing AI?" deck, and the LinkedIn and Open Graph art in the site's
-Transformidable design: oxblood, obsidian, gold and parchment, Source Serif 4
-headings, DM Sans body, Archivo labels, and the T mark. The J. Lynne circle
-and bars motif is dropped; dark panels use the constellation from the site's
-`og.png` instead.
+"Are we governing AI?" deck, and the LinkedIn and Open Graph art in the
+Transformidable brand.
+
+- **Colour:** the brand kit palette only: oxblood `#6B1429`, gold `#C0A23C`,
+  ink `#1A1714`, slate `#6E5D53`, mist `#E7DFD2`, cream `#F7F3EB`. Two colours
+  come from the official logo files: deep oxblood `#5C1D27` for dark tones and
+  mark gold `#9E810A` for small gold text on cream. Every J. Lynne colour,
+  including the colours inside illustrations, maps to one of these.
+- **Logo:** the official artwork in `marks/`, never retyped or recoloured.
+  `logo-dark-ground.png` is the gold mark with a cream wordmark;
+  `logo-light-ground.png` is the deep oxblood mark with an ink wordmark;
+  `mark-gold.png` and `mark-oxblood.png` are the symbols, for dark and light
+  backgrounds. The wordmark is set in DM Serif Display.
+- **Type:** Source Serif 4 headings, DM Sans body, Archivo labels (under review).
+- The J. Lynne circle and bars motif is dropped; dark panels use a
+  constellation instead.
 
 | File | What it does |
 | --- | --- |

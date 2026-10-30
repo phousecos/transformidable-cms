@@ -29,6 +29,7 @@ def fix_xml(name, xml):
             xml = xml.replace(f'Target="{old}"', f'Target="{new}"')
         return xml
     xml = brand.map_colors(xml)
+    xml = xml.replace('<w:color w:val="FFFFFF"/>', f'<w:color w:val="{brand.WHITE_TEXT}"/>')
     for old, new in brand.FONTS.items():
         xml = re.sub(rf'(w:(?:ascii|hAnsi|eastAsia|cs)=")({old})(")', rf'\g<1>{new}\3', xml)
         xml = xml.replace(f'w:name="{old}"', f'w:name="{new}"').replace(f'typeface="{old}"', f'typeface="{new}"')
