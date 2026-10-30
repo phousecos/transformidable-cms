@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
           process.env.ACADEMY_NOTIFY_EMAIL ||
           process.env.CONTACT_NOTIFY_EMAIL ||
           process.env.EMAIL_FROM ||
-          'hello@transformidablethinking.com',
+          'hello@betransformidable.com',
         replyTo: email,
         subject:
           type === 'organization'
