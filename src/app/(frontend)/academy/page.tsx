@@ -27,6 +27,7 @@ export default function AcademyPage() {
         kicker="Transformidable Academy · AI Governance Education"
         title="Govern the technology shaping your organization."
         intro="Executive education for the leaders and governing bodies who oversee decisions about artificial intelligence. Designed for decision-makers rather than technical specialists, with practical governance tools to take back to your organization."
+        image={{ src: "/academy-hero-jerri-bland.webp", alt: "Jerri Bland", width: 577, height: 1053 }}
       >
         <div className="ac-hero-cta">
           <Link className="btn" href={programHref(FEATURED.slug)}>Explore the briefing for boards &amp; councils <Arrow s={14} /></Link>
