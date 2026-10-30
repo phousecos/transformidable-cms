@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ResearchShell } from "../components/research/ResearchShell";
 import { Sky } from "../components/research/Sky";
 import { caseNo } from "../components/research/format";
+import { TOOLS_PATH, assetTypeLabel, listedToolsWhere } from "../../../lib/advisoryTools.ts";
 import "../components/home/home.css";
 
 export const dynamic = "force-dynamic";
@@ -68,8 +69,26 @@ async function caseFileCard() {
   }
 }
 
+// Final assets tagged "Website download", newest first. Empty until some are.
+async function advisoryTools() {
+  try {
+    const payload = await getPayload({ config });
+    const res = await payload.find({
+      collection: "assets",
+      where: listedToolsWhere,
+      sort: ["-versionDate", "-updatedAt"],
+      depth: 0,
+      limit: 24,
+      overrideAccess: true,
+    });
+    return res.docs || [];
+  } catch {
+    return [];
+  }
+}
+
 export default async function AdvisoryPage() {
-  const caseFile = await caseFileCard();
+  const [caseFile, tools] = await Promise.all([caseFileCard(), advisoryTools()]);
 
   return (
     <ResearchShell>
@@ -167,6 +186,29 @@ export default async function AdvisoryPage() {
           </div>
         </div>
       </section>
+
+      {tools.length > 0 && (
+        <section className="rule-band" id="tools" aria-labelledby="av-tools-h">
+          <div className="wrap">
+            <div className="sec-head">
+              <div>
+                <p className="kicker">Advisory tools</p>
+                <h2 className="h" id="av-tools-h">Tools to take into the room.</h2>
+              </div>
+            </div>
+            <div className="av-tools">
+              {tools.map((t) => (
+                <Link className="hm-feat" href={`${TOOLS_PATH}/${t.slug}`} key={t.id}>
+                  {assetTypeLabel(t.assetType) && <span className="hm-feat-label">{assetTypeLabel(t.assetType)}</span>}
+                  <span className="hm-feat-title">{t.title}</span>
+                  {t.summary && <span className="hm-feat-desc">{t.summary}</span>}
+                  <span className="hm-feat-go">Download <Arrow s={12} /></span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="rule-band av-cta" aria-label="Book a conversation">
         <div className="wrap av-cta-in">

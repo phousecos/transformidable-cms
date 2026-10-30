@@ -12,7 +12,6 @@ export const AssetFiles: CollectionConfig = {
   labels: { singular: 'Asset File', plural: 'Asset Files' },
   admin: {
     useAsTitle: 'filename',
-    group: 'J. Lynne Library',
     description:
       'Name files T{n}_{AssetType}_{Sector}_v{n}.{ext}, for example T6_GovBrief_PrivateSector_v1.docx.',
   },

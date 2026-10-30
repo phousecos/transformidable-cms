@@ -27,6 +27,7 @@ import { AcademyInquiries } from './collections/AcademyInquiries.ts'
 import { PodcastEpisodes } from './collections/PodcastEpisodes.ts'
 import { Documents } from './collections/Documents.ts'
 import { AdvisoryBookings } from './collections/AdvisoryBookings.ts'
+import { ToolRequests } from './collections/ToolRequests.ts'
 import { Assets } from './collections/library/Assets.ts'
 import { AssetFiles } from './collections/library/AssetFiles.ts'
 import { ApiClients } from './collections/library/ApiClients.ts'
@@ -40,6 +41,11 @@ import { Authors } from './collections/Authors.ts'
 import { BrandPillars } from './collections/BrandPillars.ts'
 import { Sponsors } from './collections/Sponsors.ts'
 import { NewsletterIssues } from './collections/NewsletterIssues.ts'
+
+// Puts collections or globals under one sidebar heading in the admin.
+function inGroup<T extends { admin?: Record<string, unknown> }>(group: string, items: T[]): T[] {
+  return items.map((item) => ({ ...item, admin: { ...item.admin, group } }))
+}
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -151,11 +157,14 @@ const csrfOrigins = Array.from(
       'https://cms.transformidable.media',
       'https://transformidable.media',
       'https://www.transformidable.media',
-      // The combined admin in the J. Lynne Cloudflare account (the jlynne-cms
-      // Worker), and the old library address that Worker still answers on.
+      // The jlynne-cms Worker in the J. Lynne Cloudflare account: the admin
+      // (transformidable.net), the public site (betransformidable.com), and
+      // the old library address it still answers on.
       'https://transformidable.net',
       'https://www.transformidable.net',
       'https://jlynne.io',
+      'https://betransformidable.com',
+      'https://www.betransformidable.com',
       // Escape hatch: comma-separated extra origins. Lets a domain change be
       // fixed with an env var instead of a code change and a redeploy.
       ...(process.env.PAYLOAD_CSRF_ORIGINS?.split(',').map((origin) => origin.trim()) ?? []),
@@ -169,6 +178,8 @@ export default buildConfig({
   // CORS: origins permitted to read responses from the Payload REST/GraphQL
   // API. These are the public brand sites that may call the read-only API.
   cors: [
+    'https://betransformidable.com',
+    'https://www.betransformidable.com',
     'https://transformidablethinking.com',
     'https://www.transformidablethinking.com',
     'https://jerribland.com',
@@ -234,30 +245,17 @@ export default buildConfig({
         })
       : undefined,
 
+  // Sidebar headings follow the divisions. Groups are set here, not in each
+  // collection, so the whole layout reads in one place; order is the order
+  // the headings appear.
   collections: [
-    // Active collections
-    Users,
-    Media,
-    Publications,
-    CaseFiles,
-    ResearchNotes,
-    Articles,
-    Issues,
-    Verticals,
-    Topics,
-    Books,
-    Subscribers,
-    CaseFollows,
-    CaseSubmissions,
-    ContactMessages,
-    AcademyInquiries,
-    PodcastEpisodes,
-    Documents,
-    AdvisoryBookings,
-    // J. Lynne library (moved from the jlynne.io instance)
-    Assets,
-    AssetFiles,
-    ApiClients,
+    ...inGroup('Research', [CaseFiles, ResearchNotes, Publications, CaseSubmissions, CaseFollows, Topics, Verticals]),
+    ...inGroup('Advisory', [Assets, AssetFiles, AdvisoryBookings, ToolRequests, ApiClients]),
+    // Training assets will join this group.
+    ...inGroup('Academy', [AcademyInquiries]),
+    ...inGroup('Publishing & Media', [Books, PodcastEpisodes, Articles, Issues]),
+    ...inGroup('Audience', [Subscribers, ContactMessages]),
+    ...inGroup('Site', [Media, Documents, Users]),
     // Legacy collections — hidden from nav, kept for data access
     { ...Authors, admin: { ...Authors.admin, hidden: true } },
     { ...BrandPillars, admin: { ...BrandPillars.admin, hidden: true } },
@@ -265,7 +263,7 @@ export default buildConfig({
     { ...NewsletterIssues, admin: { ...NewsletterIssues.admin, hidden: true } },
   ],
 
-  globals: [SiteSettings, TransformidableFeature, PodcastSettings],
+  globals: inGroup('Site', [SiteSettings, TransformidableFeature, PodcastSettings]),
 
   logger: isWorkers ? workersLogger : undefined,
 

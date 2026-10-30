@@ -12,7 +12,6 @@ export const ApiClients: CollectionConfig = {
   labels: { singular: 'API Client', plural: 'API Clients' },
   admin: {
     useAsTitle: 'name',
-    group: 'J. Lynne Library',
     description: 'Read-only API keys for connected systems such as KADE. Tick "Enable API Key" and save to issue one.',
   },
   auth: {

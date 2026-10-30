@@ -8,9 +8,9 @@ import {
 
 const codes = (options: { value: string }[]) => options.map((o) => o.value)
 
-// Prospects only ever see jlynne.co links (brief, Phase 4), never jlynne.io.
+// Prospects get the public Advisory tools page for an asset, never the API.
 const downloadBase = () =>
-  (process.env.PUBLIC_DOWNLOAD_BASE_URL || 'https://jlynne.co/downloads').replace(/\/+$/, '')
+  (process.env.PUBLIC_DOWNLOAD_BASE_URL || 'https://betransformidable.com/advisory/tools').replace(/\/+$/, '')
 
 /**
  * GET /api/assets/current?track=T1&sectorEdition=credit-union&assetType=governance-brief
@@ -86,7 +86,7 @@ export const currentAsset: Endpoint = {
         brand: asset.brand,
         updatedAt: asset.updatedAt,
       },
-      // Transformidable items live on their own site; everything else goes through jlynne.co.
+      // Transformidable items live on their own site; everything else goes through its Advisory tools page.
       url:
         asset.brand === 'transformidable' ? asset.externalUrl : `${downloadBase()}/${asset.slug}`,
       fallback,

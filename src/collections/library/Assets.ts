@@ -13,7 +13,7 @@ const PUBLISHED_STATUSES = ['final', 'retired']
 
 // One record per piece of collateral in the J. Lynne library (moved here from
 // the jlynne.io instance). Select values are short, stable codes so connected
-// systems (KADE, jlynne.co) can query them; labels are for people. Internal
+// systems (KADE) can query them; labels are for people. Internal
 // only: nothing here is public, and none of it appears on the public site.
 export const Assets: CollectionConfig = {
   slug: 'assets',
@@ -21,7 +21,6 @@ export const Assets: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'track', 'assetType', 'sectorEdition', 'status', 'version'],
     listSearchableFields: ['title', 'slug'],
-    group: 'J. Lynne Library',
   },
   access: {
     read: isStaffOrApiClient,
@@ -33,7 +32,7 @@ export const Assets: CollectionConfig = {
   hooks: {
     beforeChange: [
       ({ data, originalDoc, operation }) => {
-        // Slugs appear in printed jlynne.co links, so they freeze once published.
+        // Slugs appear in printed download links, so they freeze once published.
         if (
           operation === 'update' &&
           originalDoc &&
@@ -63,7 +62,7 @@ export const Assets: CollectionConfig = {
       type: 'textarea',
       maxLength: 240,
       admin: {
-        description: 'One or two sentences shown on the jlynne.co Resources card.',
+        description: 'One or two sentences shown on the Advisory tools card and page (public).',
       },
     },
     {
@@ -76,12 +75,12 @@ export const Assets: CollectionConfig = {
         if (!value) return true
         if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value))
           return 'Use lowercase letters, numbers and hyphens only.'
-        // jlynne.co/downloads/updated is the "this resource has been updated" page.
+        // Reserved from the jlynne.co downloads, which used it for the "updated" page.
         return value !== 'updated' || 'This slug is reserved.'
       },
       admin: {
         description:
-          'Used in jlynne.co/downloads/{slug}. Locked once the asset is Final or Retired.',
+          'Used in /advisory/tools/{slug}. Locked once the asset is Final or Retired.',
       },
     },
     {
@@ -162,6 +161,9 @@ export const Assets: CollectionConfig = {
             { label: 'Webinar takeaway', value: 'webinar-takeaway' },
             { label: 'Website download', value: 'website-download' },
           ],
+          admin: {
+            description: 'Website download: listed under Advisory tools on /advisory once Final.',
+          },
         },
       ],
     },
@@ -224,7 +226,7 @@ export const Assets: CollectionConfig = {
       }),
       admin: {
         description:
-          'Where jlynne.co/downloads/{slug} sends people once this is Retired. Leave empty to show a "this resource has been updated" page.',
+          'Where /advisory/tools/{slug} sends people once this is Retired. Leave empty to show a "this resource has been updated" page.',
         condition: (data) => data?.status === 'retired',
       },
     },

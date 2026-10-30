@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { getClientIp } from '../../../../lib/apiRequestGuards.ts'
+import { joinList } from '../../../../lib/subscribers.ts'
 
 // Generic, identical message for every successful path. We deliberately do not
 // distinguish "new subscriber", "already subscribed", or "re-subscribed", so
@@ -83,59 +84,14 @@ export async function POST(req: NextRequest) {
       ? (source as SourceValue)
       : 'website'
 
-  const normalizedEmail = email.toLowerCase().trim()
   const cleanList = list === 'book' ? 'book' : 'brief'
 
   try {
     const payload = await getPayload({ config })
-
-    const existing = await payload.find({
-      collection: 'subscribers',
-      where: { email: { equals: normalizedEmail } },
-      limit: 1,
-    })
-
-    if (existing.docs.length > 0) {
-      const sub = existing.docs[0] as Record<string, unknown>
-      // Subscribers from before lists existed have none; they joined the Brief.
-      // Someone coming back after unsubscribing starts over with just the
-      // list they asked for now.
-      const currentLists =
-        sub.status === 'unsubscribed'
-          ? []
-          : Array.isArray(sub.lists) && sub.lists.length
-            ? (sub.lists as string[])
-            : ['brief']
-      const lists = currentLists.includes(cleanList) ? currentLists : [...currentLists, cleanList]
-      if (sub.status === 'unsubscribed' || lists.length !== (sub.lists as string[] | undefined)?.length) {
-        await payload.update({
-          collection: 'subscribers',
-          id: sub.id as number,
-          data: { status: 'active', lists },
-        })
-      }
-      return NextResponse.json({ message: SUCCESS_MESSAGE })
-    }
-
-    await payload.create({
-      collection: 'subscribers',
-      data: {
-        email: normalizedEmail,
-        name: cleanName,
-        source: cleanSource,
-        lists: [cleanList],
-        status: 'active',
-      },
-    })
-
+    await joinList(payload, { email, name: cleanName, source: cleanSource, list: cleanList })
     return NextResponse.json({ message: SUCCESS_MESSAGE })
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Unknown error'
-    // Race-condition fallback: if a concurrent insert won the unique
-    // constraint, treat it as success — never reveal that the email exists.
-    if (msg.includes('unique') || msg.includes('duplicate')) {
-      return NextResponse.json({ message: SUCCESS_MESSAGE })
-    }
     console.error('[subscribe] Error:', msg)
     return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 })
   }

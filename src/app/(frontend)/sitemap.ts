@@ -1,6 +1,7 @@
 // @ts-nocheck
 import config from "@payload-config";
 import { getPayload } from "payload";
+import { TOOLS_PATH, listedToolsWhere } from "../../lib/advisoryTools.ts";
 
 export const dynamic = "force-dynamic";
 
@@ -84,6 +85,11 @@ export default async function sitemap() {
     add(notes, "/publications/research-notes");
     add(pubs, "/publications");
     add(episodes, "/podcast");
+    // Advisory tools listed on /advisory (Final, tagged "Website download").
+    try {
+      const tools = await payload.find({ collection: "assets", where: listedToolsWhere, limit: 500, depth: 0, overrideAccess: true });
+      add((tools.docs || []).filter((d: any) => d?.slug), TOOLS_PATH);
+    } catch {}
   } catch {
     // Fall back to the static routes if the CMS isn't reachable at build time.
   }

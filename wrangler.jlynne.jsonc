@@ -28,15 +28,19 @@
     },
   ],
   "routes": [
+    // The public website.
+    { "pattern": "betransformidable.com", "custom_domain": true },
+    { "pattern": "www.betransformidable.com", "custom_domain": true },
+    // The admin only: every other path redirects to /admin (next.config.mjs).
     { "pattern": "transformidable.net", "custom_domain": true },
     // The old library's address, which KADE reads until it moves to
     // transformidable.net.
     { "pattern": "jlynne.io", "custom_domain": true },
   ],
   "vars": {
-    // Where /api/assets/current points prospects for J. Lynne downloads.
-    // jlynne.co is being retired: change this when downloads have a new home.
-    "PUBLIC_DOWNLOAD_BASE_URL": "https://jlynne.co/downloads",
+    // Where /api/assets/current points people for downloads: the Advisory
+    // tools pages on the public site.
+    "PUBLIC_DOWNLOAD_BASE_URL": "https://betransformidable.com/advisory/tools",
   },
   "r2_buckets": [
     {

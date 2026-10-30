@@ -127,3 +127,13 @@
 .tr .av-cal { scroll-margin-top: 110px; }
 /* Inline links inside serif sentences keep the sans link face. */
 .tr .hm-help-close .link, .tr .av-close .link, .tr .av-note .link, .tr .av-fallback .link { font-family: var(--sans); }
+
+/* Advisory tools (/advisory#tools, /advisory/tools/{slug}). */
+.tr .av-tools { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .tr .av-tools { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1040px) { .tr .av-tools { grid-template-columns: repeat(3, 1fr); } }
+.tr .av-tools .hm-feat-desc { -webkit-line-clamp: unset; overflow: visible; }
+.tr .av-tool > .av-card { max-width: 720px; }
+.tr .av-check { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; font-family: var(--serif); font-size: .95rem; color: var(--ink-body); line-height: 1.5; }
+.tr .av-check input { margin-top: 4px; accent-color: var(--wine); }
+.tr .av-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
