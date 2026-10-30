@@ -29,6 +29,7 @@ const STATIC_PATHS = [
   "/academy/individuals",
   "/academy/faq",
   "/research/agenda",
+  "/research/governance-method",
   "/research/datasets",
   "/research/projects",
   "/briefings/webinars",

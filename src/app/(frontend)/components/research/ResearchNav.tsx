@@ -17,11 +17,12 @@ const NAV = [
     label: "Research", href: "/research", children: [
       { no: "01.1", name: "Transformidable Research", desc: "Evidence on governance and transformation", href: "/research" },
       { no: "01.2", name: "Research Agenda", desc: "The questions we set out to answer", href: "/research/agenda" },
-      { no: "01.3", name: "Case Files", desc: "Anatomies of real governance decisions", href: "/publications/case-files" },
-      { no: "01.4", name: "Publications", desc: "Articles, white papers, and annual reports", href: "/publications" },
-      { no: "01.5", name: "Research Notes", desc: "Working findings, in progress", href: "/publications/research-notes" },
-      { no: "01.6", name: "Datasets & Projects", desc: "The data and active lines of inquiry", href: "/research/datasets" },
-      { no: "01.7", name: "Governance Tools", desc: "The codebook, benchmarks, and risk models", href: "/tools/governance-codebook" },
+      { no: "01.3", name: "Governance Method", desc: "Six disciplines for visible, accountable governance", href: "/research/governance-method" },
+      { no: "01.4", name: "Case Files", desc: "Anatomies of real governance decisions", href: "/publications/case-files" },
+      { no: "01.5", name: "Publications", desc: "Articles, white papers, and annual reports", href: "/publications" },
+      { no: "01.6", name: "Research Notes", desc: "Working findings, in progress", href: "/publications/research-notes" },
+      { no: "01.7", name: "Datasets & Projects", desc: "The data and active lines of inquiry", href: "/research/datasets" },
+      { no: "01.8", name: "Governance Tools", desc: "The codebook, benchmarks, and risk models", href: "/tools/governance-codebook" },
     ],
   },
   {

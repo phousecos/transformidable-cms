@@ -27,6 +27,7 @@ export function ResearchFooter() {
           <h5>Research</h5>
           <Link href="/research">Transformidable Research</Link>
           <Link href="/research/agenda">Research Agenda</Link>
+          <Link href="/research/governance-method">Governance Method</Link>
           <Link href="/publications/case-files">Case Files</Link>
           <Link href="/publications">Publications</Link>
           <Link href="/publications/research-notes">Research Notes</Link>
