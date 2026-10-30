@@ -31,16 +31,13 @@
     // The public website.
     { "pattern": "betransformidable.com", "custom_domain": true },
     { "pattern": "www.betransformidable.com", "custom_domain": true },
-    // Former public addresses: pages redirect permanently to
-    // betransformidable.com (next.config.mjs); /api still answers, for links
-    // in emails already sent.
-    { "pattern": "transformidablethinking.com", "custom_domain": true },
-    { "pattern": "www.transformidablethinking.com", "custom_domain": true },
+    // Former public address: pages redirect permanently to
+    // betransformidable.com (next.config.mjs); /api still answers.
+    // (transformidablethinking.com is parked, not served here.)
     { "pattern": "transformidable.media", "custom_domain": true },
     { "pattern": "www.transformidable.media", "custom_domain": true },
     // The admin only: every other path redirects to /admin (next.config.mjs).
     { "pattern": "transformidable.net", "custom_domain": true },
-    { "pattern": "cms.transformidablethinking.com", "custom_domain": true },
     // The old library's address, which KADE reads until it moves to
     // transformidable.net.
     { "pattern": "jlynne.io", "custom_domain": true },
