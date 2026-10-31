@@ -174,7 +174,6 @@
 /* Submitting is a quiet, structural action, not the page's gold button. */
 .tr .ac-submit { margin-top: 18px; align-self: flex-start; }
 .tr .ac-form-note { font-size: 12px; color: var(--ac-taupe); margin: 12px 0 0; }
-.tr .ac-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 .tr .ac-form-card .case-form-success + .link { margin-top: 16px; background: none; border: 0; padding-left: 0; }
 
 /* ==========================================================================

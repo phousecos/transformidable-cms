@@ -40,3 +40,29 @@ export function createRateLimiter(max: number, windowMs: number) {
     },
   }
 }
+
+// Spam checks shared by every public form. Each form carries two extra
+// fields, added by the useSpamTrap hook on the client:
+//   company_website  a field hidden from people; bots tend to fill it.
+//   form_elapsed_ms  how long the form was open before it was sent.
+// 'bot' means drop it silently: answer as if it worked, save and send
+// nothing, so the sender has no signal to adapt to. That covers a filled
+// trap and a missing timer, which means the post didn't come from our page.
+// 'too-fast' is a timer under the minimum. That could be a person with
+// autofill, so they get an error asking them to try again, not a fake success.
+export const SPAM_TRAP_FIELD = 'company_website'
+export const SPAM_TIMER_FIELD = 'form_elapsed_ms'
+export const MIN_FORM_FILL_MS = 3000
+export const TOO_FAST_MESSAGE = 'That was quick. Please wait a moment and try again.'
+
+export type SpamVerdict = 'ok' | 'bot' | 'too-fast'
+
+export function checkSpam(get: (key: string) => unknown): SpamVerdict {
+  const trap = get(SPAM_TRAP_FIELD)
+  if (typeof trap === 'string' && trap.trim()) return 'bot'
+  const raw = get(SPAM_TIMER_FIELD)
+  const elapsed = typeof raw === 'number' ? raw : typeof raw === 'string' ? Number(raw) : NaN
+  if (!Number.isFinite(elapsed) || elapsed <= 0) return 'bot'
+  if (elapsed < MIN_FORM_FILL_MS) return 'too-fast'
+  return 'ok'
+}

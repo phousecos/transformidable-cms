@@ -1,11 +1,13 @@
 // @ts-nocheck
 "use client";
 import { useState } from "react";
+import { useSpamTrap } from "../useSpamTrap";
 
 export function FollowCaseForm({ caseSlug }: { caseSlug: string }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const { trap, spamFields } = useSpamTrap();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -14,7 +16,7 @@ export function FollowCaseForm({ caseSlug }: { caseSlug: string }) {
       const res = await fetch("/api/case-follow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, caseSlug }),
+        body: JSON.stringify({ email, caseSlug, ...spamFields() }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -41,6 +43,7 @@ export function FollowCaseForm({ caseSlug }: { caseSlug: string }) {
 
   return (
     <form className="case-form" onSubmit={handleSubmit} noValidate>
+      {trap}
       <label className="case-form-label" htmlFor="follow-email">Email</label>
       <div className="case-form-row">
         <input

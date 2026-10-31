@@ -9,8 +9,11 @@ export const Subscribers: CollectionConfig = {
     description: 'Newsletter subscribers collected from the subscribe page.',
   },
   access: {
-    // Public can create (sign up) but not read/update/delete
-    create: () => true,
+    // Public submissions go through the matching /api route, which runs the
+    // spam checks and writes with the local API (access rules skipped). The
+    // auto-generated REST endpoint stays closed to the public so bots can't
+    // post here directly and skip those checks.
+    create: isAdminOrEditor,
     read: isAdminOrEditor,
     update: isAdminOrEditor,
     delete: isAdmin,

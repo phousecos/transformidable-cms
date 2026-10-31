@@ -3,12 +3,14 @@
 import { useState } from "react";
 import SiteNav from "../components/SiteNav";
 import Footer from "../components/Footer";
+import { useSpamTrap } from "../components/useSpamTrap";
 
 export default function SubscribePage() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const { trap, spamFields } = useSpamTrap();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,7 +20,7 @@ export default function SubscribePage() {
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, name, source: "website" }),
+        body: JSON.stringify({ email, name, source: "website", ...spamFields() }),
       });
       const data = await res.json();
 
@@ -68,6 +70,7 @@ export default function SubscribePage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="mt-10 space-y-5" noValidate>
+              {trap}
               <div>
                 <label htmlFor="name" className="block text-[10px] font-medium uppercase tracking-[0.2em] text-obsidian/70 md:text-xs">
                   Name <span className="normal-case tracking-normal text-obsidian/60">(optional)</span>

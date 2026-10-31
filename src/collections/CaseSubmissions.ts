@@ -12,7 +12,11 @@ export const CaseSubmissions: CollectionConfig = {
     description: 'Documents and feedback submitted by readers for review, from the case file "Contribute" form.',
   },
   access: {
-    create: () => true,
+    // Public submissions go through the matching /api route, which runs the
+    // spam checks and writes with the local API (access rules skipped). The
+    // auto-generated REST endpoint stays closed to the public so bots can't
+    // post here directly and skip those checks.
+    create: isAdminOrEditor,
     read: isAdminOrEditor,
     update: isAdminOrEditor,
     delete: isAdmin,

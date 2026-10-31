@@ -2,6 +2,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSpamTrap } from "../useSpamTrap";
 
 const Chevron = () => (
   <svg className="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
@@ -176,6 +177,7 @@ export function ResearchSubscribe({ list = "brief", id = "tr-email", buttonLabel
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [message, setMessage] = useState("");
+  const { trap, spamFields } = useSpamTrap();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -186,7 +188,7 @@ export function ResearchSubscribe({ list = "brief", id = "tr-email", buttonLabel
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source: "website", list }),
+        body: JSON.stringify({ email, source: "website", list, ...spamFields() }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
@@ -205,6 +207,7 @@ export function ResearchSubscribe({ list = "brief", id = "tr-email", buttonLabel
 
   return (
     <form className="subscribe" onSubmit={onSubmit}>
+      {trap}
       <label className="sr-only" htmlFor={id}>Email address</label>
       <input id={id} type="email" name="email" placeholder="you@institution.org" required value={email} onChange={(e) => setEmail(e.target.value)} />
       <button className="btn" type="submit" disabled={state === "sending"}>{state === "sending" ? "Joining…" : buttonLabel}</button>
