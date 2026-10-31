@@ -4,7 +4,8 @@ import { isLoggedIn } from '../../access/checkRole.ts'
 // Connected systems (KADE) that read the J. Lynne library through the API.
 // They sign in with an API key only (`Authorization: api-clients API-Key
 // <key>`), never with a password, and can't open the admin. Collections grant
-// them access explicitly (Assets and Asset Files, read-only); everywhere else
+// them access explicitly (Assets, Asset Files, Message Templates, Message
+// Snippets, Senders and Messaging Settings, read-only); everywhere else
 // they are treated as anonymous. Kept apart from `users` so that a client can
 // never pick up a person's access by accident.
 export const ApiClients: CollectionConfig = {
