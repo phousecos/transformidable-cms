@@ -48,9 +48,10 @@ const nextConfig = {
     }
     return webpackConfig
   },
-  // cms.transformidablethinking.com and transformidable.net are admin
-  // addresses, not the public site: send anything that isn't the admin, its
-  // API, or a static file to the admin login.
+  // transformidable.net hosts the admin (and sends email). Visitors who type
+  // it in land on the public site's home page; only /admin, /api and the
+  // admin's static files are served there. cms.transformidablethinking.com
+  // and jlynne.io are parked: not served by this app at all.
   async redirects() {
     return [
       // The public site doesn't host the admin: transformidable.net does.
@@ -69,11 +70,14 @@ const nextConfig = {
         destination: 'https://betransformidable.com/:path',
         permanent: true,
       },
+      // Everything else on transformidable.net goes to the public home page.
+      // The path is dropped on purpose: transformidable.net isn't a public
+      // address, so there are no page links on it to preserve.
       {
         source: '/:path((?!admin|api|_next)(?!.*\\.\\w+$).*)',
-        has: [{ type: 'host', value: '(?:cms\\..*|(?:www\\.)?(?:transformidable\\.net|jlynne\\.io))' }],
-        destination: '/admin',
-        permanent: false,
+        has: [{ type: 'host', value: '(?:www\\.)?transformidable\\.net' }],
+        destination: 'https://betransformidable.com/',
+        permanent: true,
       },
       // The Academy's first Course 1 was replaced by the Boards & Councils
       // briefing.

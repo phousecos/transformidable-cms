@@ -20,7 +20,7 @@ with its admin at **transformidable.net/admin** (jlynne.io/admin also works).
 | Worker | `transformidable-cms` (Transformidable account), `jlynne-cms` (J. Lynne account) | `jlynne-cms` (J. Lynne account), running this repo |
 | Database | **Supabase Postgres** (Transformidable); D1 `jlynne-cms` (J. Lynne) | **Supabase Postgres**, the same database, reached through a Hyperdrive in the J. Lynne account |
 | Files | R2 `transformidable-media` (Transformidable account); R2 `jlynne-cms` | R2 `transformidable-media` in the J. Lynne account. J. Lynne files go under `asset-files/` |
-| Admin | cms.transformidablethinking.com, jlynne.io/admin | transformidable.net/admin (and jlynne.io/admin). Both are admin-only: other paths redirect to /admin |
+| Admin | cms.transformidablethinking.com, jlynne.io/admin | transformidable.net/admin. Other paths there redirect to the betransformidable.com home page. cms.transformidablethinking.com and jlynne.io are parked |
 | Public site | transformidablethinking.com (Transformidable account) | **betransformidable.com** (this Worker). transformidablethinking.com keeps running on the old Worker until it's redirected |
 
 > **The database is Supabase, outside Cloudflare.** It does not move in this
@@ -192,7 +192,7 @@ KADE's old key belonged to jlynne.io and doesn't carry over.
       `KADE Analytics` → tick **Enable API Key** → Save → copy the key into
       KADE.
 - [ ] Update KADE's settings:
-  - Base URL: `https://transformidable.net` (`https://jlynne.io` also works for now)
+  - Base URL: `https://transformidable.net` (not jlynne.io, which is parked)
   - Header: `Authorization: api-clients API-Key <key>` (was `users API-Key`)
   - Files: `/api/asset-files/…` (was `/api/media/…`)
   - `/api/assets` and `/api/assets/current` are unchanged.
@@ -246,3 +246,23 @@ as a fallback.
 - **Leftovers:** the `jlynne-cms` D1 and R2, the phousecos/jlynne-cms repo, and
   the Transformidable account's bucket and Hyperdrive stay as they are until you
   decide to retire them.
+
+## Parked domains
+
+cms.transformidablethinking.com and jlynne.io are parked: nothing is served at
+them. The app no longer sends them anywhere; detaching them is a dashboard step.
+
+- [ ] Check KADE's base URL is `https://transformidable.net` (step 8). It stops
+      working on jlynne.io once that domain is detached.
+- [ ] **jlynne.io:** J. Lynne account → Workers & Pages → `jlynne-cms` →
+      Settings → Domains & Routes → remove `jlynne.io`. Leave its MX and TXT
+      records if the domain receives email.
+- [ ] **cms.transformidablethinking.com:** served by the Transformidable
+      account's `transformidable-cms` Worker, so it goes offline when that Worker
+      is deleted (step 10). To park it sooner, remove it under that Worker's
+      Settings → Domains & Routes.
+- [ ] Once both are detached, remove them from the CSRF list in
+      `src/payload.config.ts`.
+
+transformidable.net keeps its MX, SPF, DKIM and DMARC records for sending
+email; the Worker's custom domain only answers web traffic.

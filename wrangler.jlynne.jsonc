@@ -36,11 +36,13 @@
     // (transformidablethinking.com is parked, not served here.)
     { "pattern": "transformidable.media", "custom_domain": true },
     { "pattern": "www.transformidable.media", "custom_domain": true },
-    // The admin only: every other path redirects to /admin (next.config.mjs).
+    // The admin (/admin) and API (/api), and the domain email is sent from.
+    // Every other path redirects to the betransformidable.com home page
+    // (next.config.mjs).
     { "pattern": "transformidable.net", "custom_domain": true },
-    // The old library's address, which KADE reads until it moves to
-    // transformidable.net.
-    { "pattern": "jlynne.io", "custom_domain": true },
+    // jlynne.io is parked: not served here. Removing it from this list doesn't
+    // detach it from the Worker; that's done in the dashboard
+    // (docs/jlynne-account-move.md, "Parked domains").
   ],
   "vars": {
     // Where /api/assets/current points people for downloads: the Advisory
