@@ -190,6 +190,10 @@ export default buildConfig({
     'https://lumynr.com',
     'https://agentpmo.com',
     'https://vettersgroup.com',
+    // KADE Analytics, in case it reads Assets from the browser rather than
+    // its server. Reads still need its api-clients key.
+    'https://kadeanlytics.com',
+    'https://www.kadeanlytics.com',
   ],
 
   // CSRF: only requests from these origins can carry the admin session cookie
