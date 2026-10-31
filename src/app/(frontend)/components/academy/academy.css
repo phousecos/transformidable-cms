@@ -176,3 +176,106 @@
 .tr .ac-form-note { font-size: 12px; color: var(--ac-taupe); margin: 12px 0 0; }
 .tr .ac-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 .tr .ac-form-card .case-form-success + .link { margin-top: 16px; background: none; border: 0; padding-left: 0; }
+
+/* ==========================================================================
+   TRAINING MODE (Academy front door)
+   Same palette and chrome as the rest of the site, in a more hands-on
+   register: sans headlines, rounded cards, pill choices, prices on show.
+   ========================================================================== */
+.tr .ac-t-pill { display: inline-block; margin: 0 0 16px; padding: 7px 14px; border-radius: 999px; background: var(--wine-deep); color: var(--on-wine); font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: .04em; }
+.tr .ac-t-label { font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ac-oxblood); margin: 0; }
+.tr .ac-t-h2 { font-family: var(--sans); font-weight: 800; font-size: clamp(1.6rem, 3.2vw, 2.4rem); line-height: 1.1; letter-spacing: -.02em; color: var(--ac-ink); margin: 10px 0 14px; max-width: 24ch; text-wrap: balance; }
+.tr .ac-t-intro, .tr .ac-t-lede { font-family: var(--sans); font-size: 1.05rem; line-height: 1.6; color: var(--ink-body); max-width: 60ch; margin: 0; }
+.tr .ac-t-body { font-family: var(--sans); font-size: 1rem; line-height: 1.7; color: var(--ink-body); margin: 0 0 14px; }
+.tr .ac-t-small { font-family: var(--sans); font-size: .92rem; color: var(--ac-taupe); margin: 12px 0 0; }
+
+/* Beta band */
+.tr .ac-t-beta { background: var(--wine-deep); color: var(--on-wine); padding-block: clamp(44px, 6vw, 72px); }
+.tr .ac-t-beta .ac-t-label { color: var(--gold); }
+.tr .ac-t-beta .ac-t-h2 { color: #fff; }
+.tr .ac-t-beta .ac-t-lede { color: var(--on-wine); }
+.tr .ac-t-beta-top { display: grid; gap: 28px; grid-template-columns: 1fr; align-items: end; }
+@media (min-width: 900px) { .tr .ac-t-beta-top { grid-template-columns: 1.4fr 1fr; gap: 56px; } }
+.tr .ac-t-stats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.tr .ac-t-stats li { border: 1px solid var(--wine-rule); border-radius: 12px; padding: 16px 12px; text-align: center; }
+.tr .ac-t-stats b { display: block; font-family: var(--sans); font-weight: 800; font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1; color: var(--gold); }
+.tr .ac-t-stats span { display: block; margin-top: 8px; font-family: var(--sans); font-size: 12px; line-height: 1.35; color: var(--on-wine-mute); }
+.tr .ac-t-steps { list-style: none; margin: 36px 0 0; padding: 0; display: grid; gap: 12px; grid-template-columns: 1fr; counter-reset: ac-t; }
+@media (min-width: 700px) { .tr .ac-t-steps { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1000px) { .tr .ac-t-steps { grid-template-columns: repeat(4, 1fr); } }
+.tr .ac-t-steps li { counter-increment: ac-t; background: rgba(255, 255, 255, .06); border-radius: 12px; padding: 18px 18px 20px; display: flex; flex-direction: column; gap: 6px; }
+.tr .ac-t-steps li::before { content: counter(ac-t); width: 28px; height: 28px; border-radius: 50%; background: var(--gold); color: #1a1210; font-family: var(--sans); font-weight: 800; font-size: 14px; display: grid; place-items: center; margin-bottom: 6px; }
+.tr .ac-t-steps b { font-family: var(--sans); font-size: 1.02rem; color: #fff; }
+.tr .ac-t-steps span { font-family: var(--sans); font-size: .93rem; line-height: 1.55; color: var(--on-wine); }
+
+/* Program finder */
+.tr .ac-t-finder { margin: 26px 0 22px; padding: 20px 22px; background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; display: grid; gap: 16px; }
+.tr .ac-t-chips { border: 0; margin: 0; padding: 0; min-width: 0; }
+.tr .ac-t-chips legend { font-family: var(--sans); font-size: 13px; font-weight: 700; color: var(--ac-ink); margin-bottom: 8px; padding: 0; }
+.tr .ac-t-chips > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.tr .ac-t-chip { font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--ac-ink); background: var(--ac-cream); border: 1.5px solid var(--rule-strong); border-radius: 999px; padding: 9px 16px; cursor: pointer; transition: border-color .15s ease, background .15s ease; }
+.tr .ac-t-chip:hover { border-color: var(--ac-oxblood); }
+.tr .ac-t-chip[aria-pressed="true"] { background: var(--ac-oxblood); border-color: var(--ac-oxblood); color: var(--ac-cream); }
+.tr .ac-t-chip:focus-visible, .tr .ac-t-toggle button:focus-visible, .tr .ac-t-reset:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.tr .ac-t-finder-status { font-family: var(--sans); font-size: .95rem; color: var(--ink-body); margin: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
+.tr .ac-t-reset { font-family: var(--sans); font-size: 13px; font-weight: 700; color: var(--ac-oxblood); background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
+/* Program cards */
+.tr .ac-t-cards { display: grid; gap: 18px; grid-template-columns: 1fr; }
+@media (min-width: 960px) { .tr .ac-t-cards { grid-template-columns: repeat(3, 1fr); } }
+.tr .ac-t-card { background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; box-shadow: var(--shadow); padding: 22px 22px 20px; display: flex; flex-direction: column; transition: opacity .2s ease, border-color .2s ease, transform .2s ease; }
+.tr .ac-t-card.is-fit { border: 2px solid var(--ac-oxblood); transform: translateY(-2px); }
+.tr .ac-t-card.is-dim { opacity: .5; }
+.tr .ac-t-card-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.tr .ac-t-stage { font-family: var(--sans); font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--ac-oxblood); }
+.tr .ac-t-badge { font-family: var(--sans); font-size: 11px; font-weight: 800; letter-spacing: .04em; color: #1a1210; background: var(--gold); border-radius: 999px; padding: 5px 10px; white-space: nowrap; }
+.tr .ac-t-badge--soon { background: transparent; color: var(--ac-taupe); border: 1px solid var(--rule-strong); }
+.tr .ac-t-fit { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ac-oxblood); margin: 10px 0 0; }
+.tr .ac-t-card-title { font-family: var(--sans); font-weight: 800; font-size: 1.3rem; line-height: 1.2; letter-spacing: -.01em; margin: 12px 0 6px; text-wrap: balance; }
+.tr .ac-t-card-title a { color: var(--ac-ink); }
+.tr .ac-t-card-title a:hover { color: var(--ac-oxblood); }
+.tr .ac-t-card-sub { font-family: var(--sans); font-size: .96rem; line-height: 1.5; color: var(--ink-body); margin: 0 0 14px; }
+.tr .ac-t-meta { margin: 0 0 18px; display: grid; gap: 10px; }
+.tr .ac-t-meta div { display: grid; grid-template-columns: 104px 1fr; gap: 10px; border-top: 1px solid var(--rule); padding-top: 10px; }
+.tr .ac-t-meta dt { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ac-taupe); }
+.tr .ac-t-meta dd { margin: 0; font-family: var(--sans); font-size: .9rem; line-height: 1.45; color: var(--ac-ink); }
+.tr .ac-t-card-foot { margin-top: auto; }
+.tr .ac-t-price { font-family: var(--sans); margin: 0 0 14px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
+.tr .ac-t-price s { color: var(--ac-taupe); font-size: 1rem; }
+.tr .ac-t-price b { color: var(--ac-ink); font-size: 1.6rem; font-weight: 800; letter-spacing: -.01em; }
+.tr .ac-t-price span { font-size: 12px; font-weight: 700; color: var(--ac-oxblood); text-transform: uppercase; letter-spacing: .08em; }
+.tr .ac-t-price--soon { font-size: .9rem; color: var(--ac-taupe); line-height: 1.45; display: block; }
+.tr .ac-t-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+.tr .ac-t-btn { border-radius: 999px; }
+.tr .btn.ac-t-btn--ghost { background: transparent; color: var(--ac-oxblood); border: 1.5px solid var(--ac-oxblood); box-shadow: none; }
+.tr .btn.ac-t-btn--ghost:hover { background: var(--ac-oxblood); color: var(--ac-cream); }
+.tr .ac-t-more { font-family: var(--sans); font-size: 13px; font-weight: 700; color: var(--ac-oxblood); display: inline-flex; align-items: center; gap: 6px; }
+
+/* Every program / designed for */
+.tr .ac-t-promises { display: grid; gap: 16px; grid-template-columns: 1fr; margin-top: 10px; }
+@media (min-width: 900px) { .tr .ac-t-promises { grid-template-columns: repeat(3, 1fr); } }
+.tr .ac-t-promise { background: var(--paper); border-radius: 14px; padding: 22px; border: 1px solid var(--rule); }
+.tr .ac-t-promise h3 { font-family: var(--sans); font-weight: 800; font-size: 1.1rem; color: var(--ac-ink); margin: 0 0 8px; }
+.tr .ac-t-promise p { font-family: var(--sans); font-size: .96rem; line-height: 1.6; color: var(--ink-body); margin: 0; }
+.tr .ac-t-who { margin-top: 32px; }
+.tr .ac-t-who ul { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.tr .ac-t-who li { font-family: var(--sans); font-size: .95rem; font-weight: 600; color: var(--ac-ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 999px; padding: 8px 16px; }
+
+/* Faculty */
+.tr .ac-t-faculty { display: grid; gap: 18px 56px; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .tr .ac-t-faculty { grid-template-columns: 1fr 1.4fr; } }
+.tr .ac-t-role { font-family: var(--sans); font-size: .95rem; font-weight: 600; color: var(--ac-taupe); margin: 0; }
+
+/* Beta application */
+.tr .ac-t-pricelist { list-style: none; margin: 18px 0 0; padding: 0; border-top: 1px solid var(--rule-strong); }
+.tr .ac-t-pricelist li { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--rule-strong); font-family: var(--sans); font-weight: 700; color: var(--ac-ink); }
+.tr .ac-t-pricelist small { display: block; font-weight: 500; font-size: 13px; color: var(--ac-taupe); margin-top: 2px; }
+.tr .ac-t-pricelist .ac-t-price { margin: 0; flex: none; }
+.tr .ac-t-pricelist .ac-t-price b { font-size: 1.25rem; }
+.tr .ac-t-apply { display: flex; flex-direction: column; gap: 14px; }
+.tr .ac-t-toggle { display: inline-flex; align-self: flex-start; background: var(--paper); border: 1px solid var(--rule-strong); border-radius: 999px; padding: 4px; }
+.tr .ac-t-toggle button { font-family: var(--sans); font-size: 14px; font-weight: 700; color: var(--ac-ink); background: transparent; border: 0; border-radius: 999px; padding: 9px 18px; cursor: pointer; }
+.tr .ac-t-toggle button[aria-pressed="true"] { background: var(--ac-oxblood); color: var(--ac-cream); }
+.tr .ac-t-apply .ac-form-card { border-radius: 14px; }
+.tr .ac-t-apply .ac-form-h { font-family: var(--sans); font-weight: 800; }
+.tr .ac-t-apply .ac-form-sub { font-family: var(--sans); font-size: .96rem; }

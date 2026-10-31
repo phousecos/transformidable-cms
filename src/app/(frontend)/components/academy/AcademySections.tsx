@@ -20,12 +20,13 @@ export function AcademyShell({ children }) {
 
 // The Academy's light banner, in place of the research side's dark sky.
 // With an image (a transparent cutout), the photo takes the constellation's place.
-export function AcademyHero({ kicker, title, intro, children = null, seed = 97, image = null }) {
+export function AcademyHero({ kicker, title, intro, children = null, seed = 97, image = null, badge = null }) {
   return (
     <section className={image ? "ac-hero ac-hero--photo" : "ac-hero"}>
       {!image && <Constellation seed={seed} count={22} region={{ x0: 0.58, x1: 1, y0: 0, y1: 1 }} focal={{ x: 84, y: 40 }} className="ac-hero-stars" />}
       <div className="wrap ac-hero-in">
         <div className="ac-hero-text">
+          {badge && <p className="ac-t-pill">{badge}</p>}
           {kicker && <p className="kicker">{kicker}</p>}
           <h1 className="ac-title">{title}</h1>
           {intro && <p className="ac-hero-intro">{intro}</p>}

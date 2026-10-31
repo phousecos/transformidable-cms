@@ -26,6 +26,13 @@ const EMPTY = {
 
 const PROGRAM_VALUES = ACADEMY_PROGRAM_CHOICES.map((o) => o.value);
 
+// The beta covers the first two classes only; "more than one program" reads as both.
+const BETA_PROGRAM_CHOICES = [
+  ...ACADEMY_PROGRAM_CHOICES.filter((o) => o.value === "course-1" || o.value === "course-2"),
+  { label: "Both beta classes", value: "foundation-certificate" },
+  { label: "Not sure yet", value: "not-sure" },
+];
+
 function Select({ id, label, value, onChange, options, optional = true }) {
   return (
     <>
@@ -47,16 +54,19 @@ function Select({ id, label, value, onChange, options, optional = true }) {
 // timing questions that would only get in an individual's way. A course page
 // links here with ?program=<value> so the program it came from is preselected;
 // a program page that carries the form itself passes `program` instead.
+// With `beta`, the same form is the beta application.
 export function AcademyInquiryForm({
   source,
   type,
   program: defaultProgram = "",
   heading,
+  beta = false,
 }: {
   source: string;
   type: "organization" | "individual";
   program?: string;
   heading?: string;
+  beta?: boolean;
 }) {
   const initial = { ...EMPTY, program: defaultProgram };
   const [fields, setFields] = useState(initial);
@@ -67,6 +77,14 @@ export function AcademyInquiryForm({
     const program = new URLSearchParams(window.location.search).get("program");
     if (program && PROGRAM_VALUES.includes(program)) setFields((f) => ({ ...f, program }));
   }, []);
+
+  // A beta card's "Join the beta" button names its class on the way down.
+  useEffect(() => {
+    if (!beta) return;
+    const pick = (e) => setFields((f) => ({ ...f, program: e.detail }));
+    window.addEventListener("ac-beta-program", pick);
+    return () => window.removeEventListener("ac-beta-program", pick);
+  }, [beta]);
 
   const set = (key) => (e) => setFields((f) => ({ ...f, [key]: e.target.value }));
   const isOrg = type === "organization";
@@ -81,7 +99,7 @@ export function AcademyInquiryForm({
       const res = await fetch("/api/academy-inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...fields, type, source }),
+        body: JSON.stringify({ ...fields, type, source, beta }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
@@ -104,18 +122,22 @@ export function AcademyInquiryForm({
         <div className="case-form-success" role="status" aria-live="polite">
           <p>{feedback}</p>
         </div>
-        <button type="button" className="link" onClick={() => setStatus("idle")}>Submit another inquiry</button>
+        <button type="button" className="link" onClick={() => setStatus("idle")}>{beta ? "Submit another application" : "Submit another inquiry"}</button>
       </div>
     );
   }
 
   return (
     <div className="ac-form-card">
-      <h3 className="ac-form-h">{heading || (isOrg ? "Request a private session" : "Join the interest list")}</h3>
+      <h3 className="ac-form-h">{heading || (beta ? "Apply for the beta" : isOrg ? "Request a private session" : "Join the interest list")}</h3>
       <p className="ac-form-sub">
-        {isOrg
-          ? "Tell us about your group and we will arrange a conversation about scope, format, and timing."
-          : "We will let you know when an open program is scheduled."}
+        {beta
+          ? isOrg
+            ? "Tell us about your team and which class you would like to take. We will confirm fit and scheduling with you."
+            : "Tell us about yourself and which class you would like to take. We will be in touch about joining a session."
+          : isOrg
+            ? "Tell us about your group and we will arrange a conversation about scope, format, and timing."
+            : "We will let you know when an open program is scheduled."}
       </p>
 
       <form className="case-form" onSubmit={handleSubmit} noValidate>
@@ -160,7 +182,7 @@ export function AcademyInquiryForm({
             <Select id={`${idp}-sector`} label="Sector" value={fields.sector} onChange={set("sector")} options={ACADEMY_SECTORS} />
           </div>
           <div>
-            <Select id={`${idp}-program`} label="Program interest" value={fields.program} onChange={set("program")} options={ACADEMY_PROGRAM_CHOICES} />
+            <Select id={`${idp}-program`} label={beta ? "Beta class" : "Program interest"} value={fields.program} onChange={set("program")} options={beta ? BETA_PROGRAM_CHOICES : ACADEMY_PROGRAM_CHOICES} />
           </div>
           {isOrg && (
             <>
@@ -187,10 +209,12 @@ export function AcademyInquiryForm({
         </div>
 
         <button type="submit" className="case-form-btn ac-submit" disabled={status === "loading"} aria-busy={status === "loading"}>
-          {status === "loading" ? "Sending…" : isOrg ? "Request a discussion" : "Register interest"}
+          {status === "loading" ? "Sending…" : beta ? "Apply for the beta" : isOrg ? "Request a discussion" : "Register interest"}
         </button>
         <p className="ac-form-note">
-          {isOrg ? "An inquiry carries no commitment." : "Joining the interest list is not enrollment and carries no financial commitment."}
+          {beta
+            ? "Applying carries no commitment. Your place, schedule, and price are confirmed with you first."
+            : isOrg ? "An inquiry carries no commitment." : "Joining the interest list is not enrollment and carries no financial commitment."}
         </p>
       </form>
     </div>
