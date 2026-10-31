@@ -13,9 +13,11 @@ export const CaseFollows: CollectionConfig = {
     description: 'Readers following a case file for daily update digests. Created from the "Follow this case" form.',
   },
   access: {
-    // Public can create (follow) but not read/update/delete via the API —
-    // the case-follow route and unsubscribe link handle those server-side.
-    create: () => true,
+    // Public submissions go through the matching /api route, which runs the
+    // spam checks and writes with the local API (access rules skipped). The
+    // auto-generated REST endpoint stays closed to the public so bots can't
+    // post here directly and skip those checks.
+    create: isAdminOrEditor,
     read: isAdminOrEditor,
     update: isAdminOrEditor,
     delete: isAdmin,

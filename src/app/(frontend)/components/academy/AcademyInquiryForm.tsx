@@ -1,6 +1,7 @@
 // @ts-nocheck
 "use client";
 import { useEffect, useState } from "react";
+import { useSpamTrap } from "../useSpamTrap";
 import {
   ACADEMY_DELIVERY,
   ACADEMY_PARTICIPANTS,
@@ -21,7 +22,6 @@ const EMPTY = {
   delivery: "",
   timeframe: "",
   message: "",
-  company_website: "",
 };
 
 const PROGRAM_VALUES = ACADEMY_PROGRAM_CHOICES.map((o) => o.value);
@@ -70,6 +70,7 @@ export function AcademyInquiryForm({
 }) {
   const initial = { ...EMPTY, program: defaultProgram };
   const [fields, setFields] = useState(initial);
+  const { trap, spamFields } = useSpamTrap();
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [feedback, setFeedback] = useState("");
 
@@ -99,7 +100,7 @@ export function AcademyInquiryForm({
       const res = await fetch("/api/academy-inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...fields, type, source, beta }),
+        body: JSON.stringify({ ...fields, type, source, beta, ...spamFields() }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
@@ -141,11 +142,7 @@ export function AcademyInquiryForm({
       </p>
 
       <form className="case-form" onSubmit={handleSubmit} noValidate>
-        {/* Honeypot: hidden from people and assistive tech; bots fill it. */}
-        <div className="ac-hp" aria-hidden="true">
-          <label htmlFor={`${idp}-website`}>Company website</label>
-          <input id={`${idp}-website`} type="text" tabIndex={-1} autoComplete="off" value={fields.company_website} onChange={set("company_website")} />
-        </div>
+        {trap}
 
         {isOrg && (
           <>

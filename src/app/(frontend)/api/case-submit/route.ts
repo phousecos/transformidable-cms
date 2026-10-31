@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { EMAIL_RE, MAX_EMAIL_LEN, createRateLimiter, getClientIp } from '../../../../lib/apiRequestGuards.ts'
+import { EMAIL_RE, MAX_EMAIL_LEN, TOO_FAST_MESSAGE, checkSpam, createRateLimiter, getClientIp } from '../../../../lib/apiRequestGuards.ts'
 
 const MAX_NAME_LEN = 100
 const MAX_MESSAGE_LEN = 5000
 const MAX_URL_LEN = 2000
 const MAX_FILE_BYTES = 15 * 1024 * 1024 // 15MB
 const ALLOWED_FILE_TYPES = ['application/pdf', 'image/']
+const SUCCESS_MESSAGE = 'Thanks — this has been sent to our research team for review.'
 
 // Submissions can carry a file upload, which is heavier than a form post —
 // a tighter window than the follow/subscribe endpoints.
@@ -34,6 +35,10 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 })
   }
+
+  const spam = checkSpam((key) => form.get(key))
+  if (spam === 'bot') return NextResponse.json({ message: SUCCESS_MESSAGE })
+  if (spam === 'too-fast') return NextResponse.json({ error: TOO_FAST_MESSAGE }, { status: 400 })
 
   const type = form.get('type')
   const caseSlug = form.get('caseSlug')
@@ -148,9 +153,7 @@ export async function POST(req: NextRequest) {
       },
     })
 
-    return NextResponse.json({
-      message: 'Thanks — this has been sent to our research team for review.',
-    })
+    return NextResponse.json({ message: SUCCESS_MESSAGE })
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Unknown error'
     console.error('[case-submit] Error:', msg)

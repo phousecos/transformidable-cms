@@ -1,6 +1,7 @@
 // @ts-nocheck
 "use client";
 import { useState } from "react";
+import { useSpamTrap } from "../useSpamTrap";
 
 export function SubmitToCaseForm({ caseSlug }: { caseSlug: string }) {
   const [type, setType] = useState<"document" | "feedback">("document");
@@ -11,6 +12,7 @@ export function SubmitToCaseForm({ caseSlug }: { caseSlug: string }) {
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [feedback, setFeedback] = useState("");
+  const { trap, spamFields } = useSpamTrap();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +26,7 @@ export function SubmitToCaseForm({ caseSlug }: { caseSlug: string }) {
       if (email) form.set("submitterEmail", email);
       if (type === "document" && sourceUrl) form.set("sourceUrl", sourceUrl);
       if (type === "document" && file) form.set("file", file);
+      for (const [key, value] of Object.entries(spamFields())) form.set(key, String(value));
 
       const res = await fetch("/api/case-submit", { method: "POST", body: form });
       const data = await res.json();
@@ -52,6 +55,7 @@ export function SubmitToCaseForm({ caseSlug }: { caseSlug: string }) {
 
   return (
     <form className="case-form" onSubmit={handleSubmit} noValidate>
+      {trap}
       <div className="case-form-toggle" role="radiogroup" aria-label="Submission type">
         <button
           type="button"

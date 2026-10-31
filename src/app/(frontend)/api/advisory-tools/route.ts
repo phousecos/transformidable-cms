@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { EMAIL_RE, MAX_EMAIL_LEN, createRateLimiter, getClientIp } from '../../../../lib/apiRequestGuards.ts'
+import { EMAIL_RE, MAX_EMAIL_LEN, TOO_FAST_MESSAGE, checkSpam, createRateLimiter, getClientIp } from '../../../../lib/apiRequestGuards.ts'
 import { TOOLS_PATH, downloadToken, findTool } from '../../../../lib/advisoryTools.ts'
 import { joinList } from '../../../../lib/subscribers.ts'
 
@@ -53,8 +53,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'A valid email is required.' }, { status: 400 })
   }
 
-  // Honeypot: real people never see this field. Answer as if it worked.
-  if (body.company_website) return NextResponse.json({ downloadUrl: `${TOOLS_PATH}/${slug}` })
+  // Spam (see checkSpam): bots get a normal-looking reply and nothing is saved.
+  const spam = checkSpam((key) => body[key])
+  if (spam === 'bot') return NextResponse.json({ downloadUrl: `${TOOLS_PATH}/${slug}` })
+  if (spam === 'too-fast') return NextResponse.json({ error: TOO_FAST_MESSAGE }, { status: 400 })
 
   try {
     const payload = await getPayload({ config })

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { EMAIL_RE, MAX_EMAIL_LEN, createRateLimiter, getClientIp } from '../../../../lib/apiRequestGuards.ts'
+import { EMAIL_RE, MAX_EMAIL_LEN, TOO_FAST_MESSAGE, checkSpam, createRateLimiter, getClientIp } from '../../../../lib/apiRequestGuards.ts'
 import {
   ACADEMY_DELIVERY,
   ACADEMY_PARTICIPANTS,
@@ -60,11 +60,10 @@ export async function POST(req: NextRequest) {
   }
   const f = body as Fields
 
-  // Honeypot: a field hidden from people. Bots that fill it get a normal
-  // success response so they have no signal to adapt to, and nothing is saved.
-  if (typeof f.company_website === 'string' && f.company_website.trim()) {
-    return NextResponse.json({ message: 'Thank you. We will be in touch.' })
-  }
+  // Spam (see checkSpam): bots get a normal-looking reply and nothing is saved.
+  const spam = checkSpam((key) => f[key])
+  if (spam === 'bot') return NextResponse.json({ message: 'Thank you. We will be in touch.' })
+  if (spam === 'too-fast') return NextResponse.json({ error: TOO_FAST_MESSAGE }, { status: 400 })
 
   const type = f.type === 'organization' || f.type === 'individual' ? f.type : null
   if (!type) return NextResponse.json({ error: 'Choose organization or individual.' }, { status: 400 })

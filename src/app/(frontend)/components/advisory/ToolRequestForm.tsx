@@ -2,11 +2,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import { captureInbound } from "./inbound";
+import { useSpamTrap } from "../useSpamTrap";
 
 // Name and email, then the download. The link comes back from the server
 // signed and expiring, so it can't be shared on to skip the form for long.
 export function ToolRequestForm({ slug, title }: { slug: string; title: string }) {
-  const [fields, setFields] = useState({ name: "", email: "", organization: "", joinBrief: true, company_website: "" });
+  const [fields, setFields] = useState({ name: "", email: "", organization: "", joinBrief: true });
+  const { trap, spamFields } = useSpamTrap();
   const [inbound, setInbound] = useState({});
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -32,7 +34,7 @@ export function ToolRequestForm({ slug, title }: { slug: string; title: string }
       const res = await fetch("/api/advisory-tools", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug, ...fields, inbound }),
+        body: JSON.stringify({ slug, ...fields, inbound, ...spamFields() }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.downloadUrl) {
@@ -67,11 +69,7 @@ export function ToolRequestForm({ slug, title }: { slug: string; title: string }
       <h2>Download</h2>
       <p>Tell us who you are and the download starts right away.</p>
       <form className="case-form av-form" onSubmit={onSubmit} noValidate>
-        {/* Honeypot: hidden from people and assistive tech; bots fill it. */}
-        <div className="av-hp" aria-hidden="true">
-          <label htmlFor="tool-website">Company website</label>
-          <input id="tool-website" type="text" tabIndex={-1} autoComplete="off" value={fields.company_website} onChange={set("company_website")} />
-        </div>
+        {trap}
         <div className="av-form-grid">
           <div>
             <label className="case-form-label" htmlFor="tool-name">Name</label>

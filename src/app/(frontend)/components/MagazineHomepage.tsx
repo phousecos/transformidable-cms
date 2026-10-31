@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import "./magazine.css";
+import { useSpamTrap } from "./useSpamTrap";
 
 interface MagazineHomepageProps {
   issue: any;
@@ -263,6 +264,7 @@ function SubscribeForm() {
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [message, setMessage] = useState("");
+  const { trap, spamFields } = useSpamTrap();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -273,7 +275,7 @@ function SubscribeForm() {
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source: "website" }),
+        body: JSON.stringify({ email, source: "website", ...spamFields() }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
@@ -300,6 +302,7 @@ function SubscribeForm() {
         )}
       </div>
       <form className="subscribe-form" onSubmit={onSubmit}>
+        {trap}
         <label className="sr-only" htmlFor="email">Email address</label>
         <input id="email" type="email" name="email" placeholder="you@company.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
         <button className="btn" type="submit" disabled={state === "sending"}>{state === "sending" ? "Joining…" : "Join"}</button>

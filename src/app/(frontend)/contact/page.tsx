@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ResearchShell } from "../components/research/ResearchShell";
 import { Sky } from "../components/research/Sky";
+import { useSpamTrap } from "../components/useSpamTrap";
 
 export default function ContactPage() {
   const [name, setName] = useState("");
@@ -11,6 +12,7 @@ export default function ContactPage() {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [feedback, setFeedback] = useState("");
+  const { trap, spamFields } = useSpamTrap();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +22,7 @@ export default function ContactPage() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, subject, message }),
+        body: JSON.stringify({ name, email, subject, message, ...spamFields() }),
       });
       const data = await res.json();
 
@@ -62,6 +64,7 @@ export default function ContactPage() {
             </div>
           ) : (
             <form className="case-form" onSubmit={handleSubmit} noValidate>
+              {trap}
               <label className="case-form-label" htmlFor="contact-name">Name</label>
               <input
                 id="contact-name"

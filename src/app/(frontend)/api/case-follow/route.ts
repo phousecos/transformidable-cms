@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { EMAIL_RE, MAX_EMAIL_LEN, createRateLimiter, getClientIp } from '../../../../lib/apiRequestGuards.ts'
+import { EMAIL_RE, MAX_EMAIL_LEN, TOO_FAST_MESSAGE, checkSpam, createRateLimiter, getClientIp } from '../../../../lib/apiRequestGuards.ts'
 
 // Same anti-enumeration approach as api/subscribe/route.ts: one generic
 // message regardless of whether this is a new follow, a re-activation, or
@@ -30,7 +30,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 })
   }
 
-  const { email, caseSlug } = body as Record<string, unknown>
+  const fields = body as Record<string, unknown>
+  const spam = checkSpam((key) => fields[key])
+  if (spam === 'bot') return NextResponse.json({ message: SUCCESS_MESSAGE })
+  if (spam === 'too-fast') return NextResponse.json({ error: TOO_FAST_MESSAGE }, { status: 400 })
+
+  const { email, caseSlug } = fields
 
   if (
     typeof email !== 'string' ||

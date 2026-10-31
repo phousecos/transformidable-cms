@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { getClientIp } from '../../../../lib/apiRequestGuards.ts'
+import { TOO_FAST_MESSAGE, checkSpam, getClientIp } from '../../../../lib/apiRequestGuards.ts'
 import { joinList } from '../../../../lib/subscribers.ts'
 
 // Generic, identical message for every successful path. We deliberately do not
@@ -55,7 +55,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 })
   }
 
-  const { email, name, source, list } = body as Record<string, unknown>
+  const fields = body as Record<string, unknown>
+  const spam = checkSpam((key) => fields[key])
+  if (spam === 'bot') return NextResponse.json({ message: SUCCESS_MESSAGE })
+  if (spam === 'too-fast') return NextResponse.json({ error: TOO_FAST_MESSAGE }, { status: 400 })
+
+  const { email, name, source, list } = fields
 
   if (
     typeof email !== 'string' ||
