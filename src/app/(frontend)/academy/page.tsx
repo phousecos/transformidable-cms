@@ -1,11 +1,11 @@
 // @ts-nocheck
-import Link from "next/link";
-import { AcademyFaq, AcademyHero, AcademyPrivateSessions, AcademyShell, Arrow } from "../components/academy/AcademySections";
+import { AcademyFaq, AcademyHero, AcademyShell, Arrow } from "../components/academy/AcademySections";
+import { BetaApply, ProgramFinder } from "../components/academy/AcademyTraining";
 import { LegacyAcademyAnchors } from "../components/academy/LegacyAcademyAnchors";
-import { FEATURED, OTHER_AUDIENCES, PRIMARY_AUDIENCES, PROGRAMS, PROMISES, faqIn, programHref } from "./content";
+import { BETA, BETA_STEPS, FACULTY, OTHER_AUDIENCES, PRIMARY_AUDIENCES, PROGRAMS, PROMISES, betaPrice, faqIn, formatPrice } from "./content";
 
 const DESCRIPTION =
-  "AI governance education for city councils, county commissions, university governing boards, and executive leadership teams. Programs for decision-makers, with practical governance tools, delivered as private sessions.";
+  "AI governance education for city councils, county commissions, university governing boards, and executive leadership teams. Now enrolling beta participants at 50% off the first two classes.";
 
 export const metadata = {
   title: "Academy",
@@ -18,108 +18,126 @@ export const metadata = {
   },
 };
 
+const pct = `${BETA.discount * 100}%`;
+
+// The Academy front door, in training mode: lead with the beta offer, help
+// visitors find the program that fits, then take the application.
 export default function AcademyPage() {
   return (
     <AcademyShell>
       <LegacyAcademyAnchors />
 
       <AcademyHero
+        badge={<>Beta enrollment open &middot; {pct} off &middot; {BETA.orgSpots} organization spots</>}
         kicker="Transformidable Academy · AI Governance Education"
         title="Govern the technology shaping your organization."
         intro="Executive education for the leaders and governing bodies who oversee decisions about artificial intelligence. Designed for decision-makers rather than technical specialists, with practical governance tools to take back to your organization."
         image={{ src: "/academy-hero-jerri-bland-knee.webp", alt: "Jerri Bland, Ed.D., Lead Faculty", width: 548, height: 800 }}
       >
         <div className="ac-hero-cta">
-          <Link className="btn" href={programHref(FEATURED.slug)}>Explore the briefing for boards &amp; councils <Arrow s={14} /></Link>
+          <a className="btn" href="#beta">Join the beta <Arrow s={14} /></a>
+          <a className="link" href="#programs">Find your program <Arrow /></a>
         </div>
       </AcademyHero>
 
-      <section className="ac-band" id="featured" aria-labelledby="ac-featured-h">
+      <section className="ac-t-beta" aria-labelledby="ac-beta-h">
         <div className="wrap">
-          <p className="kicker">Featured program</p>
-          <div className="ac-feature">
+          <div className="ac-t-beta-top">
             <div>
-              <p className="ac-eyebrow">{FEATURED.eyebrow}</p>
-              <h2 className="ac-feature-title" id="ac-featured-h">{FEATURED.title}</h2>
-              <p className="ac-subtitle">{FEATURED.subtitle}</p>
-              <p className="body">{FEATURED.intro[1]} {FEATURED.intro[2]}</p>
+              <p className="ac-t-label">Beta program</p>
+              <h2 className="ac-t-h2" id="ac-beta-h">Take the first two classes at {pct} off, and help shape the certificate.</h2>
+              <p className="ac-t-lede">
+                We are opening the first two classes of the AI Governance certificate pathway to a small group of beta
+                participants. Organizations come first, and individuals are welcome.
+              </p>
             </div>
-            <div className="ac-feature-side">
-              <p className="ac-feature-label">You&rsquo;ll take away</p>
-              <p className="body">{FEATURED.takeaway}</p>
-              <p style={{ marginTop: 18 }}><Link className="link" href={programHref(FEATURED.slug)}>View the briefing <Arrow /></Link></p>
-            </div>
+            <ul className="ac-t-stats">
+              <li><b>{pct}</b><span>off both beta classes</span></li>
+              <li><b>{BETA.orgSpots}</b><span>organization spots</span></li>
+              <li><b>{BETA.programs.length}</b><span>classes in the beta</span></li>
+            </ul>
           </div>
-        </div>
-      </section>
-
-      <section className="ac-band ac-band--parchment" id="programs" aria-labelledby="ac-programs-h">
-        <div className="wrap">
-          <p className="kicker">AI Governance Education</p>
-          <h2 className="ac-h2" id="ac-programs-h">Three programs. Start wherever your organization is.</h2>
-          <div className="ac-stages">
-            {PROGRAMS.map((p) => (
-              <Link className="ac-stage" href={programHref(p.slug)} key={p.slug}>
-                <span className="ac-stage-name">{p.stage.name}</span>
-                <span className="ac-stage-format">{p.stage.format}</span>
-                <span className="ac-stage-desc">{p.stage.line}</span>
-                <span className="ac-stage-title">{p.title}</span>
-                <span className="ac-course-go">View program <Arrow /></span>
-              </Link>
+          <ol className="ac-t-steps">
+            {BETA_STEPS.map((s) => (
+              <li key={s.title}><b>{s.title}</b><span>{s.text}</span></li>
             ))}
-          </div>
-          <p className="ac-request">
-            <Link className="link" href="/academy/organizations#register">Request information <Arrow /></Link>
-          </p>
-          <p className="ac-note">
-            Each program stands on its own. None is a prerequisite: a council may want only the briefing, an executive
-            team may be ready for the workshop, and an organization building an AI governance program may need the
-            applied course.
-          </p>
+          </ol>
         </div>
       </section>
 
-      <section className="ac-band" aria-labelledby="ac-promises-h">
+      <section className="ac-band ac-t-band" id="programs" aria-labelledby="ac-programs-h">
         <div className="wrap">
-          <p className="kicker">Every program</p>
-          <h2 className="ac-h2" id="ac-promises-h">Built for the people responsible for oversight.</h2>
-          <div className="ac-promises">
+          <p className="ac-t-label">Find your program</p>
+          <h2 className="ac-t-h2" id="ac-programs-h">Find the program that fits your team.</h2>
+          <p className="ac-t-intro">
+            Three programs, each standing on its own. None is a prerequisite, so start wherever your organization is.
+          </p>
+          <ProgramFinder programs={PROGRAMS} />
+        </div>
+      </section>
+
+      <section className="ac-band ac-band--parchment ac-t-band" aria-labelledby="ac-promises-h">
+        <div className="wrap">
+          <p className="ac-t-label">Every program</p>
+          <h2 className="ac-t-h2" id="ac-promises-h">Built for the people responsible for oversight.</h2>
+          <div className="ac-t-promises">
             {PROMISES.map((x) => (
-              <div className="ac-promise" key={x.title}>
-                <h3 className="ac-h3">{x.title}</h3>
+              <div className="ac-t-promise" key={x.title}>
+                <h3>{x.title}</h3>
                 <p>{x.text}</p>
               </div>
             ))}
           </div>
-          <div className="ac-who">
-            <p className="ac-feature-label">Designed for</p>
-            <ul className="ac-who-list">
+          <div className="ac-t-who">
+            <p className="ac-t-label">Designed for</p>
+            <ul>
               {PRIMARY_AUDIENCES.map((a) => <li key={a}>{a}</li>)}
             </ul>
-            <p className="ac-note" style={{ marginTop: 10 }}>{OTHER_AUDIENCES}</p>
+            <p className="ac-t-small">{OTHER_AUDIENCES}</p>
           </div>
         </div>
       </section>
 
-      <AcademyPrivateSessions />
-
-      <section className="ac-band" aria-labelledby="ac-approach-h">
-        <div className="wrap ac-two">
+      <section className="ac-band ac-t-band" aria-labelledby="ac-faculty-h">
+        <div className="wrap ac-t-faculty">
           <div>
-            <p className="kicker">Our approach</p>
-            <h2 className="ac-h2" id="ac-approach-h">Research-informed. Practice-oriented.</h2>
+            <p className="ac-t-label">Your faculty</p>
+            <h2 className="ac-t-h2" id="ac-faculty-h">{FACULTY.name}</h2>
+            <p className="ac-t-role">{FACULTY.role} &middot; {FACULTY.creds}</p>
           </div>
           <div>
-            <p className="body">
-              The Academy draws on the governance <Link className="ac-inline" href="/research">research</Link> of
-              Transformidable, which examines how governance decisions shape technology-enabled transformation, and
-              turns those lessons into practical executive education.
+            <p className="ac-t-body">{FACULTY.bio}</p>
+            <p className="ac-t-body">
+              Every program draws on Transformidable&rsquo;s governance <a className="ac-inline" href="/research">research</a>,
+              turned into practical tools leaders can use the next day.
             </p>
           </div>
         </div>
       </section>
 
-      <AcademyFaq items={faqIn("general")} heading="Common questions" />
+      <section className="ac-band ac-band--parchment ac-t-band" id="beta" aria-labelledby="ac-apply-h">
+        <div className="wrap ac-register">
+          <div className="ac-register-copy">
+            <p className="ac-t-label">Apply for the beta</p>
+            <h2 className="ac-t-h2" id="ac-apply-h">Reserve one of {BETA.orgSpots} organization spots.</h2>
+            <p className="ac-t-body">
+              Tell us who you are and which class you would like. We will confirm fit and scheduling with you before
+              anything is booked.
+            </p>
+            <ul className="ac-t-pricelist">
+              {BETA.programs.map((p) => (
+                <li key={p.slug}>
+                  <span>{p.title}<small>{p.stage.format}</small></span>
+                  <span className="ac-t-price"><s>{formatPrice(p.beta.price)}</s><b>{formatPrice(betaPrice(p.beta.price))}</b></span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <BetaApply source="/academy (beta)" />
+        </div>
+      </section>
+
+      <AcademyFaq items={[...faqIn("beta"), ...faqIn("general")]} heading="Common questions" />
     </AcademyShell>
   );
 }

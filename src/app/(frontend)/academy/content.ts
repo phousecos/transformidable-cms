@@ -39,6 +39,8 @@ export const PROGRAMS = [
     attend: "City councils, county commissions, boards of trustees, governing committees, and executive leadership teams.",
     delivery: ["90-minute facilitated briefing, available virtually or in person for private organizational groups."],
     facts: { format: "90-minute facilitated briefing", delivery: "Virtual or in person" },
+    beta: { price: 75 },
+    fit: { roles: ["board", "executive"], time: "90-min" },
     closing: {
       headline: "Bring AI governance into your next board or council discussion.",
       line: "Contact Transformidable Academy to discuss a private briefing for your organization.",
@@ -78,6 +80,8 @@ export const PROGRAMS = [
       "The workshop can be adapted to the organization's sector, existing AI activities, and governance responsibilities.",
     ],
     facts: { format: "Four-hour facilitated workshop", delivery: "Half-day session or two virtual sessions" },
+    beta: { price: 8000 },
+    fit: { roles: ["board", "executive", "builder"], time: "half-day" },
     closing: {
       headline: "Move beyond AI awareness. Establish the questions, responsibilities, and evidence needed for effective oversight.",
       line: "Contact Transformidable Academy to arrange a private workshop.",
@@ -116,6 +120,8 @@ export const PROGRAMS = [
     delivery: ["Approximately seven hours of facilitated instruction and applied exercises, available as a private organizational program."],
     note: "This course is being developed as part of the Transformidable Academy AI Governance Foundation learning pathway.",
     facts: { format: "About seven hours of instruction and applied exercises", delivery: "Private organizational program" },
+    beta: null,
+    fit: { roles: ["executive", "builder"], time: "full-day" },
     closing: {
       headline: "Translate governance principles into a practical plan for your organization.",
       line: "Register your interest in an upcoming program or discuss a private organizational cohort.",
@@ -127,6 +133,45 @@ export const PROGRAMS = [
 ];
 
 export const FEATURED = PROGRAMS.find((p) => p.featured);
+
+// The beta: the first two classes of the certificate pathway, at half price,
+// for a limited number of organizations who take the class and give feedback.
+// Individuals are welcome too. Prices on PROGRAMS[].beta are TEST NUMBERS
+// until real pricing is set.
+export const BETA = {
+  discount: 0.5,
+  orgSpots: 5,
+  programs: PROGRAMS.filter((p) => p.beta),
+};
+export const betaPrice = (price: number) => price * (1 - BETA.discount);
+export const formatPrice = (n: number) =>
+  "$" + n.toLocaleString("en-US", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
+
+export const BETA_STEPS = [
+  { title: "Apply", text: "Tell us about your organization, or yourself, and which class you are interested in." },
+  { title: "Confirm your place", text: "We confirm fit and schedule your session. Spots are limited to five organizations." },
+  { title: "Take the class at 50% off", text: "The full program, delivered privately for your team, virtually or in person." },
+  { title: "Shape what comes next", text: "Share what worked and what did not. Your feedback shapes the certificate pathway." },
+];
+
+// The program finder's two questions. Each program's `fit` uses these values.
+export const FINDER_ROLES = [
+  { value: "board", label: "Board or council member" },
+  { value: "executive", label: "Executive or leadership team" },
+  { value: "builder", label: "Building our AI governance program" },
+];
+export const FINDER_TIMES = [
+  { value: "90-min", label: "90 minutes" },
+  { value: "half-day", label: "Half a day" },
+  { value: "full-day", label: "A full day" },
+];
+
+export const FACULTY = {
+  name: "Dr. Jerri Bland",
+  role: "Lead Faculty",
+  bio: "Dr. Jerri Bland has spent more than 25 years in enterprise technology leadership, including as Deputy CIO at Columbia University and as Associate Vice Chancellor for Enterprise Applications at UNC\u2013Chapel Hill, where she led a $42M+ implementation portfolio. She leads Transformidable\u2019s research on why technology programs succeed or fail, and brings those lessons into every Academy session.",
+  creds: "Ed.D. \u00b7 PMP \u00b7 CSM \u00b7 ITIL",
+};
 export const programHref = (slug: string) => `/academy/courses/${slug}`;
 
 // What every program shares, in the order the copy leads with it.
@@ -153,10 +198,11 @@ export const PRIMARY_AUDIENCES = [
 ];
 export const OTHER_AUDIENCES = "Other governing bodies, including nonprofit and financial institution boards.";
 
-type FaqGroup = "general" | "organizations" | "individuals";
+type FaqGroup = "general" | "beta" | "organizations" | "individuals";
 
 export const FAQ_GROUPS: { key: FaqGroup; title: string }[] = [
   { key: "general", title: "About the programs" },
+  { key: "beta", title: "The beta program" },
   { key: "organizations", title: "For organizations" },
   { key: "individuals", title: "For individuals" },
 ];
@@ -191,6 +237,26 @@ export const FAQ: { q: string; a: string; group: FaqGroup }[] = [
     q: "How does the Academy relate to Transformidable research?",
     a: "The Academy draws on Transformidable's governance research, which examines how governance decisions shape technology-enabled transformation, and turns those lessons into executive education.",
     group: "general",
+  },
+  {
+    q: "What is the beta program?",
+    a: "The first two classes of the certificate pathway, AI Governance for Boards & Councils and Governing AI Adoption, are open to a small group of beta participants at 50% off. Beta participants take the full class and share feedback that shapes the programs.",
+    group: "beta",
+  },
+  {
+    q: "Who can join the beta?",
+    a: "Organizations first: the beta is limited to five organizations, each taking a class privately for its team. Individuals are welcome to apply as well.",
+    group: "beta",
+  },
+  {
+    q: "What is expected of beta participants?",
+    a: "Take the class and tell us what worked and what did not: the content, the tools, and the delivery. We will arrange how and when to gather feedback when we confirm your place.",
+    group: "beta",
+  },
+  {
+    q: "Does applying commit us to anything?",
+    a: "No. Applying starts a conversation. Your place, schedule, and price are confirmed with you before anything is booked.",
+    group: "beta",
   },
   {
     q: "Can you hold a session for our whole council or board?",

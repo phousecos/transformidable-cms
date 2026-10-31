@@ -17,7 +17,7 @@ export const AcademyInquiries: CollectionConfig = {
   labels: { singular: 'Academy Inquiry', plural: 'Academy Inquiries' },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['type', 'name', 'organization', 'program', 'status', 'submittedAt'],
+    defaultColumns: ['type', 'beta', 'name', 'organization', 'program', 'status', 'submittedAt'],
     description:
       'Private cohort inquiries and interest-list registrations from the Academy pages. Registering interest is not enrollment.',
   },
@@ -39,6 +39,13 @@ export const AcademyInquiries: CollectionConfig = {
         { label: 'Organization (private cohort)', value: 'organization' },
         { label: 'Individual (interest list)', value: 'individual' },
       ],
+    },
+    {
+      name: 'beta',
+      type: 'checkbox',
+      label: 'Beta application',
+      defaultValue: false,
+      admin: { description: 'Applied for the beta (50% off the first two classes) from the Academy page.' },
     },
     {
       name: 'name',

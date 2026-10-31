@@ -68,6 +68,7 @@ export async function POST(req: NextRequest) {
 
   const type = f.type === 'organization' || f.type === 'individual' ? f.type : null
   if (!type) return NextResponse.json({ error: 'Choose organization or individual.' }, { status: 400 })
+  const beta = f.beta === true
 
   const name = shortText(f.name, 100)
   if (!name) return NextResponse.json({ error: 'Name is required.' }, { status: 400 })
@@ -113,6 +114,7 @@ export async function POST(req: NextRequest) {
       collection: 'academy-inquiries',
       data: {
         type,
+        beta,
         name,
         email,
         jobTitle,
@@ -133,7 +135,9 @@ export async function POST(req: NextRequest) {
     // regardless of whether this succeeds.
     try {
       const lines = [
-        type === 'organization' ? 'Private cohort inquiry' : 'Interest list registration',
+        beta
+          ? `Beta application (${type === 'organization' ? 'organization' : 'individual'})`
+          : type === 'organization' ? 'Private cohort inquiry' : 'Interest list registration',
         '',
         `Name: ${name}`,
         `Email: ${email}`,
@@ -155,8 +159,9 @@ export async function POST(req: NextRequest) {
           process.env.EMAIL_FROM ||
           'hello@betransformidable.com',
         replyTo: email,
-        subject:
-          type === 'organization'
+        subject: beta
+          ? `Academy beta application: ${organization || name}`
+          : type === 'organization'
             ? `Academy cohort inquiry: ${organization}`
             : `Academy interest list: ${name}`,
         text: lines.join('\n'),
@@ -167,8 +172,9 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({
-      message:
-        type === 'organization'
+      message: beta
+        ? 'Thank you for applying to the beta. We will be in touch to confirm your place.'
+        : type === 'organization'
           ? 'Thank you. We have your inquiry and will be in touch to arrange a conversation.'
           : 'Thank you. You are on the interest list and will hear from us when dates are announced.',
     })
