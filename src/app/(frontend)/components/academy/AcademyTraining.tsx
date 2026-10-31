@@ -45,11 +45,10 @@ export function ProgramFinder({ programs }) {
         <Chips legend="I am a…" options={FINDER_ROLES} value={role} onChange={setRole} />
         <Chips legend="Time available" options={FINDER_TIMES} value={time} onChange={setTime} />
         <p className="ac-t-finder-status" role="status" aria-live="polite">
-          {filtering
-            ? matches
+          {filtering &&
+            (matches
               ? `${matches} program${matches > 1 ? "s" : ""} ${matches > 1 ? "fit" : "fits"} your answers.`
-              : "No exact match. Every program can be adapted, so tell us what you need."
-            : "Choose an answer to narrow the list, or browse all three."}
+              : "No exact match. Every program can be adapted, so tell us what you need.")}
           {filtering && (
             <button type="button" className="ac-t-reset" onClick={() => { setRole(""); setTime(""); }}>Clear</button>
           )}
